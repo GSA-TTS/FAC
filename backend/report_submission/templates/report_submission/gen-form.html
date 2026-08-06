@@ -154,6 +154,7 @@
                             </div>
                             <span class="usa-error-message" id="audit-period-other-months-error-message" role="alert">{{ errors.audit_period_other_months|space_before_striptags }}</span>
                         </fieldset>
+                        {% include "./user_provided_organization_type.html" %}
                     </fieldset>
                     <fieldset class="usa-fieldset" id="auditee-information" navitem>
                         <h2 class="font-sans-xl">Auditee information</h2>
@@ -406,11 +407,11 @@
                                     <select class="usa-select"
                                         id="auditor_country"
                                         name="auditor_country">
-                                        <option id="USA" value="USA" 
+                                        <option id="USA" value="USA"
                                             {% if auditor_country == 'USA' %} selected {% endif %}>
                                             USA
                                         </option>
-                                        <option id="non-USA" value="non-USA" 
+                                        <option id="non-USA" value="non-USA"
                                             {% if auditor_country == 'non-USA' %} selected {% endif %}>
                                             non-USA
                                         </option>

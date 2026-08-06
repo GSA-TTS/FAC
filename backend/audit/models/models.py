@@ -468,16 +468,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Constants:
     STATUS_CHOICES = STATUS_CHOICES  # Wants to be a member of the model, but wants to be defined with the constants.
 
-    USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
-        ("state", _("State")),
-        ("local", _("Local Government")),
-        ("tribal", _("Indian Tribe or Tribal Organization")),
-        ("higher-ed", _("Institution of higher education (IHE)")),
-        ("non-profit", _("Non-profit")),
-        ("unknown", _("Unknown")),
-        ("none", _("None of these (for example, for-profit")),
-    )
-
     AUDIT_TYPE_CODES = (
         ("single-audit", _("Single Audit")),
         ("program-specific", _("Program-Specific Audit")),

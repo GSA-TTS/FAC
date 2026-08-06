@@ -27,6 +27,6 @@ module "metabasedb" {
   cf_space_id   = var.cf_space.id
   name          = "metabase-db"
   tags          = ["rds"]
-  rds_plan_name = var.database_plan
+  rds_plan_name = var.metabase_database_plan
   json_params   = var.json_params
 }
