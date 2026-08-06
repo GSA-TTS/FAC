@@ -97,6 +97,9 @@ class RemoveSubmissionViewTests(TestCase):
             if status in self.valid_removal_statuses:
                 self.assertEqual(response.status_code, 200)
                 self.assertTemplateUsed(response, self.template)
+            elif status == STATUS.FLAGGED_FOR_REMOVAL:
+                # Special case. The user cannot access a flagged record.
+                self.assertEqual(response.status_code, 403)
             else:
                 url_checklist = reverse(
                     "audit:SubmissionProgress", kwargs={"report_id": report_id}
@@ -107,7 +110,7 @@ class RemoveSubmissionViewTests(TestCase):
         """
         Test that POST correctly filters out reports of invalid status, and flags reports of valid status for removal.
         """
-        url_audit_submisisons = reverse("audit:MySubmissions")
+        url_audit_submissions = reverse("audit:MySubmissions")
 
         # For all possible report statuses, get the associated report and report_id. Make a POST request to the removal URL.
         for status in self.valid_removal_statuses + self.invalid_removal_statuses:
@@ -125,10 +128,14 @@ class RemoveSubmissionViewTests(TestCase):
             # If the POST request was made with valid report status, expect the audit submisisons page to load. Verify that the report has been flagged.
             # Otherwise, expect to be redirected to the submission checklist. Verify the report was not flagged.
             if status in self.valid_removal_statuses:
-                self.assertEqual(url_after, url_audit_submisisons)
+                self.assertEqual(url_after, url_audit_submissions)
                 self.assertEqual(
                     report_after.submission_status, STATUS.FLAGGED_FOR_REMOVAL
                 )
+            elif status == STATUS.FLAGGED_FOR_REMOVAL:
+                # Special case. The user cannot access a flagged record.
+                self.assertEqual(response.status_code, 403)
+                self.assertEqual(report_after.submission_status, status)
             else:
                 url_checklist = reverse(
                     "audit:SubmissionProgress", kwargs={"report_id": report_id}
