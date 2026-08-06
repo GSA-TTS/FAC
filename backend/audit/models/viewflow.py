@@ -89,7 +89,14 @@ def sac_flag_for_removal(sac, user, audit=None):
     Transitions the submission_state for a SingleAuditChecklist to "flagged_for_removal".
     This should be accessible to django admin.
     """
-    if sac.submission_status == STATUS.IN_PROGRESS:
+    # 2026-08-06: Admins should be able to flag any unsubmitted record for removal, in the same way users can for their own records.
+    if sac.submission_status in [
+        STATUS.IN_PROGRESS,
+        STATUS.READY_FOR_CERTIFICATION,
+        STATUS.AUDITOR_CERTIFIED,
+        STATUS.AUDITEE_CERTIFIED,
+        STATUS.CERTIFIED,
+    ]:
         flow = SingleAuditChecklistFlow(sac)
 
         flow.transition_to_flagged_for_removal()
@@ -99,9 +106,10 @@ def sac_flag_for_removal(sac, user, audit=None):
                 event_user=user,
                 event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
             )
-
-    if audit and audit.submission_status == STATUS.IN_PROGRESS:
-        audit_flag_for_removal(audit, user)
+        if audit:
+            audit_flag_for_removal(audit, user)
+    else:
+        logger.error(f"SAC flagged for removal is not in a valid state")
 
 
 def audit_flag_for_removal(audit, user):
@@ -109,7 +117,13 @@ def audit_flag_for_removal(audit, user):
     Transitions the submission_state for an Audit to "flagged_for_removal".
     This should be accessible to django admin.
     """
-    if audit and audit.submission_status == STATUS.IN_PROGRESS:
+    if audit and audit.submission_status in [
+        STATUS.IN_PROGRESS,
+        STATUS.READY_FOR_CERTIFICATION,
+        STATUS.AUDITOR_CERTIFIED,
+        STATUS.AUDITEE_CERTIFIED,
+        STATUS.CERTIFIED,
+    ]:
         flow = AuditFlow(audit)
         flow.transition_to_flagged_for_removal()
         with CurationTracking():
@@ -117,6 +131,8 @@ def audit_flag_for_removal(audit, user):
                 event_user=user,
                 event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
             )
+    else:
+        logger.error(f"Audit flagged for removal is not in a valid state")
 
 
 def _sac_transition_helper(user, sac, flow, audit, audit_flow, target):
