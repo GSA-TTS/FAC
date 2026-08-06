@@ -582,21 +582,28 @@ class IntakeToDissemination(object):
     def load_unified(self):
         gen = self.loaded_objects["Generals"][0]
         unifieds = []
+        logger.warning("######## load_unified ######")
 
         for fed in self.loaded_objects["FederalAwards"]:
-            for fin in self.loaded_objects["Findings"]:
-                if fed.award_reference != fin.award_reference:
-                    continue
+            fins = [fin for fin in self.loaded_objects["Findings"] if fin.award_reference == fed.award_reference]
+            passes = [pas for pas in self.loaded_objects["Passthroughs"] if pas.award_reference == fed.award_reference]
 
-                passes = self.loaded_objects["Passthroughs"]
-                if passes:
-                    for pas in passes:
-                        if fed.award_reference == pas.award_reference:
-                            unifieds.append(
-                                self._load_unified_helper(gen, fed, fin, pas)
-                            )
-                else:
+            if not fins and not passes:
+                logger.warning("1")
+                unifieds.append(self._load_unified_helper(gen, fed, None, None))
+            elif fins and not passes:
+                for fin in fins:
+                    logger.warning("2")
                     unifieds.append(self._load_unified_helper(gen, fed, fin, None))
+            elif passes and not fins:
+                for pas in passes:
+                    logger.warning("3")
+                    unifieds.append(self._load_unified_helper(gen, fed, None, pas))
+            else:
+                for fin in fins:
+                    for pas in passes:
+                        logger.warning("4")
+                        unifieds.append(self._load_unified_helper(gen, fed, fin, pas))
 
         self.loaded_objects["Unifieds"] = unifieds
 
@@ -608,7 +615,7 @@ class IntakeToDissemination(object):
             "aln": aln,
             **model_to_dict(gen),
             **model_to_dict(fed),
-            **model_to_dict(fin),
+            **(model_to_dict(fin) if fin else {}),
             **(model_to_dict(pas) if pas else {}),
         }
 
