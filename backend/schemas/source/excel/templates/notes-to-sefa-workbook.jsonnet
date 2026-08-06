@@ -55,6 +55,7 @@ local single_cells = [
     width: 48,
     title_cell: 'A4',
     range_cell: 'B4',
+    format: 'hyperlink',
     value: 'https://www.fac.gov/audit-resources/sf-sac/notes-to-sefa/',
     help: Help.wrong_workbook_template,
     validation: SV.NoValidation,
