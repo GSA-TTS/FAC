@@ -3,6 +3,7 @@ from typing import Any
 import newrelic.agent
 
 from audit.exceptions import SessionExpiredException
+from audit.models.constants import STATUS
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -56,6 +57,16 @@ def has_role_on_audit(audit, user, role):
     )
 
 
+def is_sac_in_valid_state(sac):
+    """Is the SAC in a valid state?"""
+    return sac.submission_status != STATUS.FLAGGED_FOR_REMOVAL
+
+
+def is_audit_in_valid_state(sac):
+    """Is the audit in a valid state?"""
+    return sac.submission_status != STATUS.FLAGGED_FOR_REMOVAL
+
+
 ACCESS_ROLE_ERROR_MESSAGES = {
     AccessRole.CERTIFYING_AUDITEE_CONTACT: "Invalid role. User is not the Auditee Certifying Official",
     AccessRole.CERTIFYING_AUDITOR_CONTACT: "Invalid role. User is not the Auditor Certifying Official",
@@ -70,6 +81,7 @@ def _validate_access(request, report_id, role=None):
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         audit_has_access = has_access_to_audit(audit, request.user)
         audit_has_role = has_role_on_audit(audit, request.user, role)
+        audit_in_valid_state = is_audit_in_valid_state(audit)
 
         if not has_access(sac, request.user) and not settings.DISABLE_AUTH:
             if audit_has_access:
@@ -88,6 +100,11 @@ def _validate_access(request, report_id, role=None):
                 ACCESS_ROLE_ERROR_MESSAGES[role],
                 eligible_users=eligible_users,
             )
+
+        if not is_sac_in_valid_state(sac):
+            if audit_in_valid_state:
+                newrelic.agent.record_custom_metric("Custom/SOT/AccessMismatch", 1)
+            raise PermissionDenied(PERMISSION_DENIED_MESSAGE)
     except SingleAuditChecklist.DoesNotExist:
         if audit:
             newrelic.agent.record_custom_metric("Custom/SOT/AccessMismatch", 1)
