@@ -582,7 +582,6 @@ class IntakeToDissemination(object):
     def load_unified(self):
         gen = self.loaded_objects["Generals"][0]
         unifieds = []
-        logger.warning("######## load_unified ######")
 
         for fed in self.loaded_objects["FederalAwards"]:
             fins = [
