@@ -62,7 +62,6 @@ function handleErrors(error) {
 
 function display_error_table(data) {
   var rows_html = '';
-  var row_array = [];
 
   for (let i = 0; i < data.errors.length; i++) {
     // Convert given string-tuples into arrays:
