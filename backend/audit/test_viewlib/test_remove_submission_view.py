@@ -1,9 +1,7 @@
 from audit.models import (
-    Access,
     SingleAuditChecklist,
 )
 from audit.models.constants import STATUS
-from audit.test_views import _make_user_and_sac
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse

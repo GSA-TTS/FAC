@@ -109,7 +109,7 @@ def sac_flag_for_removal(sac, user, audit=None):
         if audit:
             audit_flag_for_removal(audit, user)
     else:
-        logger.error(f"SAC flagged for removal is not in a valid state")
+        logger.error("SAC flagged for removal is not in a valid state")
 
 
 def audit_flag_for_removal(audit, user):
@@ -132,7 +132,7 @@ def audit_flag_for_removal(audit, user):
                 event_type=SubmissionEvent.EventType.FLAGGED_SUBMISSION_FOR_REMOVAL,
             )
     else:
-        logger.error(f"Audit flagged for removal is not in a valid state")
+        logger.error("Audit flagged for removal is not in a valid state")
 
 
 def _sac_transition_helper(user, sac, flow, audit, audit_flow, target):
