@@ -21,7 +21,7 @@ RUN apt-get -yq update && \
 FROM foundation AS pip
 COPY requirements.txt /tmp/requirements.txt
 COPY dev-requirements.txt /tmp/dev-requirements.txt
-RUN pip install "setuptools=83.0.0" pip-tools
+RUN pip install "setuptools==69.5.1" pip-tools
 RUN pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \
     pip install -r /tmp/dev-requirements.txt && \
