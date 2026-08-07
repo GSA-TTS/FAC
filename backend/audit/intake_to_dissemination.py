@@ -584,32 +584,42 @@ class IntakeToDissemination(object):
         unifieds = []
 
         for fed in self.loaded_objects["FederalAwards"]:
-            for fin in self.loaded_objects["Findings"]:
-                if fed.award_reference != fin.award_reference:
-                    continue
+            fins = [
+                fin
+                for fin in self.loaded_objects["Findings"]
+                if fin.award_reference == fed.award_reference
+            ]
+            pts = [
+                pt
+                for pt in self.loaded_objects["Passthroughs"]
+                if pt.award_reference == fed.award_reference
+            ]
 
-                passes = self.loaded_objects["Passthroughs"]
-                if passes:
-                    for pas in passes:
-                        if fed.award_reference == pas.award_reference:
-                            unifieds.append(
-                                self._load_unified_helper(gen, fed, fin, pas)
-                            )
-                else:
+            if not fins and not pts:
+                unifieds.append(self._load_unified_helper(gen, fed, None, None))
+            elif fins and not pts:
+                for fin in fins:
                     unifieds.append(self._load_unified_helper(gen, fed, fin, None))
+            elif pts and not fins:
+                for pt in pts:
+                    unifieds.append(self._load_unified_helper(gen, fed, None, pt))
+            else:
+                for fin in fins:
+                    for pt in pts:
+                        unifieds.append(self._load_unified_helper(gen, fed, fin, pt))
 
         self.loaded_objects["Unifieds"] = unifieds
 
         return unifieds
 
-    def _load_unified_helper(self, gen, fed, fin, pas):
+    def _load_unified_helper(self, gen, fed, fin, pt):
         aln = f"{fed.federal_agency_prefix}.{fed.federal_award_extension}"
         params = {
             "aln": aln,
             **model_to_dict(gen),
             **model_to_dict(fed),
-            **model_to_dict(fin),
-            **(model_to_dict(pas) if pas else {}),
+            **(model_to_dict(fin) if fin else {}),
+            **(model_to_dict(pt) if pt else {}),
         }
 
         # Since report_id is a FK, the model needs an instance of General, not a string
