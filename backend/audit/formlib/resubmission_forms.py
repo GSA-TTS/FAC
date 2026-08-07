@@ -102,6 +102,10 @@ def _clean_resubmission_form(form):
             "non_material_change_reasons",
             "Select at least one non-material change.",
         )
+    
+    #Auditor opinion changes only apply to a full audit PDF resubmission, so if the user selects the SFSAC_ONLY option, we should clear out any input in that field.
+    if action != RESUBMISSION_ACTION.AUDIT_PDF:
+        cleaned_data["audit_opinion_changes"] = ""
 
     return cleaned_data
 
@@ -167,6 +171,18 @@ class ResubmissionForm(forms.Form):
         error_messages={
             "required": "Select the type of change you need to make.",
         },
+    )
+    
+    audit_opinion_changes = forms.CharField(
+        required=False,
+        strip=True,
+        widget=forms.Textarea(
+            attrs={
+                "class": "usa-textarea",
+                "rows": 3,
+                "style": "height: 5rem; min-height: 5rem;",
+            }
+        ),
     )
 
     def clean_report_id(self):

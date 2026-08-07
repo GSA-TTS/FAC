@@ -54,11 +54,13 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         non_material_change_reasons = form.cleaned_data["non_material_change_reasons"]
         resubmission_action = form.cleaned_data["resubmission_action"]
         resubmission_requester = form.cleaned_data["resubmission_requester"]
+        audit_opinion_changes = form.cleaned_data["audit_opinion_changes"]
 
         resubmission_meta["resubmission_action"] = resubmission_action
         resubmission_meta["resubmission_requester"] = resubmission_requester
         resubmission_meta["material_change_reasons"] = material_change_reasons
         resubmission_meta["non_material_change_reasons"] = non_material_change_reasons
+        resubmission_meta["audit_opinion_changes"] = audit_opinion_changes
 
         # Save the previous report data and resubmission metadata to the user profile. Overwrites other user profile data.
         profile_data = previous_report_data | {

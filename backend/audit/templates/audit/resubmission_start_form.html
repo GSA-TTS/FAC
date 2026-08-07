@@ -124,6 +124,28 @@
                         </fieldset>
                     </div>
 
+                    <div id="audit-opinion-changes-section" hidden>
+                        <label 
+                            class="usa-label margin-top-4" 
+                            id="audit_opinion_changes-label" 
+                            for="audit_opinion_changes"
+                        > 
+                            If resubmitting the auditor's report, identify the changes in the audit 
+                            opinion that are the reason for the resubmission
+                        </label>
+                        <div class="usa-hint">
+                            Optional
+                        </div>
+
+                        {% if form.audit_opinion_changes.errors %}
+                            <span class="usa-error-message margin-top-1" id="error">
+                                {{ form.audit_opinion_changes.errors|striptags }}
+                            </span>
+                        {% endif %}
+
+                        {{ form.audit_opinion_changes }}                        
+                    </div>
+
                     <label class="usa-label margin-top-4" id="report_id-label" for="report_id">Report ID of audit to resubmit:</label>
                     <div class="usa-hint" id="report_id-hint">YYYY-MM-SOURCE-0123456789</div>
                     {% if form.report_id.errors %}
