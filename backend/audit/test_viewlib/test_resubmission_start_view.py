@@ -183,7 +183,7 @@ class ResubmissionStartViewTests(TestCase):
             ],
             self.valid_sfsac_resubmission_action,
         )
-        
+
     def test_audit_opinion_changes_saved_for_audit_pdf_resubmission(self):
         """Test that audit opinion changes are saved for a full audit PDF resubmission."""
         self.client.force_login(user=self.user)
@@ -213,7 +213,6 @@ class ResubmissionStartViewTests(TestCase):
             ],
             self.valid_audit_opinion_changes,
         )
-
 
     def test_longform_audit_opinion_changes_saved(self):
         """Test that long-form audit opinion changes are saved without truncation."""
@@ -252,7 +251,7 @@ class ResubmissionStartViewTests(TestCase):
             ],
             audit_opinion_changes,
         )
-        
+
     def test_audit_opinion_changes_cleared_for_sfsac_only_resubmission(self):
         """Test that audit opinion changes are not saved for an SF-SAC-only resubmission."""
         self.client.force_login(user=self.user)
