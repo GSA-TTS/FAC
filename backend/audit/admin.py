@@ -214,8 +214,8 @@ def revert_to_in_progress(modeladmin, request, queryset):
     for sac in queryset:
         if sac.submission_status == STATUS.FLAGGED_FOR_REMOVAL:
             try:
-                sac_revert_from_flagged_for_removal(sac, request.user)
-                sac.save()
+                audit = Audit.objects.filter(report_id=sac.report_id).first()
+                sac_revert_from_flagged_for_removal(sac, request.user, audit)
                 successful_reverts.append(sac.report_id)
             except Exception as e:
                 modeladmin.message_user(
@@ -296,7 +296,8 @@ def flag_for_removal(modeladmin, request, queryset):
 
     for sac in queryset:
         if sac.submission_status != STATUS.FLAGGED_FOR_REMOVAL:
-            sac_flag_for_removal(sac, request.user)
+            audit = Audit.objects.filter(report_id=sac.report_id).first()
+            sac_flag_for_removal(sac, request.user, audit)
             sac.save()
             flagged.append(sac.report_id)
         else:
