@@ -1,5 +1,5 @@
 import pluginJs from '@eslint/js';
-import pluginCypress from 'eslint-plugin-cypress/flat';
+import pluginCypress from 'eslint-plugin-cypress';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import babelParser from '@babel/eslint-parser';
 
