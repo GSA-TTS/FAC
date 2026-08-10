@@ -54,9 +54,7 @@ def main() -> None:
         output_workbook = OUTPUT_DIR / workbook_name
 
         if not source_workbook.exists():
-            raise FileNotFoundError(
-                f"Generated workbook not found: {source_workbook}"
-            )
+            raise FileNotFoundError(f"Generated workbook not found: {source_workbook}")
 
         if not isinstance(steps, list):
             raise ValueError(
@@ -73,6 +71,6 @@ def main() -> None:
 
     print("Test workbooks generated successfully.")
 
-    
+
 if __name__ == "__main__":
     main()

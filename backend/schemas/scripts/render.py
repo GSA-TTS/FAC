@@ -395,15 +395,13 @@ def process_single_cells(wb, ws, sheet):
         if o.value:
             cell_reference = o.posn.range_cell
             ws[cell_reference] = o.value
-        
+
         if o.posn.format is not None:
             apply_cell_format(entry_cell_obj, o.posn.format)
 
         if sheet.header_height:
             row = int(o.posn.title_cell[1])
             ws.row_dimensions[row].height = sheet.header_height
-
-
 
 
 def process_meta_cells(wb, ws, sheet):
