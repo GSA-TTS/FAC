@@ -5,28 +5,41 @@ function toggleReasonSections() {
 
     const requesterSection = document.getElementById("requester-section");
     const materialSection = document.getElementById("material-change-section");
-    const nonMaterialSection = document.getElementById("non-material-change-section");
-
-    if (!requesterSection || !materialSection || !nonMaterialSection) {
-        return;
-    }
+    const nonMaterialSection = document.getElementById(
+        "non-material-change-section"
+    );
+    const auditOpinionChangesSection = document.getElementById(
+        "audit-opinion-changes-section"
+    );
 
     if (!selectedAction) {
-        requesterSection.hidden = true;
-        materialSection.hidden = true;
-        nonMaterialSection.hidden = true;
+        if (requesterSection) requesterSection.hidden = true;
+        if (materialSection) materialSection.hidden = true;
+        if (nonMaterialSection) nonMaterialSection.hidden = true;
+        if (auditOpinionChangesSection) {
+            auditOpinionChangesSection.hidden = true;
+        }
         return;
     }
 
-    // Always show requester after a radio is selected
-    requesterSection.hidden = false;
+    if (requesterSection) {
+        requesterSection.hidden = false;
+    }
 
     if (selectedAction.value === "audit_pdf") {
-        materialSection.hidden = false;
-        nonMaterialSection.hidden = true;
+        if (materialSection) materialSection.hidden = false;
+        if (nonMaterialSection) nonMaterialSection.hidden = true;
+
+        if (auditOpinionChangesSection) {
+            auditOpinionChangesSection.hidden = false;
+        }
     } else if (selectedAction.value === "sfsac_only") {
-        materialSection.hidden = true;
-        nonMaterialSection.hidden = false;
+        if (materialSection) materialSection.hidden = true;
+        if (nonMaterialSection) nonMaterialSection.hidden = false;
+
+        if (auditOpinionChangesSection) {
+            auditOpinionChangesSection.hidden = true;
+        }
     }
 }
 
