@@ -45,7 +45,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": "sqlite3.db",
         "USER": "",
-        "PASSWORD": "", # nosec B105
+        "PASSWORD": "",  # nosec B105
         "HOST": "",
         "PORT": "",
     }
