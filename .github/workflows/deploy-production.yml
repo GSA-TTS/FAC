@@ -18,6 +18,8 @@ jobs:
 
   deploy-application:
     name: Deploy application
+    needs: 
+      - deploy-infrastructure
     uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "production"
