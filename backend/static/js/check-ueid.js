@@ -4,7 +4,7 @@ import { queryAPI } from './api';
 const FORM = document.getElementById('check-eligibility');
 
 // modal-only state
-let duplicateReportIds = [];
+let duplicateSubmissions = [];
 
 /**
  * Helpers
@@ -41,13 +41,22 @@ function requiredFieldsFilled() {
 }
 
 function allResponsesValid() {
-  const inputsWithErrors = document.querySelectorAll('[class *="--error"]');
+  const inputsWithErrors = FORM.querySelectorAll('input[class*="--error"]');
   return inputsWithErrors.length === 0;
 }
 
 function updateValidateButtonState() {
-  const btn = document.getElementById('continue'); // bottom "Validate UEI" button
+  const btn = document.getElementById('continue');
+
+  // console.log('BUTTON CHECK', {
+  //   filled: requiredFieldsFilled(),
+  //   valid: allResponsesValid(),
+  //   start: getTrimmedValue('auditee_fiscal_period_start'),
+  //   end: getTrimmedValue('auditee_fiscal_period_end'),
+  // });
+
   const shouldDisable = !(requiredFieldsFilled() && allResponsesValid());
+
   if (btn) btn.disabled = Boolean(shouldDisable);
 }
 
@@ -59,7 +68,7 @@ function validatorSupportsField(el) {
 
   // Must have validate-* attributes
   const hasValidateDataset = Object.keys(el.dataset || {}).some((k) =>
-    k.toLowerCase().includes('validate')
+   String(k).toLowerCase().includes('validate')
   );
   if (!hasValidateDataset) return false;
 
@@ -148,6 +157,7 @@ function populateModal(formStatus, auditeeName = '') {
         <dl>
           <dt>UEI</dt>
           <dd>${auditeeUei}</dd>
+          ${auditeeName ? `<dt>Auditee name</dt><dd>${auditeeName}</dd>` : ''}
           ${auditYear ? `<dt>Audit year</dt><dd>${auditYear}</dd>` : ''}
         </dl>
       `,
@@ -171,16 +181,31 @@ function populateModal(formStatus, auditeeName = '') {
 
   // Duplicates list + resubmission nudge
   if (formStatus === 'duplicate-submission') {
-    if (duplicateReportIds.length > 0) {
+    if (duplicateSubmissions.length > 0) {
       descEl.innerHTML += `
         <p>These submissions match what you entered:</p>
         <ul>
-          ${duplicateReportIds.map((id) => `<li>${id}</li>`).join('')}
+          ${duplicateSubmissions
+            .map(
+              (duplicate) => `
+                <li>
+                  <strong>${duplicate.reportId}</strong>
+                  ${
+                    duplicate.auditeeName
+                      ? `<br><span>Auditee name: ${duplicate.auditeeName}</span>`
+                      : ''
+                  }
+                </li>
+              `
+            )
+            .join('')}
         </ul>
       `;
     }
-    descEl.innerHTML += `
-      <p><strong>Are you sure?</strong> If you meant to correct an already submitted or accepted audit, you may need to resubmit instead.</p>
+    descEl.innerHTML += 
+    // <p><strong>Are you sure?</strong></p> If you meant to correct an already submitted or accepted audit, you may need to resubmit instead
+    `
+      <p><strong>Are you sure?</strong></p>
     `;
   }
 
@@ -236,13 +261,18 @@ if (formStatus === 'success' || formStatus === 'duplicate-submission') {
 function handleUEIDResponse({ valid, response, errors }) {
   // ✅ If backend returns duplicates even on "valid: true", treat as duplicate modal
   if (valid && Array.isArray(response?.duplicates) && response.duplicates.length > 0) {
-    duplicateReportIds = response.duplicates.map((d) => d.report_id).filter(Boolean);
+    duplicateSubmissions = response.duplicates
+      .map((d) => ({
+        reportId: d.report_id,
+        auditeeName: d.auditee_name,
+      }))
+      .filter((d) => d.reportId);
     populateModal('duplicate-submission', response?.auditee_name ?? '');
     return;
   }
 
   if (valid) {
-    duplicateReportIds = [];
+    duplicateSubmissions = [];
     document.getElementById('auditee_name').value = response.auditee_name;
     populateModal('success', response.auditee_name);
     return;
@@ -256,10 +286,15 @@ function handleUEIDResponse({ valid, response, errors }) {
 
   // duplicates: errors array includes 'duplicate-submission'
   if (Array.isArray(errors) && errors.includes('duplicate-submission')) {
-    duplicateReportIds = Array.isArray(response?.duplicates)
-      ? response.duplicates.map((d) => d.report_id).filter(Boolean)
+    duplicateSubmissions = Array.isArray(response?.duplicates)
+      ? response.duplicates
+          .map((d) => ({
+            reportId: d.report_id,
+            auditeeName: d.auditee_name,
+          }))
+          .filter((d) => d.reportId)
       : [];
-    populateModal('duplicate-submission');
+    populateModal('duplicate-submission', response?.auditee_name ?? '');
     return;
   }
 
@@ -338,7 +373,7 @@ function attachValidateButtonHandler() {
     // guard (should already be disabled)
     if (!(requiredFieldsFilled() && allResponsesValid())) return;
 
-    duplicateReportIds = [];
+    duplicateSubmissions = [];
     validateUEID();
   });
 }
@@ -355,12 +390,12 @@ function wireFieldValidation() {
     });
 
     el.addEventListener('input', () => {
-      duplicateReportIds = [];
+      duplicateSubmissions = [];
       updateValidateButtonState();
     });
 
     el.addEventListener('change', (e) => {
-      duplicateReportIds = [];
+      duplicateSubmissions = [];
 
       if (e.target.id === 'auditee_fiscal_period_end') {
         validateFyEndDate(e.target);
@@ -378,7 +413,17 @@ function wireFieldValidation() {
 function init() {
   attachValidateButtonHandler();
   wireFieldValidation();
-  updateValidateButtonState(); // initial disabled state
+
+  document.addEventListener('input', updateValidateButtonState, true);
+  document.addEventListener('change', updateValidateButtonState, true);
+  document.addEventListener('blur', updateValidateButtonState, true);
+  document.addEventListener('usa-date-picker:change', () => setTimeout(updateValidateButtonState, 50));
+
+  document.addEventListener('click', () => {
+    setTimeout(updateValidateButtonState, 50);
+  });
+
+  updateValidateButtonState();
 }
 
 init();

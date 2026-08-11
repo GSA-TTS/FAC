@@ -9,6 +9,7 @@ from rest_framework.test import APIClient
 
 from api.test_uei import valid_uei_results
 from audit.models import Access, Audit, SingleAuditChecklist
+from dissemination.models.general import General
 
 User = get_user_model()
 
@@ -240,6 +241,41 @@ class UEIValidationViewTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(data["valid"], False)
             self.assertEqual(data["errors"], ["invalid-year"])
+
+    def test_duplicate_submission_returns_report_ids_and_auditee_names(self):
+        client = APIClient()
+        user = baker.make(User)
+        client.force_authenticate(user=user)
+
+        duplicate_auditee_name = "Health Services Management, Inc"
+
+        baker.make(
+            General,
+            auditee_uei="ZQGGHJH74DW7",
+            audit_year="2021",
+            report_id="2021-12-GSAFAC-0000000001",
+            auditee_name=duplicate_auditee_name,
+        )
+
+        with patch("api.uei.SESSION.get") as mock_get:
+            mock_get.return_value.status_code = 200
+            mock_get.return_value.json.return_value = json.loads(valid_uei_results)
+
+            response = client.post(self.PATH, self.SUCCESS, format="json")
+            data = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["valid"], False)
+        self.assertEqual(data["errors"], ["duplicate-submission"])
+        self.assertEqual(
+            data["response"]["duplicates"],
+            [
+                {
+                    "report_id": "2021-12-GSAFAC-0000000001",
+                    "auditee_name": duplicate_auditee_name,
+                }
+            ],
+        )
 
 
 class AuditeeInfoTests(TestCase):

@@ -23,7 +23,9 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       TERRAFORM_PRE_RUN: |
           apt-get update
-          apt-get install -y zip python
+          apt-get install -y zip python3
+
+          ln -s /usr/bin/python3 /usr/bin/python
 
           # Install CF CLI
           curl -k -O -L https://github.com/cloudfoundry/cli/releases/download/v8.8.0/cf8-cli-installer_8.8.0_x86-64.deb
@@ -36,13 +38,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         # Plan output will be posted as a comment on the PR to aid with review.
         # The post includes a link to the workflow run where the plan was
         # generated, and the same comment will be updated each time a new commit
         # on the PR branch triggers a re-plan.
       - name: Plan ${{ inputs.environment }}
-        uses: dflook/terraform-plan@v1
+        uses: dflook/terraform-plan@v3.0.0
         with:
           path: terraform/${{ inputs.environment }}
           label: ${{ inputs.environment }}
@@ -53,7 +55,6 @@ jobs:
           backend_config: >
             access_key=${{ secrets.terraform_AWS_ACCESS_KEY_ID }},
             secret_key=${{ secrets.terraform_AWS_SECRET_ACCESS_KEY }}
-            endpoint=https://${{ secrets.terraform_ENDPOINT }},
             bucket=${{ secrets.terraform_BUCKET }},
             region=${{ secrets.terraform_REGION }},
             key=${{ env.KEY }},

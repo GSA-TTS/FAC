@@ -16,6 +16,7 @@ from audit.validators import validate_general_information_json
 
 from audit.utils import Util
 from config.settings import STATE_ABBREVS
+from django.http import JsonResponse
 
 from report_submission.forms import GeneralInformationForm
 from report_submission.views.utils import parse_hyphened_date, parse_slashed_date
@@ -24,6 +25,8 @@ logger = logging.getLogger(__name__)
 
 
 class GeneralInformationFormView(LoginRequiredMixin, View):
+    template_name = "report_submission/gen-form.html"
+
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -44,9 +47,14 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             self._compare_contexts(sac_context, audit_context)
 
+            sac_context["auditee_ein_warning"] = self._get_auditee_ein_warning(
+                sac_context.get("auditee_uei"),
+                sac_context.get("ein"),
+            )
+
             # SOT TODO What happens here when SOT is the only thing?
             # Does this become audit_context?
-            return render(request, "report_submission/gen-form.html", sac_context)
+            return render(request, self.template_name, sac_context)
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
 
@@ -77,7 +85,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 for field, errors in form.errors.items():
                     message = f"{message}\n {field}: {errors}"
                     logger.warning(f"Error {field}: {errors}")
-                return render(request, "report_submission/gen-form.html", context)
+                return render(request, self.template_name, context)
 
             # The form is valid.
 
@@ -117,13 +125,20 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "state_abbrevs": STATE_ABBREVS,
                 "unexpected_errors": True,
             }
-            return render(request, "report_submission/gen-form.html", context)
+            return render(request, self.template_name, context)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
         except Exception as err:
             message = f"Unexpected error in GeneralInformationFormView post. Report ID {report_id}"
             logger.error(message)
             raise err
+
+    @staticmethod
+    def _get_auditee_ein_warning(auditee_uei, current_ein):
+        return Util.get_previous_ein_warning(
+            auditee_uei,
+            current_ein,
+        )
 
     @staticmethod
     def _dates_to_slashes(data):
@@ -352,3 +367,27 @@ def _update_audit(report_id, general_information, request):
             event_user=request.user,
             event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
         )
+
+
+class AuditeeEinWarningView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+        current_ein = request.GET.get("ein", "").strip()
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        except SingleAuditChecklist.DoesNotExist as err:
+            raise PermissionDenied("You do not have access to this audit.") from err
+
+        if not Access.objects.filter(
+            sac=sac,
+            user=request.user,
+        ).exists():
+            raise PermissionDenied("You do not have access to this audit.")
+
+        warning = GeneralInformationFormView._get_auditee_ein_warning(
+            sac.auditee_uei,
+            current_ein,
+        )
+
+        return JsonResponse({"warning": warning})

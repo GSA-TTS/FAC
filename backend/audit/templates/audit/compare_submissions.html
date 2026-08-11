@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+{% comment %} Perhaps only show the text at the top if this is a public/non-federal user? {% endcomment %}
+<div class="grid-container margin-y-6">
+    <div class="grid-col grid-gap">
+      <div>
+        <h1>Resubmission comparison</h1>
+        <p>To assist auditees and auditors in completing the resubmission of audits,
+           the Clearinghouse provides an automated comparison between the previous submission
+           (<a class="usa-link" href="{% url 'audit:SubmissionProgress' r1 %}">{{ r1 }}</a>)
+           and current submission
+           (<a class="usa-link" href="{% url 'audit:SubmissionProgress' r2 %}">{{ r2 }}</a>).
+        </p>
+        <p>This comparison is not comprehensive; it is a summary of changes detected between sections of the SF-SAC.</p>
+        <section class="usa-alert usa-alert--warning margin-top-0 margin-bottom-1"
+              aria-label="Resubmission check"
+                id="resubmission-check">
+          <div class="usa-alert__body grid-container">
+            <p>This comparison tool does not absolve submitters from their responsibility to independently validate and assert the correctness of their submission to the FAC.</p>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="grid-row width-full">
+      <div class="tablet:grid-col width-full">
+        {% include "./comparison_sections_only.html" %}
+      </div>
+    </div>
+
+    <a class="usa-button margin-bottom-8 margin-top-5" href="{% url 'audit:SubmissionProgress' r2 %}">Return to the submission checklist</a>
+</div>
+{% endblock content %}

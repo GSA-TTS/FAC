@@ -48,7 +48,7 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
         if not Access.objects.filter(
             email=request.user.email, sac=sac, role__in=role_values
         ).exists():
-            raise PermissionDenied("Only authorized auditors can remove audits.")
+            raise PermissionDenied("Only authorized editors can remove audits.")
 
         context = {
             "auditee_uei": sac.general_information["auditee_uei"],
@@ -82,7 +82,7 @@ class RemoveSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
         if not Access.objects.filter(
             email=request.user.email, sac=sac, role__in=role_values
         ).exists():
-            raise PermissionDenied("Only authorized auditors can remove audits.")
+            raise PermissionDenied("Only authorized editors can remove audits.")
 
         flow = SingleAuditChecklistFlow(sac)
         flow.transition_to_flagged_for_removal()

@@ -40,7 +40,7 @@ function appendContactField(btnEl) {
       q.setAttribute('data-validate-must-match', newMatchVal);
     }
     if (key in [0, 1]) {
-      const newMatchVal = newInputs[(key ^= 1)].id + '_' + addedContactNum;
+      const newMatchVal = newInputs[(key ^ 1)].id + '_' + addedContactNum;
       q.setAttribute('data-validate-matched-field', newMatchVal);
     }
   });

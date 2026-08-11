@@ -365,18 +365,31 @@ class Audit(CreatedMixin, UpdatedMixin):
         Full validation, intended for use when the user indicates that the
         submission is finished.
         """
+        shaped_audit = audit_validation_shape(self)
         cross_result = self._validate_cross()
         individual_result = self._validate_individually()
-        full_result = {}
+
+        # Combining the results from cross and individual validations is non-trivial.
+        # A casual extension of the top level dicts will cause the second to overwrite the first.
+        all_errors = []
+        all_warnings = []
 
         if "errors" in cross_result:
-            full_result = cross_result
-            if "errors" in individual_result:
-                full_result["errors"].extend(individual_result["errors"])
-        elif "errors" in individual_result:
-            full_result = individual_result
+            all_errors.extend(cross_result["errors"])
+        if "errors" in individual_result:
+            all_errors.extend(individual_result["errors"])
 
-        return full_result
+        if "warnings" in cross_result:
+            all_warnings.extend(cross_result["warnings"])
+        if "warnings" in individual_result:
+            all_warnings.extend(individual_result["warnings"])
+
+        full_result_errors = (
+            {"data": shaped_audit, "errors": all_errors} if all_errors else {}
+        )
+        full_result_warnings = {"warnings": all_warnings} if all_warnings else {}
+
+        return full_result_errors, full_result_warnings
 
     def _validate_individually(self):
         """
@@ -418,20 +431,27 @@ class Audit(CreatedMixin, UpdatedMixin):
         """
         shaped_audit = audit_validation_shape(self)
         try:
-            sar = SingleAuditReportFile.objects.filter(sac_id=self.id).latest(
+            sar = SingleAuditReportFile.objects.filter(audit_id=self.id).latest(
                 "date_created"
             )
         except SingleAuditReportFile.DoesNotExist:
             sar = None
 
-        errors = list(
+        results = list(
             chain.from_iterable(
                 [func(shaped_audit, sar=sar) for func in cross_validation_functions]
             )
         )
+
+        errors = [r for r in results if "error" in r]
+        warnings = [r for r in results if "warning" in r]
+        result = {}
         if errors:
-            return {"errors": errors, "data": shaped_audit}
-        return {}
+            result["errors"] = errors
+            result["data"] = shaped_audit
+        if warnings:
+            result["warnings"] = warnings
+        return result
 
     @Field.register_lookup
     class DateCast(Transform):

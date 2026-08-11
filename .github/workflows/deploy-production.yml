@@ -11,10 +11,9 @@ permissions:
 jobs:
   deploy-infrastructure:
     name: Deploy infrastructure
-    uses: ./.github/workflows/terraform-apply-env.yml
+    uses: ./.github/workflows/terraform-deploy-prod.yml
     with:
       environment: "production"
-      autoapprove: false
     secrets: inherit
 
   deploy-application:

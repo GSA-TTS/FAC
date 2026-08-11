@@ -1,4 +1,4 @@
-{% comment %} 
+{% comment %}
 Modal content, triggered outside the component. Displays terms and conditions, contains a form post to accept the conditions and start a new audit.
 {% endcomment %}
 {% load sprite_helper %}
@@ -17,9 +17,14 @@ Modal content, triggered outside the component. Displays terms and conditions, c
                 </p>
                 <p>
                     FAC.gov is a U.S. General Services Administration federal government service. This site collects
-                    required documentation from organizations that spend <span class="text-bold">$750,000 or more</span> in federal grant funds in
-                    a given year.
+                    required documentation from organizations that spend the following amounts in federal grant funds in
+                    a year:
                 </p>
+                    <ul>
+                        {% for dollar_threshold in dollar_thresholds %}
+                        <li>{{ dollar_threshold }}</li>
+                        {% endfor %}
+                    </ul>
                 <p>
                     All use of FAC.gov will be monitored, recorded, and subject to audit by GSA staff and other
                     federal government authorities. By using this system, you consent to your use being monitored

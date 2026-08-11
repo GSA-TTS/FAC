@@ -62,12 +62,11 @@ function handleErrors(error) {
 
 function display_error_table(data) {
   var rows_html = '';
-  var row_array = [];
 
   for (let i = 0; i < data.errors.length; i++) {
     // Convert given string-tuples into arrays:
     // "(col, row...)" -> [col, row, ...]
-    row_array = data.errors[i];
+    var row_array = data.errors[i];
     row_array = JSON.parse(
       row_array.replaceAll('(', '[').replaceAll(')', ']').replaceAll(`'`, `"`)
     );

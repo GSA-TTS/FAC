@@ -179,3 +179,26 @@ def err_total_amount_expended(amount_expended):
         "for that year. "
         f"The amount expended is ${pretty_amount_expended}. "
     )
+
+
+def err_identical_resubmissions(report_id):
+    return f"This resubmission appears identical to the previous version ({report_id}). A resubmission that is identical to the original submission is not permitted."
+
+
+def err_resubmission_type_required():
+    return "Resubmission type is required."
+
+
+def err_resubmission_requester_required():
+    return "At least one resubmission requester is required."
+
+
+def err_material_change_required():
+    return "At least one material change is required for an audit PDF resubmission."
+
+
+def err_non_material_change_required():
+    return (
+        "At least one non-material change is required for an "
+        "SF-SAC-only modification."
+    )

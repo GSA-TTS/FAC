@@ -3,6 +3,7 @@ import logging
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.views import generic
+from django.urls import reverse
 from audit.cross_validation import (
     naming,
     sac_validation_shape,
@@ -159,6 +160,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                         STATUS.AUDITEE_CERTIFIED,
                         STATUS.SUBMITTED,
                         STATUS.DISSEMINATED,
+                        STATUS.RESUBMITTED,
                     ],
                     "completed_date": None,
                     "completed_by": None,
@@ -178,6 +180,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     in [
                         STATUS.SUBMITTED,
                         STATUS.DISSEMINATED,
+                        STATUS.RESUBMITTED,
                     ],
                     "completed_date": None,
                     "completed_by": None,
@@ -196,7 +199,22 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "is_user_auditee_certifier": is_user_auditee_certifier,
                 "is_tribal_data_consent_complete": is_tribal_data_consent_complete,
                 "previous_report_id": (
-                    sac.resubmission_meta["previous_report_id"]
+                    sac.resubmission_meta.get("previous_report_id", None)
+                    if sac.resubmission_meta
+                    and "previous_report_id" in sac.resubmission_meta
+                    else None
+                ),
+                "next_report_id": (
+                    sac.resubmission_meta.get("next_report_id", None)
+                    if sac.resubmission_meta
+                    else None
+                ),
+                "is_resubmission": bool(sac.resubmission_meta),
+                "resubmission_action_url": (
+                    reverse(
+                        "audit:ResubmissionActionEdit",
+                        kwargs={"report_id": report_id},
+                    )
                     if sac.resubmission_meta
                     else None
                 ),

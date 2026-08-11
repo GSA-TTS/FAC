@@ -405,7 +405,7 @@ class TestDeleteFlaggedRecordsAdminAction(TestCase):
     def test_delete_flagged_records_success(
         self,
         mock_audit_remove_workbook_artifacts,
-        mock_audit_remove_singleauditreport_pd,
+        mock_audit_remove_singleauditreport_pdf,
     ):
         AUDITEE_UEI = "ABCDHJH74DW7"
         REPORT_ID = "1900-01-GSAFAC-0000000001"
@@ -442,7 +442,7 @@ class TestDeleteFlaggedRecordsAdminAction(TestCase):
         self.assertFalse(
             AuditValidationWaiver.objects.filter(report_id=REPORT_ID).exists()
         )
-        mock_audit_remove_singleauditreport_pd.assert_called_once()
+        mock_audit_remove_singleauditreport_pdf.assert_called_once()
         mock_audit_remove_workbook_artifacts.assert_called_once()
 
     @patch("audit.admin.remove_workbook_artifacts")

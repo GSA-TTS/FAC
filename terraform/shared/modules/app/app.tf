@@ -16,7 +16,7 @@ resource "cloudfoundry_route" "app_route" {
   domain       = data.cloudfoundry_domain.public.id
   host         = "fac-${replace(var.cf_space_name, ".", "-")}"
   destinations = [{ app_id = cloudfoundry_app.fac_app.id }]
-  # Yields something like: fac-sandbox.app.cloud.gov
+  # Yields something like: fac-dev.app.cloud.gov
 }
 
 data "external" "app_zip" {

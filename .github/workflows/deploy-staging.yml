@@ -12,13 +12,17 @@ jobs:
   deploy-infrastructure:
     name: Deploy infrastructure
     uses: ./.github/workflows/terraform-apply-env.yml
+    permissions:
+      contents: read
+      pull-requests: write
     with:
       environment: "staging"
-      autoapprove: false
+      autoapprove: true
     secrets: inherit
 
   deploy-application:
     name: Deploy application
+    needs: deploy-infrastructure
     uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "staging"

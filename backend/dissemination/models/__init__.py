@@ -10,6 +10,7 @@ from .note import Note
 from .passthrough import Passthrough
 from .resubmission import Resubmission
 from .secondaryauditor import SecondaryAuditor
+from .unified import Unified
 
 from .censusmigration import (
     InvalidAuditRecord,
@@ -34,6 +35,7 @@ _dissemination_models = [
     Passthrough,
     Resubmission,
     SecondaryAuditor,
+    Unified,
 ]
 
 _migration_models = [

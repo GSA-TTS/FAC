@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="grid-container margin-y-6">
+        <div class="grid-row grid-gap">
+            <form id="form-resubmission-action-edit" method="post">
+                {% csrf_token %}
+
+                <fieldset class="usa-fieldset">
+                    <legend class="usa-legend usa-legend--large">
+                        Resubmission Type
+                    </legend>
+
+                    <p>
+                        Update whether this submission is a full audit PDF resubmission or an SF-SAC Data Collection Form only modification.
+                    </p>
+
+                    {% include "audit/resubmission_action_field.html" %}
+                    {% include "audit/resubmission_reason_fields.html" %}
+
+                    <button class="usa-button margin-y-2" id="continue">
+                        Save and continue
+                    </button>
+
+                    <a class="usa-link margin-left-3"
+                       href="{% url 'audit:SubmissionProgress' report_id %}">
+                        Cancel
+                    </a>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <script src="{% static 'js/resubmission-reasons.js' %}"></script>
+{% endblock content %}

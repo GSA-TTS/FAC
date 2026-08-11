@@ -28,7 +28,7 @@ resource "cloudfoundry_route" "app_route" {
   domain       = data.cloudfoundry_domain.public.id
   host         = var.cf_space_name == "production" ? "metabase" : "metabase-${replace(var.cf_space_name, ".", "-")}"
   destinations = [{ app_id = cloudfoundry_app.metabase.id }]
-  # Yields something like: fac-sandbox.app.cloud.gov
+  # Yields something like: metabase-dev.app.cloud.gov
 }
 
 resource "cloudfoundry_app" "metabase" {

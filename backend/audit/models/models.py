@@ -340,14 +340,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             ]
             data = model_to_dict(self, fields=include_list)
 
-            # Update individual fields
-            data["general_information"]["auditee_uei"] = self.auditee_uei
-            data["general_information"][
-                "auditee_fiscal_period_start"
-            ] = self.auditee_fiscal_period_start
-            data["general_information"][
-                "auditee_fiscal_period_end"
-            ] = self.auditee_fiscal_period_end
+            # These are the fields that are pulled fresh from the pre-submission eligibility steps.
+            # UEI and fiscal period are also from pre-submission eligibility, but we can rely on them being copied from the previous record - they were validated then.
+            # "met_spending_threshold" and "is_usa_based" are always true. We store them as an user attestation, so we'll continue to do that and use the new values.
+            user_form_data = user.profile.entry_form_data
+            data["general_information"]["user_provided_organization_type"] = (
+                user_form_data["user_provided_organization_type"]
+            )
+            data["general_information"]["met_spending_threshold"] = user_form_data[
+                "met_spending_threshold"
+            ]
+            data["general_information"]["is_usa_based"] = user_form_data["is_usa_based"]
 
             # Manually add back foreign key as instance
             data["submitted_by"] = self.submitted_by
@@ -362,6 +365,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             else:
                 old_version = 1
 
+            resubmission_action = user_form_data.get("resubmission_meta", {}).get(
+                "resubmission_action"
+            )
+
             # Add/override fields
             data.update(
                 {
@@ -371,6 +378,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                         "previous_row_id": self.id,
                         "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
                         "version": old_version + 1,
+                        "resubmission_action": resubmission_action,
                     },
                     "transition_name": [STATUS.IN_PROGRESS],
                     "transition_date": [now()],
@@ -459,16 +467,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
     # Constants:
     STATUS_CHOICES = STATUS_CHOICES  # Wants to be a member of the model, but wants to be defined with the constants.
-
-    USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
-        ("state", _("State")),
-        ("local", _("Local Government")),
-        ("tribal", _("Indian Tribe or Tribal Organization")),
-        ("higher-ed", _("Institution of higher education (IHE)")),
-        ("non-profit", _("Non-profit")),
-        ("unknown", _("Unknown")),
-        ("none", _("None of these (for example, for-profit")),
-    )
 
     AUDIT_TYPE_CODES = (
         ("single-audit", _("Single Audit")),
@@ -605,18 +603,32 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         Full validation, intended for use when the user indicates that the
         submission is finished.
         """
+        shaped_sac = audit.cross_validation.sac_validation_shape(self)
         cross_result = self.validate_cross()
         individual_result = self.validate_individually()
-        full_result = {}
+
+        # Combining the results from cross and individual validations is non-trivial.
+        # A casual extension of the top level dicts will cause the second to overwrite the first.
+        all_errors = []
+        all_warnings = []
 
         if "errors" in cross_result:
-            full_result = cross_result
-            if "errors" in individual_result:
-                full_result["errors"].extend(individual_result["errors"])
-        elif "errors" in individual_result:
-            full_result = individual_result
+            all_errors.extend(cross_result["errors"])
+        if "errors" in individual_result:
+            all_errors.extend(individual_result["errors"])
 
-        return full_result
+        if "warnings" in cross_result:
+            all_warnings.extend(cross_result["warnings"])
+        if "warnings" in individual_result:
+            all_warnings.extend(individual_result["warnings"])
+
+        # "data" is relied on to verify some error results further down the chain. It may be removable.
+        full_result_errors = (
+            {"data": shaped_sac, "errors": all_errors} if all_errors else {}
+        )
+        full_result_warnings = {"warnings": all_warnings} if all_warnings else {}
+
+        return full_result_errors, full_result_warnings
 
     def validate_cross(self):
         """
@@ -634,15 +646,23 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             )
         except SingleAuditReportFile.DoesNotExist:
             sar = None
+
         validation_functions = audit.cross_validation.functions
-        errors = list(
+        results = list(
             chain.from_iterable(
                 [func(shaped_sac, sar=sar) for func in validation_functions]
             )
         )
+
+        errors = [r for r in results if "error" in r]
+        warnings = [r for r in results if "warning" in r]
+        result = {}
         if errors:
-            return {"errors": errors, "data": shaped_sac}
-        return {}
+            result["errors"] = errors
+            result["data"] = shaped_sac
+        if warnings:
+            result["warnings"] = warnings
+        return result
 
     def validate_individually(self):
         """

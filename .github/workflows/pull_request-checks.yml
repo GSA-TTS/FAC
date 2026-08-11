@@ -39,7 +39,10 @@ jobs:
               - './backend/requirements.txt'
             migration:
               - './backend/audit/models/**'
+              - './backend/census_historical_migration/models.py'
+              - './backend/curation/models.py'
               - './backend/dissemination/models/**'
+              - './backend/users/models.py'
             terraform:
               - './terraform/**'
 
@@ -97,14 +100,6 @@ jobs:
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
       environment: staging
-    secrets: inherit
-
-# uses tags "v1.*"
-  terraform-plan-prod:
-    if: github.base_ref == 'prod'
-    uses: ./.github/workflows/terraform-plan-env.yml
-    with:
-      environment: production
     secrets: inherit
 
   repo-event:

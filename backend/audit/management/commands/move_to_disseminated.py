@@ -54,9 +54,9 @@ class Command(BaseCommand):
             exit(-1)
 
         # check for validation errors.
-        errors = sac.validate_full()
+        errors, warnings = sac.validate_full()
         if errors:
-            logger.info(
+            logger.error(
                 f"Unable to disseminate report with validation errors: {report_id}."
             )
             logger.info(errors["errors"])
@@ -65,6 +65,10 @@ class Command(BaseCommand):
             sac_revert_from_submitted(sac)
             logger.info(f"Returned report to auditee_certified state: {report_id}")
             exit(0)
+        if warnings:
+            logger.warning(
+                f"Disseminating a report with validation warnings: {report_id}."
+            )
 
         with CurationTracking():
             # BEGIN ATOMIC BLOCK

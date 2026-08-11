@@ -1,5 +1,6 @@
 import logging
 
+from config.settings import DOLLAR_THRESHOLDS
 from django.views import generic
 from django.shortcuts import render, redirect
 from django.db import transaction
@@ -16,7 +17,7 @@ from audit.models import (
     Audit,
     Access,
 )
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from audit.models.utils import generate_audit_indexes
 from audit.models.viewflow import sac_transition
 from audit.decorators import verify_status
@@ -42,20 +43,19 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         submissions = MySubmissions.fetch_my_submissions(request.user, use_audit)
 
         data = {"completed_audits": [], "in_progress_audits": []}
-        for audit in submissions:
-            raw_status = audit["submission_status"]
+        for submission in submissions:
+            raw_status = submission["submission_status"]
             friendly = _friendly_status(raw_status)
+            is_resubmission = (submission.get("resubmission_version") or 0) > 1
 
-            is_resubmission = (audit.get("resubmission_version") or 0) > 1
-
-            if friendly in ["Submitted", "Disseminated"]:
-                audit["submission_status"] = friendly
-                data["completed_audits"].append(audit)
+            if friendly in ["Submitted", "Disseminated", "Resubmitted"]:
+                submission["submission_status"] = friendly
+                data["completed_audits"].append(submission)
             else:
-                audit["submission_status"] = (
+                submission["submission_status"] = (
                     "Resubmission in progress" if is_resubmission else friendly
                 )
-                data["in_progress_audits"].append(audit)
+                data["in_progress_audits"].append(submission)
 
         context = {
             "data": data,
@@ -63,6 +63,9 @@ class MySubmissions(LoginRequiredMixin, generic.View):
             "edit_link": edit_link,
             "is_beta": use_audit,
             "non_beta_url": "audit:MySubmissions",
+            "dollar_thresholds": [
+                dict_item["message"] for dict_item in DOLLAR_THRESHOLDS
+            ],
         }
         return render(request, self.template_name, context)
 
@@ -155,12 +158,12 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             resubmission_meta = sac.resubmission_meta or {}
             previous_report_id = resubmission_meta.get("previous_report_id")
-            errors = sac.validate_full()
+            errors, warnings = sac.validate_full()
 
             # TODO: Update Post SOC Launch
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
             if audit:
-                audit_errors = audit.validate()
+                audit_errors, audit_warnings = audit.validate()
                 _compare_errors(errors, audit_errors)
 
             if errors:
@@ -192,16 +195,24 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
                         getattr(old_sac, "resubmission_meta", {}) or {}
                     )
                     old_sac.resubmission_meta = {
-                        "previous_report_id": old_resubmission_meta.get(
-                            "previous_report_id", None
-                        ),
-                        "previous_row_id": old_resubmission_meta.get(
-                            "previous_row_id", None
-                        ),
+                        **old_resubmission_meta,
                         "version": old_resubmission_meta.get("version", 1),
+                        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
                         "next_report_id": sac.report_id,
                         "next_row_id": sac.id,
                     }
+                    old_audit = Audit.objects.find_audit_or_none(
+                        report_id=old_sac.report_id
+                    )
+
+                    sac_transition(
+                        request,
+                        old_sac,
+                        audit=old_audit,
+                        transition_to=STATUS.RESUBMITTED,
+                    )
+
+                    old_sac.save()
                     old_sac.redisseminate()
 
                 if audit:

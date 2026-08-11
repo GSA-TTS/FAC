@@ -4,6 +4,7 @@ export const checkValidity = (field) => {
   const identifier = field.type == 'radio' ? field.name : field.id;
 
   for (const [operation, constraint] of Object.entries(checks)) {
+    if (!validations[operation]) continue;  
     const result = validations[operation](field, constraint);
 
     if (result.error) {

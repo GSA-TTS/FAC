@@ -24,7 +24,8 @@ class TestMaterializedViewBuilder(TestCase):
             with connection.cursor() as cursor:
                 cursor.execute(sql_commands)
         except Exception as e:
-            print(f"Error executing SQL command: {e}")
+            # print(f"Error executing SQL command: {e}")
+            raise e
 
     def refresh_materialized_view(self):
         """Refresh the materialized view"""

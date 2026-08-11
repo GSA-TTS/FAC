@@ -14,6 +14,7 @@ from .mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from .models import Access, SingleAuditChecklist
+from .models.constants import STATUS
 
 User = get_user_model()
 
@@ -272,3 +273,54 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
 
         view = self.ViewStub()
         view.dispatch(request, report_id=sac.report_id)
+
+
+class SingleAuditChecklistStatusRequiredMixinTests(TestCase):
+    class ViewStub(SingleAuditChecklistAccessRequiredMixin, generic.View):
+        def get(self, request, *args, **kwargs):
+            pass
+
+    VALID_STATUSES = [
+        STATUS.IN_PROGRESS,
+        STATUS.READY_FOR_CERTIFICATION,
+        STATUS.AUDITOR_CERTIFIED,
+        STATUS.AUDITEE_CERTIFIED,
+        STATUS.CERTIFIED,
+        STATUS.SUBMITTED,
+        STATUS.DISSEMINATED,
+    ]
+
+    INVALID_STATUSES = [
+        STATUS.FLAGGED_FOR_REMOVAL,
+    ]
+
+    def test_valid_statuses_allow_access(self):
+        """A SAC with any valid status should be accessible to a user with access."""
+        for status in self.VALID_STATUSES:
+            with self.subTest(status=status):
+                user = baker.make(User)
+                sac = baker.make(SingleAuditChecklist, submission_status=status)
+                baker.make(Access, sac=sac, user=user)
+
+                request = RequestFactory().get("/")
+                request.user = user
+
+                view = self.ViewStub()
+                # Should not raise
+                view.dispatch(request, report_id=sac.report_id)
+
+    def test_flagged_for_removal_raises(self):
+        """A SAC with FLAGGED_FOR_REMOVAL status should raise PermissionDenied."""
+        for status in self.INVALID_STATUSES:
+            with self.subTest(status=status):
+                user = baker.make(User)
+                sac = baker.make(SingleAuditChecklist, submission_status=status)
+                baker.make(Access, sac=sac, user=user)
+
+                request = RequestFactory().get("/")
+                request.user = user
+
+                view = self.ViewStub()
+                self.assertRaises(
+                    PermissionDenied, view.dispatch, request, report_id=sac.report_id
+                )

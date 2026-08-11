@@ -1,13 +1,16 @@
-from psycopg2._psycopg import connection
-from config import settings
 import logging
 import os
+
+from django.db import connection as django_connection
+from psycopg2._psycopg import connection
+
+from config import settings
 
 logger = logging.getLogger(__name__)
 
 # These are API versions we want live.
 live = {
-    "dissemination": ["api_v1_1_0", "api_v1_2_0"],
+    "dissemination": ["api_v1_1_0", "api_v1_2_0", "api_v1_3_0"],
     "support": ["admin_api_v1_1_0"],
 }
 
@@ -27,16 +30,17 @@ def get_conn_string():
     return conn_string
 
 
+# For use in Django management commands, to ensure a return value is reported "up the chain".
+# This method allows things like "CurationTracking" to resolve so further transactions can begin.
 def exec_sql_at_path(dir, filename):
-    conn = connection(get_conn_string())
-    conn.autocommit = True
     path = os.path.join(dir, filename)
-    with conn.cursor() as curs:
+    sql = open(path, "r").read()
+    with django_connection.cursor() as curs:
         logger.info(f"EXEC SQL {path}")
-        sql = open(path, "r").read()
         curs.execute(sql)
 
 
+# For use in/out of Django, to directly execute API specific SQL.
 def exec_sql(location, version, filename):
     conn = connection(get_conn_string())
     conn.autocommit = True

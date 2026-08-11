@@ -1,0 +1,72 @@
+<div id="requester-section" hidden>
+    <fieldset class="usa-fieldset margin-top-4" aria-describedby="requester-hint">
+        <legend class="usa-legend usa-label">
+            Reason for resubmission
+        </legend>
+
+        <div class="usa-hint" id="requester-hint">
+            Choose one or more of the following statements. This field is required.
+        </div>
+
+        {% if form.resubmission_requester.errors %}
+            <span class="usa-error-message margin-top-1">
+                {{ form.resubmission_requester.errors|striptags }}
+            </span>
+        {% endif %}
+
+        {% for checkbox in form.resubmission_requester %}
+            <div class="usa-checkbox">
+                {{ checkbox.tag }}
+                <label class="usa-checkbox__label" for="{{ checkbox.id_for_label }}">
+                    {{ checkbox.choice_label }}
+                </label>
+            </div>
+        {% endfor %}
+    </fieldset>
+</div>
+
+<div id="material-change-section" hidden>
+    <fieldset class="usa-fieldset margin-top-4" aria-describedby="material-change-hint">
+        <div class="usa-hint" id="material-change-hint">
+            Select one or more material changes that apply. This field is required.
+        </div>
+
+        {% if form.material_change_reasons.errors %}
+            <span class="usa-error-message margin-top-1">
+                {{ form.material_change_reasons.errors|striptags }}
+            </span>
+        {% endif %}
+
+        {% for checkbox in form.material_change_reasons %}
+            <div class="usa-checkbox">
+                {{ checkbox.tag }}
+                <label class="usa-checkbox__label" for="{{ checkbox.id_for_label }}">
+                    {{ checkbox.choice_label }}
+                </label>
+            </div>
+        {% endfor %}
+    </fieldset>
+</div>
+
+<div id="non-material-change-section" hidden>
+    <fieldset class="usa-fieldset margin-top-4" aria-describedby="non-material-change-hint">
+        <div class="usa-hint" id="non-material-change-hint">
+            Select one or more non-material changes that apply. This field is required.
+        </div>
+
+        {% if form.non_material_change_reasons.errors %}
+            <span class="usa-error-message margin-top-1">
+                {{ form.non_material_change_reasons.errors|striptags }}
+            </span>
+        {% endif %}
+
+        {% for checkbox in form.non_material_change_reasons %}
+            <div class="usa-checkbox">
+                {{ checkbox.tag }}
+                <label class="usa-checkbox__label" for="{{ checkbox.id_for_label }}">
+                    {{ checkbox.choice_label }}
+                </label>
+            </div>
+        {% endfor %}
+    </fieldset>
+</div>

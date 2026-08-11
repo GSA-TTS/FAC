@@ -58,7 +58,7 @@ import { sassPlugin } from 'esbuild-sass-plugin';
     outdir: 'static/compiled',
     minify: process.env.NODE_ENV === 'production',
     sourcemap: process.env.NODE_ENV !== 'production',
-    target: ['chrome58', 'firefox57', 'safari11', 'edge18'],
+    target: ["es2020"],
     bundle: true,
     format: 'iife',
     loader: {

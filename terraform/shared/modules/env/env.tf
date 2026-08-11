@@ -11,10 +11,11 @@ module "database" {
 module "snapshot-database" {
   source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.3.0"
 
+  count         = var.cf_space.name == "staging" || var.cf_space.name == "production" ? 1 : 0
   cf_space_id   = var.cf_space.id
   name          = "fac-snapshot-db"
   tags          = ["rds"]
-  rds_plan_name = var.database_plan
+  rds_plan_name = var.snapshot_database_plan
   json_params   = var.json_params
 }
 

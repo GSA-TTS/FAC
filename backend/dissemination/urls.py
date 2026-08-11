@@ -47,6 +47,5 @@ urlpatterns = [
     path("search/advanced/", views.AdvancedSearch.as_view(), name="AdvancedSearch"),
     path("summary/<str:report_id>", views.AuditSummaryView.as_view(), name="Summary"),
     path("analytics", views.AnalyticsView.as_view(), name="Analytics"),
-    # TODO SOT: Enable for testing
-    # path("search/beta/", views.AuditSearch.as_view(), name="BetaSearch"),
+    path("search/beta/", views.AdvancedSearch.as_view(), name="BetaSearch"),
 ]

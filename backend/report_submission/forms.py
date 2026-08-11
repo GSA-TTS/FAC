@@ -5,6 +5,9 @@ from django.core.validators import RegexValidator
 
 from api.uei import get_uei_info_from_sam_gov
 from config.settings import CHARACTER_LIMITS_GENERAL, STATE_ABBREVS
+from audit.models.constants import (
+    USER_PROVIDED_ORGANIZATION_TYPE_CODE,
+)
 
 # Regex for words, includes non-[A-Z] ASCII characters like ñ and ī.
 # \A and \Z start and terminate the string.
@@ -94,13 +97,22 @@ class GeneralInformationForm(forms.Form):
         required=False,
         validators=[audit_period_other_months_validator],
     )
+    user_provided_organization_type = forms.ChoiceField(
+        choices=USER_PROVIDED_ORGANIZATION_TYPE_CODE,
+        error_messages={
+            "invalid_choice": "We only accept submissions from state and local governments, Indian tribes or tribal organizations, institutions of higher education (IHEs), and nonprofits."
+        },
+        required=True,
+    )
     ein = forms.CharField(
         required=False,
         validators=[ein_validator],  # validators are not run against empty fields
     )
     ein_not_an_ssn_attestation = forms.BooleanField(required=False)
     multiple_eins_covered = forms.BooleanField(required=False)
-    auditee_uei = forms.CharField(required=False)
+    # The UEI is not allowed to be changed after the initial validations. In a world where we allow users to
+    # change the UEI in this form, add this field back and include SAM validation to the field cleanup function(s).
+    # auditee_uei = forms.CharField(required=False)
     multiple_ueis_covered = forms.BooleanField(required=False)
     auditee_name = forms.CharField(
         min_length=CHARACTER_LIMITS_GENERAL["auditee_name"]["min"],

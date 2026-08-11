@@ -7,7 +7,8 @@ module "cg-logshipper" {
   source      = "../cg-logshipper"
   name        = local.logshipper_name
   cf_org_name = var.cf_org_name
-  https_proxy = module.https-proxy.https_proxy
+  https_proxy = module.https-proxy.https_proxy["fac"]
+
   cf_space = {
     id   = var.cf_space.id
     name = var.cf_space.name

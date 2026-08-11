@@ -1,14 +1,28 @@
+{% if previous_report_id %}
 <section class="usa-alert usa-alert--warning margin-top-0 margin-bottom-1"
          aria-label="Resubmission banner"
          id="resubmission-banner">
     <div class="usa-alert__body grid-container">
       <p class="usa-alert__text">
-        Resubmission of <a class="usa-link" href="{% url 'audit:SubmissionProgress' previous_report_id %}">{{ previous_report_id }}</a>
-        {% if submission.completed %}
-          completed
-        {% else %}
-          in progress
-        {% endif %}.
+          Resubmission of <a class="usa-link" href="{% url 'audit:SubmissionProgress' previous_report_id %}">{{ previous_report_id }}</a>
+          {% if submission.completed %}
+            completed.
+          {% else %}
+            in progress.
+          {% endif %}
       </p>
   </div>
 </section>
+{% endif %}
+
+{% if next_report_id %}
+<section class="usa-alert usa-alert--warning margin-top-0 margin-bottom-1"
+         aria-label="Resubmission banner"
+         id="resubmitted-banner">
+    <div class="usa-alert__body grid-container">
+      <p class="usa-alert__text">
+          Resubmitted via <a class="usa-link" href="{% url 'audit:SubmissionProgress' next_report_id %}">{{ next_report_id }}</a>.
+      </p>
+  </div>
+</section>
+{% endif %}

@@ -95,7 +95,9 @@
                 </form>
             </div>
             <div class="grid-col audit-search-results">
-                {% if advanced_search_flag %}
+                {% if beta_search_flag %}
+                <h1 class="font-sans-2xl">Audit Submissions Beta Search</h1>
+                {% elif advanced_search_flag %}
                 <h1 class="font-sans-2xl">Audit Submissions Advanced Search</h1>
                 {% else %}
                 <h1 class="font-sans-2xl">Audit Submissions Basic Search </h1>

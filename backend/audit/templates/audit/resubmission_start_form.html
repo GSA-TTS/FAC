@@ -44,10 +44,41 @@
                         Resubmission must be completed in coordination with certifying officials, and resubmission will change the acceptance date for your audit.
                     </p>
 
+                    <hr>
+
+                    {% include "audit/resubmission_action_field.html" %}
+                    <div id="requester-section" hidden>
+                        <fieldset class="usa-fieldset margin-top-4"
+                                aria-describedby="resubmission-requester-hint">
+
+                            <legend class="usa-legend usa-label" id="requester-title">
+                                Reason for resubmission
+                            </legend>
+
+                            <div class="usa-hint" id="requester-hint">
+                                Choose one or more of the following statements. This field is required.
+                            </div>
+
+                            {% if form.resubmission_requester.errors %}
+                                <span class="usa-error-message margin-top-1">
+                                    {{ form.resubmission_requester.errors|striptags }}
+                                </span>
+                            {% endif %}
+
+                            {% for checkbox in form.resubmission_requester %}
+                                <div class="usa-checkbox">
+                                    {{ checkbox.tag }}
+                                    <label class="usa-checkbox__label"
+                                        for="{{ checkbox.id_for_label }}">
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
+
+                <div id="material-change-section" hidden>
                     <fieldset class="usa-fieldset margin-top-4" aria-describedby="material-change-hint">
-                        <legend class="usa-legend usa-label" id="material-change-label">
-                            Reason for resubmission
-                        </legend>
                         <div class="usa-hint" id="material-change-hint">
                             Select one or more material changes that apply. This field is required.
                         </div>
@@ -67,6 +98,53 @@
                             </div>
                         {% endfor %}
                     </fieldset>
+                </div>
+
+                    <div id="non-material-change-section" hidden>
+                        <fieldset class="usa-fieldset margin-top-4" aria-describedby="non-material-change-hint">
+
+                            <div class="usa-hint" id="non-material-change-hint">
+                                Select one or more non-material changes that apply. This field is required.
+                            </div>
+
+                            {% if form.non_material_change_reasons.errors %}
+                                <span class="usa-error-message margin-top-1">
+                                    {{ form.non_material_change_reasons.errors|striptags }}
+                                </span>
+                            {% endif %}
+
+                            {% for checkbox in form.non_material_change_reasons %}
+                                <div class="usa-checkbox">
+                                    {{ checkbox.tag }}
+                                    <label class="usa-checkbox__label" for="{{ checkbox.id_for_label }}">
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
+
+                    <div id="audit-opinion-changes-section" hidden>
+                        <label 
+                            class="usa-label margin-top-4" 
+                            id="audit_opinion_changes-label" 
+                            for="audit_opinion_changes"
+                        > 
+                            If resubmitting the auditor's report, identify the changes in the audit 
+                            opinion that are the reason for the resubmission.
+                        </label>
+                        <div class="usa-hint">
+                            This field is optional.
+                        </div>
+
+                        {% if form.audit_opinion_changes.errors %}
+                            <span class="usa-error-message margin-top-1" id="error">
+                                {{ form.audit_opinion_changes.errors|striptags }}
+                            </span>
+                        {% endif %}
+
+                        {{ form.audit_opinion_changes }}                        
+                    </div>
 
                     <label class="usa-label margin-top-4" id="report_id-label" for="report_id">Report ID of audit to resubmit:</label>
                     <div class="usa-hint" id="report_id-hint">YYYY-MM-SOURCE-0123456789</div>
@@ -91,4 +169,5 @@
         </div>
     </div>
     <script src="{% static 'compiled/js/util.js' %}"></script>
+    <script src="{% static 'js/resubmission-reasons.js' %}"></script>
 {% endblock content %}

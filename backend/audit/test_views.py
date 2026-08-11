@@ -396,16 +396,16 @@ class SubmissionViewTests(TestCase):
         mock_disseminate,
         mock_remove,
         mock_transition,
-        mock_validate,
         mock_validate_audit,
+        mock_validate_sac,
     ):
         """Test that a valid submission transitions SAC to a disseminated state"""
-        mock_validate.return_value = []
-        mock_validate_audit.return_value = []
+        mock_validate_sac.return_value = ({}, {})
+        mock_validate_audit.return_value = ({}, {})
         mock_disseminate.return_value = None
         response = self.client.post(self.url)
 
-        mock_validate.assert_called_once()
+        mock_validate_sac.assert_called_once()
         mock_validate_audit.assert_called_once()
         mock_disseminate.assert_called_once()
         mock_transition.assert_called_with(
@@ -431,11 +431,11 @@ class SubmissionViewTests(TestCase):
     @patch("audit.views.submissions.sac_transition")
     @patch("audit.views.submissions.SingleAuditChecklist.disseminate")
     def test_post_validation_errors(
-        self, mock_disseminate, mock_transition, mock_validate, mock_validate_audit
+        self, mock_disseminate, mock_transition, mock_validate_audit, mock_validate_sac
     ):
         """Test that validation errors are displayed if submission is invalid"""
-        mock_validate.return_value = ["Error 1", "Error 2"]
-        mock_validate_audit.return_value = ["Error 1", "Error 2"]
+        mock_validate_audit.return_value = (["Error 1", "Error 2"], {})
+        mock_validate_sac.return_value = (["Error 1", "Error 2"], {})
         self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
         self.sac.save()
 
@@ -454,7 +454,7 @@ class SubmissionViewTests(TestCase):
     @patch("audit.views.submissions.SingleAuditChecklist.validate_full")
     @patch("audit.models.Audit.validate")
     def test_post_transaction_error(
-        self, mock_validate, mock_validate_audit, mock_general_get
+        self, mock_validate_audit, mock_validate_sac, mock_general_get
     ):
         """Test that a transaction error during a submission is handled properly"""
         self.sac.submission_status = STATUS.AUDITEE_CERTIFIED
@@ -467,8 +467,8 @@ class SubmissionViewTests(TestCase):
         self.audit.submission_status = STATUS.AUDITEE_CERTIFIED
         self.audit.save()
 
-        mock_validate.return_value = []
-        mock_validate_audit.return_value = []
+        mock_validate_audit.return_value = ({}, {})
+        mock_validate_sac.return_value = ({}, {})
         mock_general_get.return_value = True
 
         response = self.client.post(self.url)
@@ -2170,7 +2170,10 @@ class CrossValidationViewTests(TestCase):
     @patch("audit.models.SingleAuditChecklist.validate_full")
     def test_post_view_renders_results_template(self, mock_validate_full):
         """Test that POST with validation errors renders template with errors"""
-        mock_validate_full.return_value = {"errors": ["Error 1", "Error 2"], "data": {}}
+        mock_validate_full.return_value = (
+            {"errors": ["Error 1", "Error 2"], "data": {}},
+            {},
+        )
 
         response = self.client.post(self.url)
 
@@ -2188,128 +2191,3 @@ class CrossValidationViewTests(TestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 403)
-
-
-class RemoveSubmissionViewTests(TestCase):
-    def setUp(self):
-        """Setup client, user, valid/invalid statuses, and a report for each status"""
-        self.client = Client()
-        self.user = baker.make(User)
-        self.client.force_login(self.user)
-
-        # Static info
-        self.template = "audit/remove-submission-in-progress.html"
-        self.general_information = {
-            "auditee_uei": "auditee_uei",
-            "auditee_name": "auditee_name",
-            "fiscal_year_end_date": "01/01/2022",
-            "auditee_fiscal_period_end": "01/01/2022",
-        }
-
-        # Valid/invalid statuses. Create one report per status. Create one access per report.
-        self.valid_removal_statuses = [
-            STATUS.IN_PROGRESS,
-            STATUS.READY_FOR_CERTIFICATION,
-            STATUS.AUDITOR_CERTIFIED,
-            STATUS.AUDITEE_CERTIFIED,
-            STATUS.CERTIFIED,
-        ]
-        self.invalid_removal_statuses = [
-            STATUS.SUBMITTED,
-            STATUS.DISSEMINATED,
-            STATUS.FLAGGED_FOR_REMOVAL,
-        ]
-        self.reports = [
-            baker.make(
-                SingleAuditChecklist,
-                report_id=f"test-report-id--{status}",
-                submission_status=status,
-                general_information=self.general_information,
-            )
-            for status in self.valid_removal_statuses + self.invalid_removal_statuses
-        ]
-        for report in self.reports:
-            baker.make(
-                "audit.Access",
-                email=self.user.email,
-                sac=report,
-                user=self.user,
-                role="certifying_auditor_contact",
-            )
-
-    def test_get_view_permission_denied(self):
-        url = reverse(
-            "audit:RemoveSubmissionInProgress", kwargs={"report_id": "non-existent-id"}
-        )
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 403)
-
-    def test_post_view_permission_denied(self):
-        """Test that POST returns 403 if SAC report_id does not exist"""
-        url = reverse(
-            "audit:RemoveSubmissionInProgress", kwargs={"report_id": "non-existent-id"}
-        )
-        response = self.client.post(url)
-
-        self.assertEqual(response.status_code, 403)
-
-    def test_get_view_renders_correct_template(self):
-        """
-        Test that GET correctly filters out reports of invalid status.
-        """
-        # For all possible report statuses, get the associated report and report_id. Make a GET request to the removal URL.
-        for status in self.valid_removal_statuses + self.invalid_removal_statuses:
-            report = next(
-                (x for x in self.reports if x.submission_status == status), None
-            )
-            report_id = report.report_id
-            url_removal = reverse(
-                "audit:RemoveSubmissionInProgress", kwargs={"report_id": report_id}
-            )
-            response = self.client.get(url_removal, follow=True)
-            url_after = response.request.get("PATH_INFO")
-
-            # If the GET request was made with valid report status, expect the correct template to load.
-            # Otherwise, expect to be redirected to the submission checklist.
-            if status in self.valid_removal_statuses:
-                self.assertEqual(response.status_code, 200)
-                self.assertTemplateUsed(response, self.template)
-            else:
-                url_checklist = reverse(
-                    "audit:SubmissionProgress", kwargs={"report_id": report_id}
-                )
-                self.assertEqual(url_after, url_checklist)
-
-    def test_post_view_flags_correct_reports(self):
-        """
-        Test that POST correctly filters out reports of invalid status, and flags reports of valid status for removal.
-        """
-        url_audit_submisisons = reverse("audit:MySubmissions")
-
-        # For all possible report statuses, get the associated report and report_id. Make a POST request to the removal URL.
-        for status in self.valid_removal_statuses + self.invalid_removal_statuses:
-            report = next(
-                (x for x in self.reports if x.submission_status == status), None
-            )
-            report_id = report.report_id
-            url_removal = reverse(
-                "audit:RemoveSubmissionInProgress", kwargs={"report_id": report_id}
-            )
-            response = self.client.post(url_removal, follow=True)
-            report_after = SingleAuditChecklist.objects.get(report_id=report_id)
-            url_after = response.request.get("PATH_INFO")
-
-            # If the POST request was made with valid report status, expect the audit submisisons page to load. Verify that the report has been flagged.
-            # Otherwise, expect to be redirected to the submission checklist. Verify the report was not flagged.
-            if status in self.valid_removal_statuses:
-                self.assertEqual(url_after, url_audit_submisisons)
-                self.assertEqual(
-                    report_after.submission_status, STATUS.FLAGGED_FOR_REMOVAL
-                )
-            else:
-                url_checklist = reverse(
-                    "audit:SubmissionProgress", kwargs={"report_id": report_id}
-                )
-                self.assertEqual(url_after, url_checklist)
-                self.assertEqual(report_after.submission_status, status)
