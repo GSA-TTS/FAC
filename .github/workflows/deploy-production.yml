@@ -9,17 +9,17 @@ permissions:
   contents: read
   
 jobs:
-  deploy-infrastructure:
-    name: Deploy infrastructure
-    uses: ./.github/workflows/terraform-deploy-prod.yml
-    with:
-      environment: "production"
-    secrets: inherit
+  # deploy-infrastructure:
+  #   name: Deploy infrastructure
+  #   uses: ./.github/workflows/terraform-deploy-prod.yml
+  #   with:
+  #     environment: "production"
+  #   secrets: inherit
 
   deploy-application:
     name: Deploy application
-    needs: 
-      - deploy-infrastructure
+    # needs: 
+    #   - deploy-infrastructure
     uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "production"
