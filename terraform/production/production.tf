@@ -10,7 +10,8 @@ module "production" {
   pgrst_jwt_secret       = var.pgrst_jwt_secret
   clamav_instances       = 2
   clamav_fs_instances    = 1
-  database_plan          = "xlarge-gp-psql-redundant"
+  database_plan          = "xlarge-gp-psql-replica"
+  metabase_database_plan = "xlarge-gp-psql-redundant"
   snapshot_database_plan = "xlarge-gp-psql"
   postgrest_instances    = 2
   json_params = jsonencode(

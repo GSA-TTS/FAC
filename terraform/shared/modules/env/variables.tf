@@ -33,14 +33,21 @@ variable "cf_space" {
 
 variable "database_plan" {
   type        = string
-  description = "name of the cloud.gov RDS service plan name to create"
+  description = "name of the RDS service plan name to create"
   # See https://cloud.gov/docs/services/relational-database/#plans
   default = "medium-gp-psql-redundant"
 }
 
 variable "snapshot_database_plan" {
   type        = string
-  description = "name of the cloud.gov secondary RDS service plan name to create"
+  description = "name of the snapshot RDS service plan name to create"
+  # See https://cloud.gov/docs/services/relational-database/#plans
+  default = "medium-gp-psql-redundant"
+}
+
+variable "metabase_database_plan" {
+  type        = string
+  description = "name of the metabase RDS service plan name to create"
   # See https://cloud.gov/docs/services/relational-database/#plans
   default = "medium-gp-psql-redundant"
 }

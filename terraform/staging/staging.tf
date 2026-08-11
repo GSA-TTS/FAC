@@ -11,6 +11,7 @@ module "staging" {
 
   database_plan          = "medium-gp-psql"
   snapshot_database_plan = "medium-gp-psql"
+  metabase_database_plan = "medium-gp-psql"
   postgrest_instances    = 1
   postgrest_memory       = "512M"
   swagger_instances      = 1

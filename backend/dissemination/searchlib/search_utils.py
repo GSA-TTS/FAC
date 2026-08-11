@@ -64,11 +64,13 @@ def run_search(request, form_data, is_soc=False):
         "order_by": form_data["order_by"],
         "order_direction": form_data["order_direction"],
     }
-    search_parameters = basic_parameters.copy()
 
+    search_parameters = basic_parameters.copy()
     search_parameters["advanced_search_flag"] = form_data.get(
         "advanced_search_flag", True
     )
+    search_parameters["beta_search_flag"] = form_data.get("beta_search_flag", False)
+
     if search_parameters["advanced_search_flag"]:
         advanced_parameters = {
             "agency_name": form_data["agency_name"],
