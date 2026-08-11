@@ -2,16 +2,15 @@
 
 -c ../requirements.txt
 
-aiohttp==3.13.3
+aiohttp==3.14.3
 asyncio==4.0.0
-bandit==1.7.10
+bandit==1.9.4
 black==26.3.1
 coverage==7.6.3
 django-debug-toolbar==4.4.6
 djlint==1.35.2
 faker==30.5.0
 flake8==7.1.1
-gitpython==3.1.43
 jsonnet==0.20.0
 model-bakery==1.20.0
 mypy==1.12.0

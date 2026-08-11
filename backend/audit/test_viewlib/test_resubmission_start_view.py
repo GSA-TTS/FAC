@@ -21,6 +21,10 @@ class ResubmissionStartViewTests(TestCase):
     valid_resubmission_action = "audit_pdf"
     valid_non_material_change_reasons = ["spelling"]
     valid_resubmission_requester = ["auditee"]
+    valid_audit_opinion_changes = (
+        "The auditor's opinion changed due to revised findings in the audit report."
+    )
+    valid_sfsac_resubmission_action = "sfsac_only"
 
     general_information = {
         "auditee_uei": "auditee_uei",
@@ -161,7 +165,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.valid_report_id,
                 "non_material_change_reasons": self.valid_non_material_change_reasons,
-                "resubmission_action": "sfsac_only",
+                "resubmission_action": self.valid_sfsac_resubmission_action,
                 "resubmission_requester": self.valid_resubmission_requester,
             },
         )
@@ -177,5 +181,103 @@ class ResubmissionStartViewTests(TestCase):
             self.user.profile.entry_form_data["resubmission_meta"][
                 "resubmission_action"
             ],
-            "sfsac_only",
+            self.valid_sfsac_resubmission_action,
+        )
+
+    def test_audit_opinion_changes_saved_for_audit_pdf_resubmission(self):
+        """Test that audit opinion changes are saved for a full audit PDF resubmission."""
+        self.client.force_login(user=self.user)
+
+        response = self.client.post(
+            self.path_name,
+            {
+                "report_id": self.valid_report_id,
+                "material_change_reasons": self.valid_material_change_reasons,
+                "resubmission_action": self.valid_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
+                "audit_opinion_changes": self.valid_audit_opinion_changes,
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("report_submission:eligibility"),
+            fetch_redirect_response=False,
+        )
+
+        self.user.profile.refresh_from_db()
+
+        self.assertEqual(
+            self.user.profile.entry_form_data["resubmission_meta"][
+                "audit_opinion_changes"
+            ],
+            self.valid_audit_opinion_changes,
+        )
+
+    def test_longform_audit_opinion_changes_saved(self):
+        """Test that long-form audit opinion changes are saved without truncation."""
+        self.client.force_login(user=self.user)
+
+        audit_opinion_changes = (
+            "The auditor's opinion was revised after additional documentation "
+            "was reviewed. The updated audit report includes changes to the "
+            "findings, compliance determination, and supporting explanation.\n\n"
+            "Additional details regarding the revised opinion are included "
+            "in the resubmitted audit package."
+        )
+
+        response = self.client.post(
+            self.path_name,
+            {
+                "report_id": self.valid_report_id,
+                "material_change_reasons": self.valid_material_change_reasons,
+                "resubmission_action": self.valid_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
+                "audit_opinion_changes": audit_opinion_changes,
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("report_submission:eligibility"),
+            fetch_redirect_response=False,
+        )
+
+        self.user.profile.refresh_from_db()
+
+        self.assertEqual(
+            self.user.profile.entry_form_data["resubmission_meta"][
+                "audit_opinion_changes"
+            ],
+            audit_opinion_changes,
+        )
+
+    def test_audit_opinion_changes_cleared_for_sfsac_only_resubmission(self):
+        """Test that audit opinion changes are not saved for an SF-SAC-only resubmission."""
+        self.client.force_login(user=self.user)
+
+        response = self.client.post(
+            self.path_name,
+            {
+                "report_id": self.valid_report_id,
+                "non_material_change_reasons": self.valid_non_material_change_reasons,
+                "resubmission_action": self.valid_sfsac_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
+                "audit_opinion_changes": self.valid_audit_opinion_changes,
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("report_submission:eligibility"),
+            fetch_redirect_response=False,
+        )
+
+        self.user.profile.refresh_from_db()
+
+        self.assertEqual(
+            self.user.profile.entry_form_data["resubmission_meta"][
+                "audit_opinion_changes"
+            ],
+            "",
         )
