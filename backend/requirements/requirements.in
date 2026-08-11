@@ -27,6 +27,7 @@ psycogreen==1.0.2
 psycopg2-binary==2.9.10
 pycryptodomex==3.21.0
 pydash==8.0.3
+pyjwt==2.13.0
 pypdf==6.15.0
 python-dateutil==2.9.0.post0
 python-json-logger==2.0.7
