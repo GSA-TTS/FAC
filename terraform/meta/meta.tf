@@ -21,10 +21,10 @@ data "cloudfoundry_user" "meta_deployer" {
 }
 
 module "environments" {
-  for_each = local.spaces
-  source   = "./bootstrap-env"
-  name     = each.key
-  org_name = local.org_name
+  for_each               = local.spaces
+  source                 = "./bootstrap-env"
+  name                   = each.key
+  org_name               = local.org_name
   developers             = concat(local.developers, [data.cloudfoundry_user.meta_deployer.users.0.id])
   managers               = local.managers
   allow_ssh              = lookup(each.value, "allow_ssh", true)
