@@ -4,6 +4,7 @@ The colons (":") that appear after the titles are inserted with CSS.
 The spacing can be stange if the `dt` tags are split between lines.
 TODO: Move that colon into HTML here, so it's not so ambiguous.
 {% endcomment %}
+{% load static %}
 <div class="audit-metadata">
     <div class="grid-container">
         <dl class="grid-row grid-gap">
@@ -15,8 +16,30 @@ TODO: Move that colon into HTML here, so it's not so ambiguous.
             </div>
             <div class="tablet:grid-col-6 padding-top-105">
                 <dt>Report ID</dt>
-                <dd>
-                    #{{ report_id | default_if_none:'' }}
+                <dd class="display-flex flex-align-center">
+                    #<span class="report-id">{{ report_id | default_if_none:'' }}</span>
+                    {% if report_id %}
+                        <button
+                            type="button"
+                            class="usa-button usa-button--unstyled margin-left-1 copy-report-id"
+                            aria-label="Copy report ID"
+                        >
+                            <img
+                                src="{% static 'img/usa-icons/content_copy.svg' %}"
+                                alt=""
+                                aria-hidden="true"
+                                class="width-3 height-3"
+                            />
+                        </button>
+                        <span
+                            class="copy-report-id-message margin-left-1 text-green"
+                            role="status"
+                            aria-live="polite"
+                            hidden
+                        >
+                            Copied!
+                        </span>
+                    {% endif %}
                 </dd>
             </div>
             <div class="tablet:grid-col-6 padding-top-105">
@@ -28,3 +51,5 @@ TODO: Move that colon into HTML here, so it's not so ambiguous.
         </dl>
     </div>
 </div>
+
+<script src="{% static 'js/copy-report-id.js' %}"></script>
