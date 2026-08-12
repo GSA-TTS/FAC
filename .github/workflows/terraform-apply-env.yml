@@ -21,7 +21,7 @@ jobs:
       KEY: "terraform.tfstate.${{ inputs.environment }}"
       TF_VAR_cf_user: ${{ secrets.CF_USERNAME }}
       TF_VAR_cf_password: ${{ secrets.CF_PASSWORD }}
-      TF_VAR_new_relic_license_key: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+      TF_VAR_new_relic_license_key: ${{ secrets.NEW_RELIC_API_KEY }}
       TF_VAR_new_relic_account_id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
       TF_VAR_new_relic_api_key: ${{ secrets.NEW_RELIC_API_KEY }}
       TF_VAR_pgrst_jwt_secret: ${{ secrets.PGRST_JWT_SECRET }}
@@ -56,8 +56,8 @@ jobs:
           # Secrets" section of the repository settings, and are the same across
           # all environments.
           backend_config: >
-            access_key=${{ secrets.terraform_AWS_ACCESS_KEY_ID }},
-            secret_key=${{ secrets.terraform_AWS_SECRET_ACCESS_KEY }}
-            bucket=${{ secrets.terraform_BUCKET }},
-            region=${{ secrets.terraform_REGION }},
+            access_key=${{ secrets.TERRAFORM_AWS_ACCESS_KEY_ID }},
+            secret_key=${{ secrets.TERRAFORM_AWS_SECRET_ACCESS_KEY }}
+            bucket=${{ secrets.TERRAFORM_BUCKET }},
+            region=${{ secrets.TERRAFORM_REGION }},
             key=${{ env.KEY }},
