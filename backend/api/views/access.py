@@ -112,7 +112,11 @@ def access_and_submission_check(user, data):
         )
 
         # For SFSAC_ONLY resubmissions, automatically copy the PDF from the previous submission.
-        if previous_report_id and resubmission_meta.get("resubmission_action") == RESUBMISSION_ACTION.SFSAC_ONLY:
+        if (
+            previous_report_id
+            and resubmission_meta.get("resubmission_action")
+            == RESUBMISSION_ACTION.SFSAC_ONLY
+        ):
             try:
                 copy_previous_report_data(
                     previous_report_id=previous_report_id,
