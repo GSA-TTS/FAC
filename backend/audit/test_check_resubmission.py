@@ -4,7 +4,7 @@ from django.utils import timezone
 from datetime import datetime, timezone as dt_timezone
 from model_bakery import baker
 
-from audit.models import SingleAuditChecklist
+from audit.models import SingleAuditChecklist, SubmissionEvent
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from audit.check_resubmission_allowed import (
     check_resubmission_allowed,
@@ -60,7 +60,12 @@ def create_sac(
         sac.transition_date = [transition_date]
         sac.save(update_fields=["transition_date", "version"])
     else:
-        sac.save(update_fields=["version"])
+        sac.save(
+            update_fields=["version"],
+            administrative_override=True,
+            event_user=user,
+            event_type=SubmissionEvent.EventType.CREATED,
+        )
 
     return sac
 
