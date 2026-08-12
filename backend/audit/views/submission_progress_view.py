@@ -14,7 +14,7 @@ from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access, Audit
-from audit.models.constants import STATUS
+from audit.models.constants import STATUS, RESUBMISSION_ACTION
 
 logger = logging.getLogger(__name__)
 
@@ -210,6 +210,12 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     else None
                 ),
                 "is_resubmission": bool(sac.resubmission_meta),
+                "is_sfsac_only": (
+                    sac.resubmission_meta.get("resubmission_action")
+                    == RESUBMISSION_ACTION.SFSAC_ONLY
+                    if sac.resubmission_meta
+                    else False
+                ),
                 "resubmission_action_url": (
                     reverse(
                         "audit:ResubmissionActionEdit",
