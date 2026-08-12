@@ -2,7 +2,6 @@ from unittest.mock import patch
 
 from audit.models import (
     Access,
-    SingleAuditReportFile,
     SubmissionEvent,
 )
 from audit.models.constants import SAC_SEQUENCE_ID
