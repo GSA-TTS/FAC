@@ -128,7 +128,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            # SFSAC_ONLY resubmissions have their PDF auto-copied; the user cannot upload one manually.
+            # SFSAC_ONLY resubmissions cannot upload manually. Kick them back to the checklist.
             resubmission_action = (
                 sac.resubmission_meta.get("resubmission_action")
                 if sac.resubmission_meta
@@ -192,7 +192,6 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "previous_report_id": previous_report_id,
             }
 
-            # Find form errors and return if any exist
             if not form.is_valid():
                 return render(
                     request, "audit/upload-report.html", context | {"form": form}
@@ -301,6 +300,7 @@ def copy_previous_report_data(
     )
 
     # Remove any existing SAR rows for the current submission before copying
+    # 2026-08-11: Should we also remove the associated s3 object?
     SingleAuditReportFile.objects.filter(sac=current_sac).delete()
 
     # Copy the S3 object
