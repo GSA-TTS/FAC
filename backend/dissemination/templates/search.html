@@ -25,37 +25,25 @@
                     </div>
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
-                        {% if advanced_search_flag %}
-                            {% comment %} Advanced search contains filters the cross-reference tables (materialized DisseminationCombined table). {% endcomment %}
-                            {% include "search_filters/audit-year.html" %}
-                            {% include "search_filters/uei-ein.html" %}
-                            {% include "search_filters/aln.html" %}
-                            {% include "search_filters/name.html" %}
-                            {% include "search_filters/acceptance-date.html" %}
-                            {% include "search_filters/state.html" %}
-                            {% include "search_filters/cog-over.html" %}
-                            {% include "search_filters/findings.html" %}
-                            {% include "search_filters/direct_funding.html" %}
-                            {% include "search_filters/major-program.html" %}
-                            {% include "search_filters/fy-end-month.html" %}
-                            {% include "search_filters/type-requirement.html" %}
-                            {% include "search_filters/entity-type.html" %}
-                            {% include "search_filters/passthrough-name.html" %}
-                            {% include "search_filters/federal-program-name.html" %}
-                            {% include "search_filters/report-id.html" %}
-                            {% if can_view_resubmissions %}
-                                {% include "search_filters/resubmissions.html" %}
-                            {% endif %}
-                        {% else %}
-                            {% comment %} Basic search contains filters only applicable to the general table. {% endcomment %}
-                            {% include "search_filters/audit-year.html" %}
-                            {% include "search_filters/uei-ein.html" %}
-                            {% include "search_filters/name.html" %}
-                            {% include "search_filters/acceptance-date.html" %}
-                            {% include "search_filters/state.html" %}
-                            {% include "search_filters/fy-end-month.html" %}
-                            {% include "search_filters/entity-type.html" %}
-                            {% include "search_filters/report-id.html" %}
+                        {% comment %} Advanced search contains filters the cross-reference tables (materialized DisseminationCombined table). {% endcomment %}
+                        {% include "search_filters/audit-year.html" %}
+                        {% include "search_filters/uei-ein.html" %}
+                        {% include "search_filters/aln.html" %}
+                        {% include "search_filters/name.html" %}
+                        {% include "search_filters/acceptance-date.html" %}
+                        {% include "search_filters/state.html" %}
+                        {% include "search_filters/cog-over.html" %}
+                        {% include "search_filters/findings.html" %}
+                        {% include "search_filters/direct_funding.html" %}
+                        {% include "search_filters/major-program.html" %}
+                        {% include "search_filters/fy-end-month.html" %}
+                        {% include "search_filters/type-requirement.html" %}
+                        {% include "search_filters/entity-type.html" %}
+                        {% include "search_filters/passthrough-name.html" %}
+                        {% include "search_filters/federal-program-name.html" %}
+                        {% include "search_filters/report-id.html" %}
+                        {% if can_view_resubmissions %}
+                            {% include "search_filters/resubmissions.html" %}
                         {% endif %}
                     </div>
 
@@ -95,14 +83,9 @@
                 </form>
             </div>
             <div class="grid-col audit-search-results">
-                {% if beta_search_flag %}
-                <h1 class="font-sans-2xl">Audit Submissions Beta Search</h1>
-                {% elif advanced_search_flag %}
-                <h1 class="font-sans-2xl">Audit Submissions Advanced Search</h1>
-                {% else %}
-                <h1 class="font-sans-2xl">Audit Submissions Basic Search </h1>
-                {% endif %}
+                <h1 class="font-sans-2xl">Audit Submissions Search </h1>
                 {% include "search-alert-info.html" %}
+
                 {% if form.errors %}
                   {% include "search-alert-error.html" %}
                 {% elif results|length > 0 %}

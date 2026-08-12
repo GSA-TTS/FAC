@@ -12,46 +12,9 @@ from .searchlib.search_major_program import search_major_program
 from .searchlib.search_passthrough_name import search_passthrough_name
 from .searchlib.search_type_requirement import search_type_requirement
 from .searchlib.search_resubmissions import search_resubmissions
-from dissemination.models import DisseminationCombined, Unified, General
+from dissemination.models import Unified
 
 logger = logging.getLogger(__name__)
-
-
-#######################
-# https://books.agiliq.com/en/latest/README.html
-# Their ORM cookbook looks to be useful reading.
-# https://books.agiliq.com/projects/django-orm-cookbook/en/latest/subquery.html
-
-# {'alns': [], -- DisseminationCombined
-#  'names': ['AWESOME'], -- General
-#  'uei_or_eins': [],  -- General
-#  'start_date': None,  -- General
-#  'end_date': None,  -- General
-#  'cog_or_oversight': '', -- General, but not wanted
-#  'agency_name': '',  -- NO IDEA
-#  'audit_years': [], -- General
-#  'findings': [], -- DisseminationCombined
-#  'direct_funding': [], -- DisseminationCombined
-#  'major_program': [], -- DisseminationCombined
-#  'auditee_state': '', -- General
-#  'order_by': -- General
-#  'fac_accepted_date', -- General
-#  'order_direction': -- General
-#  'descending', 'LIMIT': 1000} -- General
-
-
-def is_advanced_search(params_dict):
-    """
-    Returns True if the 'advanced_search_flag' param is True.
-    """
-    return params_dict.get("advanced_search_flag", False)
-
-
-def is_beta_search(params_dict):
-    """
-    Returns True if the 'beta_search_flag' param is True.
-    """
-    return params_dict.get("beta_search_flag", False)
 
 
 def search(request, params):
@@ -59,47 +22,33 @@ def search(request, params):
     Given any (or no) search fields, build and execute a query on the General table and return the results.
     Empty searches return everything.
     """
-    ##############
     # Set defaults for things we definitely want in the params.
     params = _set_general_defaults(params)
 
     # Time the whole thing.
     t0 = time.time()
 
-    ##############
-    # GENERAL
-
-    if is_advanced_search(params):
-        if is_beta_search(params):
-            logger.info("search Searching `Unified`")
-            results = search_general(Unified, params)
-        else:
-            logger.info("search Searching `DisseminationCombined`")
-            results = search_general(DisseminationCombined, params)
-
-        results = search_alns(results, params)
-        results = search_cog_or_oversight(results, params)
-        results = search_federal_program_name(results, params)
-        results = search_findings(results, params)
-        results = search_direct_funding(results, params)
-        results = search_major_program(results, params)
-        results = search_passthrough_name(results, params)
-        results = search_type_requirement(results, params)
-    else:
-        logger.info("search Searching `General`")
-        results = search_general(General, params)
-
+    logger.info("search Searching `Unified`")
+    results = search_general(Unified, params)
+    results = search_alns(results, params)
+    results = search_cog_or_oversight(results, params)
+    results = search_federal_program_name(results, params)
+    results = search_findings(results, params)
+    results = search_direct_funding(results, params)
+    results = search_major_program(results, params)
+    results = search_passthrough_name(results, params)
+    results = search_type_requirement(results, params)
     results = search_resubmissions(request, results, params)
     results = _sort_results(results, params)
     results = _make_distinct(results, params)
 
     t1 = time.time()
     report_timing("search", params, t0, t1)
+
     return results
 
 
 def _set_general_defaults(params):
-    #############
     # Set some defaults.
     # Set default order direction
     if not params.get("order_by", None):
@@ -151,7 +100,7 @@ def _sort_results(results, params):
 def _make_distinct(results, params):
     """
     Append a `.distinct()` to the results QuerySet, to prevent duplicate results.
-    Rows with duplicate report_ids exist when using AdvancedSearch/DisseminationCombined.
+    Rows with duplicate report_ids exist when using the Unified table.
     """
     order_by = params.get("order_by", "fac_accepted_date")
     order_direction = params.get("order_direction", "")
