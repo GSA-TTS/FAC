@@ -11,12 +11,13 @@ from audit.models import (
     SubmissionEvent,
     Audit,
 )
-from audit.models.constants import STATUS, AuditType
+from audit.models.constants import STATUS, AuditType, RESUBMISSION_ACTION
 from .constants import ACCESS_SUBMISSION_DATA_REQUIRED
 
 from audit.models.access_roles import AccessRole
 
 from ..serializers import AccessListSerializer, AccessAndSubmissionSerializer
+from audit.views.upload_report_view import copy_previous_report_data
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +110,21 @@ def access_and_submission_check(user, data):
             event_user=user,
             event_type=SubmissionEvent.EventType.CREATED,
         )
+
+        # For SFSAC_ONLY resubmissions, automatically copy the PDF from the previous submission.
+        if previous_report_id and resubmission_meta.get("resubmission_action") == RESUBMISSION_ACTION.SFSAC_ONLY:
+            try:
+                copy_previous_report_data(
+                    previous_report_id=previous_report_id,
+                    current_sac=sac,
+                    current_audit=audit,
+                    user=user,
+                )
+            except Exception as err:
+                logger.error(
+                    "Unexpected error copying SingleAuditReportFile on initiate_resubmission: %s",
+                    err,
+                )
 
         # Create all contact Access objects
         # TODO: Update Post SOC Launch
