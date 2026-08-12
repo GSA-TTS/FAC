@@ -1,7 +1,11 @@
-# Since we're not platform admins, we need to look for user details in the
-# context of our specific org.
-data "cloudfoundry_org" "org" {
+
+data "cloudfoundry_org" "organization" {
   name = local.org_name
+}
+
+data "cloudfoundry_space" "space" {
+  name = "production"
+  org  = data.cloudfoundry_org.organization.id
 }
 
 # We need to include the meta deployer user in the set of users with the
@@ -17,13 +21,12 @@ data "cloudfoundry_user" "meta_deployer" {
 }
 
 module "environments" {
-  for_each               = local.spaces
-  source                 = "./bootstrap-env"
-  name                   = each.key
-  org_name               = local.org_name
+  for_each = local.spaces
+  source   = "./bootstrap-env"
+  name     = each.key
+  org_name = local.org_name
   developers             = concat(local.developers, [data.cloudfoundry_user.meta_deployer.users.0.id])
   managers               = local.managers
-  reponame               = "GSA-TTS/FAC"
   allow_ssh              = lookup(each.value, "allow_ssh", true)
   populate_creds_locally = var.populate_creds_locally
   # Apply egress ASGs if explicitly requested
@@ -35,26 +38,4 @@ module "environments" {
   # credentials. So I think we'll be removing this option and having the
   # bootstrap-env module manage both spaces in a future PR!
   asgs = lookup(each.value, "allow_egress", false) ? tolist(local.egress_asgs) : tolist(local.internal_asgs)
-}
-
-locals {
-  # Filters the list of spaces with a value of true for "uses_backups". We only want to share the bucket to those spaces.
-  spaces_that_use_backups = join(" ", [for key, config in local.spaces : lookup(config, "uses_backups", false) ? key : ""])
-}
-
-data "cloudfoundry_org" "organization" {
-  name = local.org_name
-}
-
-data "cloudfoundry_space" "space" {
-  name = "production"
-  org  = data.cloudfoundry_org.organization.id
-}
-
-module "s3-backups" {
-  source       = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
-  cf_space_id  = data.cloudfoundry_space.space.id
-  name         = "backups"
-  s3_plan_name = "basic"
-  tags         = ["s3"]
 }
