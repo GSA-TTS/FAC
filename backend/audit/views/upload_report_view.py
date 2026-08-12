@@ -12,12 +12,13 @@ from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from audit.models import (
+    Audit,
     LateChangeError,
     SingleAuditChecklist,
     SingleAuditReportFile,
-    Audit,
+    User,
 )
-from audit.models.constants import EventType
+from audit.models.constants import EventType, RESUBMISSION_ACTION
 from dissemination.file_downloads import copy_file
 
 logging.basicConfig(
@@ -126,15 +127,20 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # SFSAC_ONLY resubmissions have their PDF auto-copied; the user cannot upload one manually.
+            resubmission_action = (
+                sac.resubmission_meta.get("resubmission_action")
+                if sac.resubmission_meta
+                else None
+            )
+            if resubmission_action == RESUBMISSION_ACTION.SFSAC_ONLY:
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+
             sar = SingleAuditReportFile.objects.filter(sac_id=sac.id)
             if sar.exists():
                 sar = sar.latest("date_created")
-            current_info = {
-                "cleaned_data": getattr(sar, "component_page_numbers", {})
-                | {
-                    "keep_previous_report": getattr(sar, "keep_previous_report", False),
-                }
-            }
+            current_info = {"cleaned_data": getattr(sar, "component_page_numbers", {})}
 
             previous_report_id = (
                 sac.resubmission_meta.get("previous_report_id")
@@ -186,17 +192,10 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "previous_report_id": previous_report_id,
             }
 
-            # Find form errors and return if any exist, then EITHER:
-            # 1. For resubmissions that opt in, copy the previous report.
-            # 2. For original or updated resubmissions, validate and store as normal.
+            # Find form errors and return if any exist
             if not form.is_valid():
                 return render(
                     request, "audit/upload-report.html", context | {"form": form}
-                )
-
-            if form.cleaned_data.get("keep_previous_report") and previous_report_id:
-                return self._handle_keep_previous_report(
-                    request, report_id, previous_report_id, form, context
                 )
 
             return self._handle_new_report(request, report_id, form, context)
@@ -208,34 +207,6 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         except Exception as err:
             logger.error("Unexpected error in UploadReportView post:\n %s", err)
             raise BadRequest() from err
-
-    def _handle_keep_previous_report(
-        self,
-        request: HttpRequest,
-        report_id: str,
-        previous_report_id: str,
-        form: UploadReportForm,
-        context: dict,
-    ) -> HttpResponse:
-        """
-        Copy the previous submission's SingleAuditReportFile and PDF to the current resubmission.
-        """
-        sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        audit = Audit.objects.find_audit_or_none(report_id)
-
-        try:
-            self.copy_previous_report_data(
-                previous_report_id=previous_report_id,
-                current_sac=sac,
-                current_audit=audit,
-                request=request,
-            )
-        except Exception as err:
-            logger.error("Unexpected error copying a SingleAuditReportFile: {err}")
-            form.add_error(None, f"Unable to copy the previous report: {err}")
-            return render(request, "audit/upload-report.html", context | {"form": form})
-
-        return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
     def _handle_new_report(
         self,
@@ -261,7 +232,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 event_user=request.user,
                 event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
             )
-            self._save_audit(report_id=report_id, sar_file=sar_file, request=request)
+            save_audit(report_id=report_id, sar_file=sar_file, user=request.user)
         except ValidationError as err:
             for issue in err.error_dict.get("file"):
                 form.add_error("upload_report", issue)
@@ -304,7 +275,6 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         sar_file = SingleAuditReportFile(
             **{
                 "component_page_numbers": component_page_numbers,
-                "keep_previous_report": False,
                 "file": file,
                 "filename": file.name,
                 "sac_id": sac_id,
@@ -313,65 +283,66 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         )
         return sar_file
 
-    def copy_previous_report_data(
-        self,
-        previous_report_id: str,
-        current_sac: SingleAuditChecklist,
-        current_audit: Audit | None,
-        request: HttpRequest,
-    ) -> None:
-        """
-        Copy the SingleAuditReportFile and the associated s3 object from the
-        previous submission to the current resubmission.
-        """
-        previous_sac = SingleAuditChecklist.objects.get(report_id=previous_report_id)
-        previous_sar = SingleAuditReportFile.objects.filter(sac=previous_sac).latest(
-            "date_created"
-        )
 
-        # Copy the S3 object
-        source_key = f"singleauditreport/{previous_sac.report_id}.pdf"
-        dest_key = f"singleauditreport/{current_sac.report_id}.pdf"
-        copy_file(source_key, dest_key)
+def copy_previous_report_data(
+    previous_report_id: str,
+    current_sac: SingleAuditChecklist,
+    current_audit: "Audit | None",
+    user: User,
+) -> None:
+    """
+    Copy the SingleAuditReportFile and the associated s3 object from the
+    previous submission to the current resubmission.
+    Deletes any existing SingleAuditReportFile rows for the current submission first.
+    """
+    previous_sac = SingleAuditChecklist.objects.get(report_id=previous_report_id)
+    previous_sar = SingleAuditReportFile.objects.filter(sac=previous_sac).latest(
+        "date_created"
+    )
 
-        # Copy the SingleAuditReportFile row
-        new_sar = SingleAuditReportFile(
-            file=dest_key,
-            filename=f"{current_sac.report_id}.pdf",
-            sac=current_sac,
-            audit=current_audit,
-            component_page_numbers=previous_sar.component_page_numbers,
-            keep_previous_report=True,
+    # Remove any existing SAR rows for the current submission before copying
+    SingleAuditReportFile.objects.filter(sac=current_sac).delete()
+
+    # Copy the S3 object
+    source_key = f"singleauditreport/{previous_sac.report_id}.pdf"
+    dest_key = f"singleauditreport/{current_sac.report_id}.pdf"
+    copy_file(source_key, dest_key)
+
+    # Copy the SingleAuditReportFile row
+    new_sar = SingleAuditReportFile(
+        file=dest_key,
+        filename=f"{current_sac.report_id}.pdf",
+        sac=current_sac,
+        audit=current_audit,
+        component_page_numbers=previous_sar.component_page_numbers,
+    )
+    new_sar.save(
+        event_user=user,
+        event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
+    )
+
+    # Mirror onto the Audit model if it exists
+    if current_audit:
+        save_audit(report_id=current_sac.report_id, sar_file=new_sar, user=user)
+
+
+def save_audit(
+    report_id: str,
+    sar_file: SingleAuditReportFile,
+    user: User,
+) -> None:
+    # TODO: Update Post SOC Launch : Delete and move done for linting complexity
+    audit = Audit.objects.find_audit_or_none(report_id=report_id)
+    if audit:
+        audit.audit.update(
+            {
+                "file_information": {
+                    "filename": sar_file.filename,
+                    "pages": sar_file.component_page_numbers,
+                }
+            }
         )
-        new_sar.save(
-            event_user=request.user,
+        audit.save(
+            event_user=user,
             event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
         )
-
-        # Mirror onto the Audit model if it exists
-        if current_audit:
-            self._save_audit(
-                report_id=current_sac.report_id, sar_file=new_sar, request=request
-            )
-
-    @staticmethod
-    def _save_audit(
-        report_id: str,
-        sar_file: SingleAuditReportFile,
-        request: HttpRequest,
-    ) -> None:
-        # TODO: Update Post SOC Launch : Delete and move done for linting complexity
-        audit = Audit.objects.find_audit_or_none(report_id=report_id)
-        if audit:
-            audit.audit.update(
-                {
-                    "file_information": {
-                        "filename": sar_file.filename,
-                        "pages": sar_file.component_page_numbers,
-                    }
-                }
-            )
-            audit.save(
-                event_user=request.user,
-                event_type=EventType.AUDIT_REPORT_PDF_UPDATED,
-            )
