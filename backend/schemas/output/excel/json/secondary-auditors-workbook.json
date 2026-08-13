@@ -64,6 +64,7 @@
                "width": 48
             },
             {
+               "format": "hyperlink",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#section_name",
                   "text": "The workbook you tried to upload is for a different section."
