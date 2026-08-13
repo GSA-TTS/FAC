@@ -21,14 +21,13 @@ data "cloudfoundry_user" "meta_deployer" {
 }
 
 module "environments" {
-  for_each               = local.spaces
-  source                 = "./bootstrap-env"
-  name                   = each.key
-  org_name               = local.org_name
-  developers             = concat(local.developers, [data.cloudfoundry_user.meta_deployer.users.0.id])
-  managers               = local.managers
-  allow_ssh              = lookup(each.value, "allow_ssh", true)
-  populate_creds_locally = var.populate_creds_locally
+  for_each   = local.spaces
+  source     = "./bootstrap-env"
+  name       = each.key
+  org_name   = local.org_name
+  developers = concat(local.developers, [data.cloudfoundry_user.meta_deployer.users.0.id])
+  managers   = local.managers
+  allow_ssh  = lookup(each.value, "allow_ssh", true)
   # Apply egress ASGs if explicitly requested
   #
   # NOTE: This implies that we should have a 1:1 mapping between environments
