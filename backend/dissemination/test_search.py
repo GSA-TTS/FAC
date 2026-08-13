@@ -15,7 +15,6 @@ from dissemination.search import (
     search_general,
     search_alns,
     search,
-    is_advanced_search,
 )
 from dissemination.test_materialized_view_builder import TestMaterializedViewBuilder
 from users.models import Permission, UserPermission
@@ -52,24 +51,6 @@ def assert_results_contain_private_and_public(cls, results):
 
 
 class SearchGeneralTests(TestCase):
-    def is_advanced_search(self):
-        basic_params = {
-            "names": "not_important",
-            "uei_or_eins": "not_important",
-            "start_date": "not_important",
-            "advanced_search_flag": False,
-        }
-        advanced_params = {
-            "names": "not_important",
-            "uei_or_eins": "not_important",
-            "start_date": "not_important",
-            "alns": "not_important",
-            "advanced_search_flag": True,
-        }
-
-        self.assertTrue(is_advanced_search(advanced_params))
-        self.assertFalse(is_advanced_search(basic_params))
-
     def test_empty_query(self):
         """
         Given empty query parameters, search_general should return all records

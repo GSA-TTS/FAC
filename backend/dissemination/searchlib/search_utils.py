@@ -42,7 +42,6 @@ def _add_search_params_to_newrelic(search_parameters):
     )
 
 
-# TODO: Update Post SOC Launch -> Clean up to ignore basic/advanced
 def run_search(request, form_data):
     """
     Given cleaned form data, run the search.
