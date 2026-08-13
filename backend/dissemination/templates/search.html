@@ -186,7 +186,7 @@
                                         <td>
                                             {% if result.is_public or include_private %}
                                                 <a class="usa-link display-flex flex-column flex-align-center"
-                                                href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
+                                                href="{% url 'dissemination:PdfDownload' report_id=result.report_id_id %}"
                                                 target="_blank">
                                                     <svg class="usa-icon usa-icon--size-4"
                                                         aria-hidden="true"
