@@ -11,6 +11,9 @@ on:
           - preview
           - staging
 
+permissions:
+  contents: read
+
 jobs:
   push-with-creds:
     name: Deploy to cloud.gov Environment
