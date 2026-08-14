@@ -15,7 +15,6 @@ from audit.models import (
 from audit.models.utils import get_next_sequence_id
 from audit.models.constants import SAC_SEQUENCE_ID
 from audit.fixtures.excel import FORM_SECTIONS
-from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
     CapText,
     FederalAward,
@@ -27,6 +26,7 @@ from dissemination.models import (
     Resubmission,
 )
 from users.models import Permission, UserPermission
+from dissemination.test_utils import bake_unified
 
 from model_bakery import baker
 
@@ -154,7 +154,7 @@ class PdfDownloadViewTests(TestCase):
         self.assertIn(file.filename, response.url)
 
 
-class SearchViewTests(TestMaterializedViewBuilder):
+class SearchViewTests(TestCase):
     def setUp(self):
         super().setUp()
         self.anon_client = Client()
@@ -198,8 +198,8 @@ class SearchViewTests(TestMaterializedViewBuilder):
 
         Returns tuple: (public, private, deprecated)
         """
-        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
-        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
+        public_gens = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
+        private_gens = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
 
         deprecated_public = baker.make(
             General,
@@ -216,24 +216,25 @@ class SearchViewTests(TestMaterializedViewBuilder):
             resubmission_version=1,
         )
 
-        # Ensure they show up in the materialized view result set (your tests do this via FederalAward)
-        for g in public:
-            baker.make(FederalAward, report_id=g)
-        for g in private:
-            baker.make(FederalAward, report_id=g)
+        for g in public_gens:
+            fed = baker.make(FederalAward, report_id=g)
+            bake_unified(g, [fed])
+        for g in private_gens:
+            fed = baker.make(FederalAward, report_id=g)
+            bake_unified(g, [fed])
 
-        baker.make(FederalAward, report_id=deprecated_public)
-        baker.make(FederalAward, report_id=deprecated_private)
+        pub_fed = baker.make(FederalAward, report_id=deprecated_public)
+        bake_unified(deprecated_public, [pub_fed])
+        priv_fed = baker.make(FederalAward, report_id=deprecated_private)
+        bake_unified(deprecated_public, [priv_fed])
 
-        return public, private, [deprecated_public, deprecated_private]
+        return public_gens, private_gens, [deprecated_public, deprecated_private]
 
     def test_anonymous_returns_public_and_private_excludes_deprecated(self):
         """
         Anonymous users should see public + private reports, but NOT audits deprecated via resubmission.
         """
         public, private, deprecated = self._make_reports()
-
-        self.refresh_materialized_view()
         response = self.anon_client.post(self._search_url(), {})
 
         # Should include 10 results (public + private), excluding deprecated
@@ -252,8 +253,6 @@ class SearchViewTests(TestMaterializedViewBuilder):
         but NOT audits deprecated via resubmission.
         """
         public, private, deprecated = self._make_reports()
-
-        self.refresh_materialized_view()
         response = self.auth_client.post(self._search_url(), {})
 
         self.assertContains(response, "<strong>10</strong>")
@@ -271,8 +270,6 @@ class SearchViewTests(TestMaterializedViewBuilder):
         Deprecated-via-resubmission audits should not appear in results.
         """
         public, private, deprecated = self._make_reports()
-
-        self.refresh_materialized_view()
         response = self.perm_client.post(self._search_url(), {})
 
         self.assertContains(response, "<strong>10</strong>")
@@ -603,7 +600,7 @@ class XlsxDownloadViewTests(TestCase):
         self.assertIn(file.filename, response.url)
 
 
-class SummaryViewTests(TestMaterializedViewBuilder):
+class SummaryViewTests(TestCase):
     def setUp(self):
         super().setUp()
         self.client = Client()
@@ -870,7 +867,7 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         self.assertEqual(response.context["is_sf_sac_downloadable"], False)
 
 
-class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
+class SummaryReportDownloadViewTests(TestCase):
     def setUp(self):
         super().setUp()
         self.anon_client = Client()
