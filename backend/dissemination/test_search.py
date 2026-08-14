@@ -589,14 +589,16 @@ class SearchFilterTests(TestCase):
             cognizant_agency=42,
             oversight_agency=None,
         )
-        baker.make(FederalAward, report_id=general_cog)
+        fed_cog = baker.make(FederalAward, report_id=general_cog)
+        bake_unified(general_cog, [fed_cog])
+
         general_over = baker.make(
             General,
             cognizant_agency=None,
             oversight_agency=24,
         )
-        baker.make(FederalAward, report_id=general_over)
-        self.refresh_materialized_view()
+        fed_over = baker.make(FederalAward, report_id=general_over)
+        bake_unified(general_over, [fed_over])
 
         # Either cog or over with no agency should return all
         params = {"agency_name": None, "cog_or_oversight": "either"}
@@ -612,19 +614,19 @@ class SearchFilterTests(TestCase):
         params = {"agency_name": 42, "cog_or_oversight": "either"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id, general_cog.report_id)
+        self.assertEqual(results[0].report_id_id, general_cog.report_id)
 
         # Cog with valid agency
         params = {"agency_name": 42, "cog_or_oversight": "cog"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id, general_cog.report_id)
+        self.assertEqual(results[0].report_id_id, general_cog.report_id)
 
         # Over with valid agency
         params = {"agency_name": 24, "cog_or_oversight": "oversight"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id, general_over.report_id)
+        self.assertEqual(results[0].report_id_id, general_over.report_id)
 
     def test_search_findings(self):
         """
