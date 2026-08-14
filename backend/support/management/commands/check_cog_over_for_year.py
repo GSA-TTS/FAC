@@ -67,18 +67,14 @@ class Command(BaseCommand):
                 )
                 self.show_mismatch(sac)
             if processed % 1000 == 0:
-                print(
-                    f"""
+                print(f"""
                       Processed {processed} rows so far.
                       Found {cog_mismatches} cog and {over_mismatches} over mismatches.
-                      ..."""
-                )
-        print(
-            f"""
+                      ...""")
+        print(f"""
                 Processed all {processed} rows.
                 Found {cog_mismatches} cog and {over_mismatches} over mismatches.
-                """
-        )
+                """)
 
     def show_mismatch(self, sac):
         print(
