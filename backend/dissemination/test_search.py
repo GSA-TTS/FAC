@@ -835,18 +835,21 @@ class SearchSortTests(TestCase):
         When sorting on COG/OVER, the appropriate records should come back first.
         """
         for agency_number in ["02", "03", "01"]:  # Generate out of order intentionally
-            baker.make(
+            gen_cog = baker.make(
                 General,
                 is_public=True,
                 cognizant_agency=agency_number,
                 oversight_agency="",
             )
-            baker.make(
+            bake_unified(gen_cog)
+
+            gen_over = baker.make(
                 General,
                 is_public=True,
                 oversight_agency=agency_number,
                 cognizant_agency="",
             )
+            bake_unified(gen_over)
 
         results_cognizant = search(
             self.request,
