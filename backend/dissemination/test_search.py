@@ -760,19 +760,19 @@ class SearchFilterTests(TestCase):
         # The award is necessary for the materialized view to pick up the Finding
         for tr in type_requirements:
             general_foreign_object = baker.make(General, is_public=True)
-            baker.make(
+            fed = baker.make(
                 FederalAward,
                 report_id=general_foreign_object,
                 award_reference="AWARD-0001",
             )
-            baker.make(
+            fin = baker.make(
                 Finding,
                 report_id=general_foreign_object,
                 award_reference="AWARD-0001",
                 type_requirement=tr,
             )
-        self.refresh_materialized_view()
-
+            bake_unified(general_foreign_object, [fed, fin])
+            
         params = {
             "type_requirement": [type_requirements[0]],
         }
