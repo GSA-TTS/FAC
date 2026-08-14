@@ -66,6 +66,7 @@ def bake_unified(gen_obj, other_objs=[]):
 
     return baker.make(Unified, **uni)
 
+
 class SearchGeneralTests(TestCase):
     def test_empty_query(self):
         """
@@ -470,14 +471,14 @@ class SearchALNTests(TestCase):
 
         # Prefix + extension
         params_extention = {"alns": ["98.765"]}
-        results_general_extention = search_general(
-            Unified, params_extention
-        )
+        results_general_extention = search_general(Unified, params_extention)
         results_alns_extention = search_alns(
             results_general_extention, params_extention
         )
         self.assertEqual(len(results_alns_extention), 1)
-        self.assertIn(extension_object.report_id, results_alns_extention[0].report_id_id)
+        self.assertIn(
+            extension_object.report_id, results_alns_extention[0].report_id_id
+        )
 
         # Both
         params_both = {"alns": ["12", "98.765"]}
@@ -547,7 +548,7 @@ class SearchFilterTests(TestCase):
         bake_unified(general_bar, [fed_bar])
 
         general_yub_nub = baker.make(General)
-        fed_yub_nub  = baker.make(
+        fed_yub_nub = baker.make(
             FederalAward,
             report_id=general_yub_nub,
             federal_program_name="Yub Nub",
@@ -695,7 +696,9 @@ class SearchFilterTests(TestCase):
             General,
             is_public=True,
         )
-        fed_passthrough = baker.make(FederalAward, report_id=general_passthrough, is_direct="N")
+        fed_passthrough = baker.make(
+            FederalAward, report_id=general_passthrough, is_direct="N"
+        )
         bake_unified(general_passthrough, [fed_passthrough])
 
         params = {"direct_funding": ["direct_funding"]}
@@ -732,7 +735,9 @@ class SearchFilterTests(TestCase):
             General,
             is_public=True,
         )
-        fed_non_major = baker.make(FederalAward, report_id=general_non_major, is_major="N")
+        fed_non_major = baker.make(
+            FederalAward, report_id=general_non_major, is_major="N"
+        )
         bake_unified(general_non_major, [fed_non_major])
 
         params = {"major_program": ["True"]}
