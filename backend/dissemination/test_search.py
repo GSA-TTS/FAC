@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth import get_user_model
+from django.forms import model_to_dict
 
 from audit.models.constants import RESUBMISSION_STATUS
 from dissemination.models import (
@@ -10,6 +11,7 @@ from dissemination.models import (
     FederalAward,
     AdditionalUei,
     AdditionalEin,
+    Unified,
 )
 from dissemination.search import (
     search_general,
@@ -407,67 +409,84 @@ class SearchGeneralTests(TestCase):
         self.assertEqual(len(results), 2)
 
 
-class SearchALNTests(TestMaterializedViewBuilder):
+class SearchALNTests(TestCase):
     def test_aln_search(self):
         """Given an ALN (or ALNs), search_general should only return records with awards under one of these ALNs."""
 
         prefix_object = baker.make(
             General, is_public=True, report_id="2022-04-TSTDAT-0000000001"
         )
-        baker.make(
+        fed_1 = baker.make(
             FederalAward,
             report_id=prefix_object,
             federal_agency_prefix="12",
             federal_award_extension="345",
         )
+        uni_1 = {
+            **model_to_dict(prefix_object),
+            **model_to_dict(fed_1),
+            "report_id": prefix_object,
+        }
+        baker.make(Unified, **uni_1)
 
         extension_object = baker.make(
             General, is_public=True, report_id="2022-04-TSTDAT-0000000002"
         )
-        baker.make(
+        fed_2 = baker.make(
             FederalAward,
             report_id=extension_object,
             federal_agency_prefix="98",
             federal_award_extension="765",
         )
+        uni_2 = {
+            **model_to_dict(extension_object),
+            **model_to_dict(fed_2),
+            "report_id": extension_object,
+        }
+        baker.make(Unified, **uni_2)
 
         gen_object = baker.make(
             General, is_public=True, report_id="2022-04-TSTDAT-0000000003"
         )
-        baker.make(
+        fed_3 = baker.make(
             FederalAward,
             report_id=gen_object,
             federal_agency_prefix="00",
             federal_award_extension="000",
         )
-        self.refresh_materialized_view()
+        uni_3 = {
+            **model_to_dict(gen_object),
+            **model_to_dict(fed_3),
+            "report_id": gen_object,
+        }
+        baker.make(Unified, **uni_3)
 
         # Just a prefix
         params_prefix = {"alns": ["12"]}
-        results_general_prefix = search_general(DisseminationCombined, params_prefix)
+        results_general_prefix = search_general(Unified, params_prefix)
         results_alns_prefix = search_alns(results_general_prefix, params_prefix)
         self.assertEqual(len(results_alns_prefix), 1)
         # Check if the prefix_object's report_id is in the results
-        self.assertIn(prefix_object.report_id, results_alns_prefix[0].report_id)
+        self.assertIn(prefix_object.report_id, results_alns_prefix[0].report_id_id)
 
         # Prefix + extension
         params_extention = {"alns": ["98.765"]}
         results_general_extention = search_general(
-            DisseminationCombined, params_extention
+            Unified, params_extention
         )
         results_alns_extention = search_alns(
             results_general_extention, params_extention
         )
         self.assertEqual(len(results_alns_extention), 1)
-        self.assertIn(extension_object.report_id, results_alns_extention[0].report_id)
+        self.assertIn(extension_object.report_id, results_alns_extention[0].report_id_id)
 
         # Both
         params_both = {"alns": ["12", "98.765"]}
-        results_general_both = search_general(DisseminationCombined, params_both)
+        results_general_both = search_general(Unified, params_both)
         results_alns_both = search_alns(results_general_both, params_both)
 
         self.assertEqual(len(results_alns_both), 2)
-        result_report_ids = set(result.report_id for result in results_alns_both)
+        result_report_ids = set(result.report_id_id for result in results_alns_both)
         self.assertSetEqual(
             result_report_ids, {prefix_object.report_id, extension_object.report_id}
         )
