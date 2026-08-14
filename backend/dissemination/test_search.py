@@ -643,9 +643,6 @@ class SearchFilterTests(TestCase):
         ]
 
         # For every field, create a General object with an associated Finding with a 'Y' in that field.
-        gen_objects = []
-        award_objects = []
-        finding_objects = []
         for field in findings_fields:
             general = baker.make(
                 General,
@@ -660,10 +657,8 @@ class SearchFilterTests(TestCase):
             finding = baker.make(
                 Finding, report_id=general, award_reference="2023-001", **field
             )
-            finding_objects.append(finding)
-            gen_objects.append(general)
-            award_objects.append(award)
-        self.refresh_materialized_view()
+            bake_unified(general, [award, finding])
+
         # One field returns the one appropriate general
         params = {"findings": ["is_modified_opinion"]}
         results = search(self.request, params)
