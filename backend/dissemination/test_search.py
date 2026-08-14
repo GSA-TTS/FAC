@@ -52,7 +52,7 @@ def assert_results_contain_private_and_public(cls, results):
     cls.assertTrue(found_private, "No private results found.")
 
 
-def bake_unified(gen_obj, other_objs):
+def bake_unified(gen_obj, other_objs=[]):
     """
     Bakes a Unified object given a General object and optional FederalAward,
     Passthrough, and Finding objects
@@ -518,7 +518,7 @@ class SearchALNTests(TestCase):
         self.assertEqual(len(results_alns), 0)
 
 
-class SearchFilterTests(TestMaterializedViewBuilder):
+class SearchFilterTests(TestCase):
     def setUp(self):
         self.user = baker.make(User)
         self.request = RequestFactory().get("/")
@@ -531,24 +531,28 @@ class SearchFilterTests(TestMaterializedViewBuilder):
         should only return records with an award of that type.
         """
         general_foo = baker.make(General)
-        baker.make(
+        fed_foo = baker.make(
             FederalAward,
             report_id=general_foo,
             federal_program_name="Foo",
         )
+        bake_unified(general_foo, [fed_foo])
+
         general_bar = baker.make(General)
-        baker.make(
+        fed_bar = baker.make(
             FederalAward,
             report_id=general_bar,
             federal_program_name="Bar",
         )
+        bake_unified(general_bar, [fed_bar])
+
         general_yub_nub = baker.make(General)
-        baker.make(
+        fed_yub_nub  = baker.make(
             FederalAward,
             report_id=general_yub_nub,
             federal_program_name="Yub Nub",
         )
-        self.refresh_materialized_view()
+        bake_unified(general_yub_nub, [fed_yub_nub])
 
         # Search for multiple program valid names
         params = {"federal_program_name": ["Foo", "Bar"]}
