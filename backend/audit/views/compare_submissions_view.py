@@ -21,6 +21,7 @@ class CompareSubmissionsView(LoginRequiredMixin, generic.View):
 
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
+        route = kwargs["route"]
         current_user = request.user
 
         try:
@@ -60,23 +61,25 @@ class CompareSubmissionsView(LoginRequiredMixin, generic.View):
             user_id=current_user.id
         ).exists()
 
-        logger.info(
-            f"[DIFF] {current_user.id} {sac_1.report_id} {is_authenticated} AND ({is_on_audit} OR {is_federal_user})"
-        )
+        if route == "submission":
+            # If I am attached to this report, I can see the diff.
+            if is_authenticated and is_on_audit:
+                logger.debug("Authenticated as a user on the audit")
+                pass
+            # If I am a Federal user, I can see the diff
+            elif is_authenticated and is_federal_user:
+                logger.debug("Authenticated as a federal user")
+                pass
+            else:
+                raise PermissionDenied(
+                    "You do not have access to this comparison page."
+                )
 
-        # If I am attached to this report, I can see the diff.
-        if is_authenticated and is_on_audit:
-            logger.debug("Authenticated as a user on the audit")
-            pass
-        # If I am a Federal user, I can see the diff
-        elif is_authenticated and is_federal_user:
-            logger.debug("Authenticated as a federal user")
-            pass
-        else:
-            raise PermissionDenied("You do not have access to this comparison page.")
-
-        # We get here if we passed one of the above conditions.
         context = _compare_sac(sac_1)
+        context = context | {"is_authenticated": is_authenticated}
+        context = context | {"is_on_audit": is_on_audit}
+        context = context | {"is_federal_user": is_federal_user}
+        context = context | {"route": route}
 
         return render(request, "audit/compare_submissions.html", context)
 

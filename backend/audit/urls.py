@@ -141,7 +141,7 @@ urlpatterns = [
         name="PredisseminationSummaryReportDownload",
     ),
     path(
-        "compare/<str:report_id>",
+        "compare/<str:route>/<str:report_id>",
         views.CompareSubmissionsView.as_view(),
         name="CompareSubmissions",
     ),
