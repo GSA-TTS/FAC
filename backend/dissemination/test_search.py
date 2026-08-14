@@ -52,6 +52,20 @@ def assert_results_contain_private_and_public(cls, results):
     cls.assertTrue(found_private, "No private results found.")
 
 
+def bake_unified(gen_obj, other_objs):
+    """
+    Bakes a Unified object given a General object and optional FederalAward,
+    Passthrough, and Finding objects
+    """
+    uni = model_to_dict(gen_obj)
+
+    for other_obj in other_objs:
+        uni.update(model_to_dict(other_obj))
+
+    uni["report_id"] = gen_obj
+
+    return baker.make(Unified, **uni)
+
 class SearchGeneralTests(TestCase):
     def test_empty_query(self):
         """
@@ -422,12 +436,7 @@ class SearchALNTests(TestCase):
             federal_agency_prefix="12",
             federal_award_extension="345",
         )
-        uni_1 = {
-            **model_to_dict(prefix_object),
-            **model_to_dict(fed_1),
-            "report_id": prefix_object,
-        }
-        baker.make(Unified, **uni_1)
+        bake_unified(prefix_object, [fed_1])
 
         extension_object = baker.make(
             General, is_public=True, report_id="2022-04-TSTDAT-0000000002"
@@ -438,12 +447,7 @@ class SearchALNTests(TestCase):
             federal_agency_prefix="98",
             federal_award_extension="765",
         )
-        uni_2 = {
-            **model_to_dict(extension_object),
-            **model_to_dict(fed_2),
-            "report_id": extension_object,
-        }
-        baker.make(Unified, **uni_2)
+        bake_unified(extension_object, [fed_2])
 
         gen_object = baker.make(
             General, is_public=True, report_id="2022-04-TSTDAT-0000000003"
@@ -454,12 +458,7 @@ class SearchALNTests(TestCase):
             federal_agency_prefix="00",
             federal_award_extension="000",
         )
-        uni_3 = {
-            **model_to_dict(gen_object),
-            **model_to_dict(fed_3),
-            "report_id": gen_object,
-        }
-        baker.make(Unified, **uni_3)
+        bake_unified(gen_object, [fed_3])
 
         # Just a prefix
         params_prefix = {"alns": ["12"]}
@@ -510,12 +509,7 @@ class SearchALNTests(TestCase):
             federal_award_extension="000",
             findings_count=1,
         )
-        uni = {
-            **model_to_dict(gen_object),
-            **model_to_dict(fed),
-            "report_id": gen_object,
-        }
-        baker.make(Unified, **uni)
+        bake_unified(gen_object, [fed])
 
         params = {"alns": ["99"], "audit_years": ["2024"]}
         results_general = search_general(Unified, params)
