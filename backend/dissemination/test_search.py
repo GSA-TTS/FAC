@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth import get_user_model
-from django.forms import model_to_dict
 
 from audit.models.constants import RESUBMISSION_STATUS
 from dissemination.models import (
@@ -18,6 +17,7 @@ from dissemination.search import (
     search,
 )
 from users.models import Permission, UserPermission
+from dissemination.test_utils import bake_unified
 
 from model_bakery import baker
 
@@ -48,21 +48,6 @@ def assert_results_contain_private_and_public(cls, results):
 
     cls.assertTrue(found_public, "No public results found.")
     cls.assertTrue(found_private, "No private results found.")
-
-
-def bake_unified(gen_obj, other_objs=[]):
-    """
-    Bakes a Unified object given a General object and optional FederalAward,
-    Passthrough, and Finding objects
-    """
-    uni = model_to_dict(gen_obj)
-
-    for other_obj in other_objs:
-        uni.update(model_to_dict(other_obj))
-
-    uni["report_id"] = gen_obj
-
-    return baker.make(Unified, **uni)
 
 
 class SearchGeneralTests(TestCase):
