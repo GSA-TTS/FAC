@@ -502,7 +502,7 @@ class SearchALNTests(TestCase):
             is_public=True,
             audit_year="2024",
         )
-        baker.make(
+        fed = baker.make(
             FederalAward,
             report_id=gen_object,
             award_reference="2023-0001",
@@ -510,9 +510,15 @@ class SearchALNTests(TestCase):
             federal_award_extension="000",
             findings_count=1,
         )
-        self.refresh_materialized_view()
+        uni = {
+            **model_to_dict(gen_object),
+            **model_to_dict(fed),
+            "report_id": gen_object,
+        }
+        baker.make(Unified, **uni)
+
         params = {"alns": ["99"], "audit_years": ["2024"]}
-        results_general = search_general(DisseminationCombined, params)
+        results_general = search_general(Unified, params)
         results_alns = search_alns(results_general, params)
 
         self.assertEqual(len(results_alns), 0)
