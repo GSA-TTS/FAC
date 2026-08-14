@@ -725,24 +725,25 @@ class SearchFilterTests(TestCase):
             General,
             is_public=True,
         )
-        baker.make(FederalAward, report_id=general_major, is_major="Y")
+        fed_major = baker.make(FederalAward, report_id=general_major, is_major="Y")
+        bake_unified(general_major, [fed_major])
 
         general_non_major = baker.make(
             General,
             is_public=True,
         )
-        baker.make(FederalAward, report_id=general_non_major, is_major="N")
-        self.refresh_materialized_view()
+        fed_non_major = baker.make(FederalAward, report_id=general_non_major, is_major="N")
+        bake_unified(general_non_major, [fed_non_major])
 
         params = {"major_program": ["True"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id, general_major.report_id)
+        self.assertEqual(results[0].report_id_id, general_major.report_id)
 
         params = {"major_program": ["False"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id, general_non_major.report_id)
+        self.assertEqual(results[0].report_id_id, general_non_major.report_id)
 
     def test_search_type_requirement(self):
         """
