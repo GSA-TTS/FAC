@@ -772,7 +772,7 @@ class SearchFilterTests(TestCase):
                 type_requirement=tr,
             )
             bake_unified(general_foreign_object, [fed, fin])
-            
+
         params = {
             "type_requirement": [type_requirements[0]],
         }
@@ -794,16 +794,16 @@ class SearchFilterTests(TestCase):
             is_public=True,
             resubmission_status=RESUBMISSION_STATUS.DEPRECATED,
         )
-        baker.make(FederalAward, report_id=general_deprecated)
+        fed_deprecated = baker.make(FederalAward, report_id=general_deprecated)
+        bake_unified(general_deprecated, [fed_deprecated])
 
         general_most_recent = baker.make(
             General,
             is_public=True,
             resubmission_status=RESUBMISSION_STATUS.MOST_RECENT,
         )
-        baker.make(FederalAward, report_id=general_most_recent)
-
-        self.refresh_materialized_view()
+        fed_most_recent = baker.make(FederalAward, report_id=general_most_recent)
+        bake_unified(general_most_recent, [fed_most_recent])
 
         # Not a Fed, so can only see most recent
         params = {"resubmissions": "include"}
