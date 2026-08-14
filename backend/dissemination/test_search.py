@@ -688,26 +688,27 @@ class SearchFilterTests(TestCase):
             General,
             is_public=True,
         )
-        baker.make(FederalAward, report_id=general_direct, is_direct="Y")
+        fed_direct = baker.make(FederalAward, report_id=general_direct, is_direct="Y")
+        bake_unified(general_direct, [fed_direct])
 
         general_passthrough = baker.make(
             General,
             is_public=True,
         )
-        baker.make(FederalAward, report_id=general_passthrough, is_direct="N")
-        self.refresh_materialized_view()
+        fed_passthrough = baker.make(FederalAward, report_id=general_passthrough, is_direct="N")
+        bake_unified(general_passthrough, [fed_passthrough])
 
         params = {"direct_funding": ["direct_funding"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id, general_direct.report_id)
+        self.assertEqual(results[0].report_id_id, general_direct.report_id)
 
         params = {
             "direct_funding": ["passthrough_funding"],
         }
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id, general_passthrough.report_id)
+        self.assertEqual(results[0].report_id_id, general_passthrough.report_id)
 
         # One can search on both, even if there's not much reason to.
         params = {
