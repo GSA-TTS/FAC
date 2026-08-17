@@ -3,6 +3,9 @@ name: Deploy to the Preview Environment
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
 
   deploy-infrastructure-preview:

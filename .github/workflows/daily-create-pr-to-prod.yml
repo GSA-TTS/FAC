@@ -6,6 +6,9 @@ on:
     - cron: '0 10 * * 1-6'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   GH_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
 
@@ -39,6 +42,9 @@ jobs:
     needs: [check-commit]
     if: ${{ needs.check-commit.outputs.should_run != 'false' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     outputs:
         pr_number: ${{ steps.pr-number.outputs.pull_request_number }}
     steps:
