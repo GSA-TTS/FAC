@@ -198,7 +198,7 @@ class MultipleSummaryReportDownloadView(View):
         3. Generate a summary report with the report_ids, which goes into into S3
         4. Redirect to the download url of this new report
         """
-        form = Form(request.POST)
+        form = SearchForm(request.POST)
         # TODO SOT: Enable for testing
         # use_audit = request.GET.get("beta", "N") == "Y"
         use_audit = False
