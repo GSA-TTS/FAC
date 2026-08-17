@@ -14,7 +14,17 @@ module "production" {
   metabase_database_plan = "xlarge-gp-psql-redundant"
   snapshot_database_plan = "xlarge-gp-psql"
   postgrest_instances    = 2
-  json_params = jsonencode(
+  db_params = jsonencode(
+    {
+      "storage" : 200,
+    }
+  )
+  snapshot_db_params = jsonencode(
+    {
+      "storage" : 75,
+    }
+  )
+  metabase_db_params = jsonencode(
     {
       "storage" : 75,
     }

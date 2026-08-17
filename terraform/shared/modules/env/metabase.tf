@@ -28,5 +28,5 @@ module "metabasedb" {
   name          = "metabase-db"
   tags          = ["rds"]
   rds_plan_name = var.metabase_database_plan
-  json_params   = var.json_params
+  json_params   = var.metabase_db_params
 }
