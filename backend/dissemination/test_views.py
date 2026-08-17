@@ -201,21 +201,6 @@ class SearchViewTests(TestCase):
         public_gens = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
         private_gens = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
 
-        deprecated_public = baker.make(
-            General,
-            is_public=True,
-            audit_year=2023,
-            resubmission_status="deprecated_via_resubmission",
-            resubmission_version=1,
-        )
-        deprecated_private = baker.make(
-            General,
-            is_public=False,
-            audit_year=2023,
-            resubmission_status="deprecated_via_resubmission",
-            resubmission_version=1,
-        )
-
         for g in public_gens:
             fed = baker.make(FederalAward, report_id=g)
             bake_unified(g, [fed])
@@ -223,10 +208,26 @@ class SearchViewTests(TestCase):
             fed = baker.make(FederalAward, report_id=g)
             bake_unified(g, [fed])
 
+
+        deprecated_public = baker.make(
+            General,
+            is_public=True,
+            audit_year=2023,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
         pub_fed = baker.make(FederalAward, report_id=deprecated_public)
         bake_unified(deprecated_public, [pub_fed])
+
+        deprecated_private = baker.make(
+            General,
+            is_public=False,
+            audit_year=2023,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
         priv_fed = baker.make(FederalAward, report_id=deprecated_private)
-        bake_unified(deprecated_public, [priv_fed])
+        bake_unified(deprecated_private, [priv_fed])
 
         return public_gens, private_gens, [deprecated_public, deprecated_private]
 
@@ -272,14 +273,14 @@ class SearchViewTests(TestCase):
         public, private, deprecated = self._make_reports()
         response = self.perm_client.post(self._search_url(), {})
 
-        self.assertContains(response, "<strong>10</strong>")
+        self.assertContains(response, "<strong>12</strong>")
 
         for g in public:
             self.assertContains(response, g.report_id)
         for g in private:
             self.assertContains(response, g.report_id)
         for g in deprecated:
-            self.assertNotContains(response, g.report_id)
+            self.assertContains(response, g.report_id)
 
 
 class PublicDataDownloadViewTests(TestCase):
@@ -842,11 +843,12 @@ class SummaryViewTests(TestCase):
         gen_object = baker.make(
             General, is_public=True, report_id="2022-12-GSAFAC-0000000001"
         )
-        baker.make(
+        fed = baker.make(
             FederalAward,
             report_id=gen_object,
         )
-        self.refresh_materialized_view()
+        bake_unified(gen_object, [fed])
+
         url = reverse(
             "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
         )
@@ -919,8 +921,9 @@ class SummaryReportDownloadViewTests(TestCase):
         Searches with no results should return a 404, not an empty excel file.
         """
         general = self._make_general(is_public=False, auditee_uei="123456789012")
-        baker.make(FederalAward, report_id=general)
-        self.refresh_materialized_view()
+        fed = baker.make(FederalAward, report_id=general)
+        bake_unified(general, [fed])
+
         response = self.anon_client.post(
             self._summary_report_url(), {"uei_or_ein": "NotTheOther1"}
         )
@@ -940,9 +943,9 @@ class SummaryReportDownloadViewTests(TestCase):
         )
 
         general = self._make_general(is_public=False)
-        baker.make(FederalAward, report_id=general)
+        fed = baker.make(FederalAward, report_id=general)
         baker.make(FindingText, report_id=general)
-        self.refresh_materialized_view()
+        bake_unified(general, [fed])
 
         response = self.perm_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -969,9 +972,9 @@ class SummaryReportDownloadViewTests(TestCase):
         )
 
         general = self._make_general(is_public=False)
-        baker.make(FederalAward, report_id=general)
+        fed = baker.make(FederalAward, report_id=general)
         baker.make(FindingText, report_id=general)
-        self.refresh_materialized_view()
+        bake_unified(general, [fed])
 
         response = self.anon_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -996,9 +999,9 @@ class SummaryReportDownloadViewTests(TestCase):
         )
 
         general = self._make_general(is_public=True)
-        baker.make(FederalAward, report_id=general)
+        fed = baker.make(FederalAward, report_id=general)
         baker.make(FindingText, report_id=general)
-        self.refresh_materialized_view()
+        bake_unified(general, [fed])
 
         response = self.perm_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -1025,9 +1028,9 @@ class SummaryReportDownloadViewTests(TestCase):
         )
 
         general = self._make_general(is_public=True)
-        baker.make(FederalAward, report_id=general)
+        fed = baker.make(FederalAward, report_id=general)
         baker.make(FindingText, report_id=general)
-        self.refresh_materialized_view()
+        bake_unified(general, [fed])
 
         response = self.anon_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -1053,8 +1056,8 @@ class SummaryReportDownloadViewTests(TestCase):
             1.0,
         )
         general = self._make_general(is_public=True)
-        baker.make(FederalAward, report_id=general)
-        self.refresh_materialized_view()
+        fed = baker.make(FederalAward, report_id=general)
+        bake_unified(general, [fed])
 
         response = self.anon_client.post(self._summary_report_url(), {})
 
@@ -1091,8 +1094,9 @@ class SummaryReportDownloadViewTests(TestCase):
                     end_date="2023-12-31", sequence=sequence
                 ),
             )
-            baker.make(FederalAward, report_id=general)
-        self.refresh_materialized_view()
+            fed = baker.make(FederalAward, report_id=general)
+            bake_unified(general, [fed])
+
 
         with self.settings(SUMMARY_REPORT_DOWNLOAD_LIMIT=2):
             response = self.anon_client.post(self._summary_report_url(), {})
