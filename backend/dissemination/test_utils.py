@@ -6,6 +6,7 @@ from dissemination.models import (
     Unified,
 )
 
+
 def bake_unified(gen_obj, other_objs=[]):
     """
     Bakes a Unified object given a General object and optional FederalAward,

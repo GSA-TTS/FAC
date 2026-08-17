@@ -199,7 +199,9 @@ class SearchViewTests(TestCase):
         Returns tuple: (public, private, deprecated)
         """
         public_gens = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
-        private_gens = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
+        private_gens = baker.make(
+            General, is_public=False, audit_year=2023, _quantity=5
+        )
 
         for g in public_gens:
             fed = baker.make(FederalAward, report_id=g)
@@ -207,7 +209,6 @@ class SearchViewTests(TestCase):
         for g in private_gens:
             fed = baker.make(FederalAward, report_id=g)
             bake_unified(g, [fed])
-
 
         deprecated_public = baker.make(
             General,
@@ -265,10 +266,9 @@ class SearchViewTests(TestCase):
         for g in deprecated:
             self.assertNotContains(response, g.report_id)
 
-    def test_permissioned_returns_public_and_private_excludes_deprecated(self):
+    def test_permissioned_returns_all(self):
         """
-        Permissioned users should see public + private reports.
-        Deprecated-via-resubmission audits should not appear in results.
+        Permissioned users should see all reports.
         """
         public, private, deprecated = self._make_reports()
         response = self.perm_client.post(self._search_url(), {})
@@ -1096,7 +1096,6 @@ class SummaryReportDownloadViewTests(TestCase):
             )
             fed = baker.make(FederalAward, report_id=general)
             bake_unified(general, [fed])
-
 
         with self.settings(SUMMARY_REPORT_DOWNLOAD_LIMIT=2):
             response = self.anon_client.post(self._summary_report_url(), {})
