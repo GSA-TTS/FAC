@@ -944,8 +944,8 @@ class SummaryReportDownloadViewTests(TestCase):
 
         general = self._make_general(is_public=False)
         fed = baker.make(FederalAward, report_id=general)
-        baker.make(FindingText, report_id=general)
         bake_unified(general, [fed])
+        baker.make(FindingText, report_id=general)
 
         response = self.perm_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -973,8 +973,8 @@ class SummaryReportDownloadViewTests(TestCase):
 
         general = self._make_general(is_public=False)
         fed = baker.make(FederalAward, report_id=general)
-        baker.make(FindingText, report_id=general)
         bake_unified(general, [fed])
+        baker.make(FindingText, report_id=general)
 
         response = self.anon_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -1000,8 +1000,8 @@ class SummaryReportDownloadViewTests(TestCase):
 
         general = self._make_general(is_public=True)
         fed = baker.make(FederalAward, report_id=general)
-        baker.make(FindingText, report_id=general)
         bake_unified(general, [fed])
+        baker.make(FindingText, report_id=general)
 
         response = self.perm_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -1029,8 +1029,8 @@ class SummaryReportDownloadViewTests(TestCase):
 
         general = self._make_general(is_public=True)
         fed = baker.make(FederalAward, report_id=general)
-        baker.make(FindingText, report_id=general)
         bake_unified(general, [fed])
+        baker.make(FindingText, report_id=general)
 
         response = self.anon_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)

@@ -207,10 +207,10 @@ class MultipleSummaryReportDownloadView(View):
             if form.is_valid():
                 form_data = form.cleaned_data
             else:
-                raise ValidationError("Form error in Search POST.")
+                raise BadRequest("Form error in Search POST.")
 
             include_private = include_private_results(request)
-            results = run_search(request, form_data, use_audit)
+            results = run_search(request, form_data)
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
 
             if len(results) == 0:
@@ -232,15 +232,10 @@ class MultipleSummaryReportDownloadView(View):
             return response
 
         except Http404 as err:
-            logger.info(
+            logger.error(
                 "No results found for MultipleSummaryReportDownloadView post. Suggests an improper or old form submission."
             )
             raise Http404 from err
-        except Exception as err:
-            logger.info(
-                "Unexpected error in MultipleSummaryReportDownloadView post:\n%s", err
-            )
-            raise BadRequest(err)
 
 
 class FindingsSummaryReportDownloadView(FederalAccessRequiredMixin, View):
