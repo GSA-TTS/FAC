@@ -19,8 +19,29 @@
                         </p>
                     </legend>
                     <div class="font-sans-lg">
-                        <p class="margin-bottom-1 margin-top-2">
-                            <strong>Report ID:&nbsp;</strong>{{ report_id }}
+                        <p class="margin-bottom-1 margin-top-2 display-flex flex-align-center">
+                            <strong>Report ID:&nbsp;</strong>
+                            <span class="report-id">{{ report_id }}</span>
+                            <button
+                                type="button"
+                                class="usa-button usa-button--unstyled margin-left-1 copy-report-id"
+                                aria-label="Copy report ID"
+                            >
+                                <img
+                                    src="{% static 'img/usa-icons/content_copy.svg' %}"
+                                    alt=""
+                                    aria-hidden="true"
+                                    class="width-3 height-3"
+                                />
+                            </button>
+                            <span
+                                class="copy-report-id-message margin-left-1 text-green"
+                                role="status"
+                                aria-live="polite"
+                                hidden
+                            >
+                                Copied!
+                            </span>
                         </p>
                         <p class="margin-y-1">
                             <strong>FAC acceptance date:&nbsp;</strong>{{ general.fac_accepted_date }}
@@ -368,4 +389,5 @@
             </div>
         </div>
     </div>
+<script src="{% static 'js/copy-report-id.js' %}"></script>
 {% endblock content %}

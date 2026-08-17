@@ -2,6 +2,10 @@ name: Database Backup
 ### Common Commands:
 # ./fac-backup-util.sh v0.1.11 initial_backup
 # ./fac-backup-util.sh v0.1.11 deploy_backup
+
+permissions:
+  contents: read
+  
 on:
   schedule:
     # Invoke every 2 hours from 12UTC-22UTC
