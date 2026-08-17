@@ -43,7 +43,9 @@ urlpatterns = [
         views.FindingsSummaryReportDownloadView.as_view(),
         name="FindingsSummaryReportDownload",
     ),
-    path("search/", views.Search.as_view(), name="Search"),
     path("summary/<str:report_id>", views.AuditSummaryView.as_view(), name="Summary"),
     path("analytics", views.AnalyticsView.as_view(), name="Analytics"),
+    path("search/", views.Search.as_view(), name="Search"),
+    # Pointing old advanced search URLs to normal search
+    path("search/advanced/", views.Search.as_view(), name="DeprecatedAdvancedSearch"),
 ]
