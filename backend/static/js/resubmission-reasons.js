@@ -12,34 +12,24 @@ function toggleReasonSections() {
         "audit-opinion-changes-section"
     );
 
-    if (!selectedAction) {
-        if (requesterSection) requesterSection.hidden = true;
-        if (materialSection) materialSection.hidden = true;
-        if (nonMaterialSection) nonMaterialSection.hidden = true;
-        if (auditOpinionChangesSection) {
-            auditOpinionChangesSection.hidden = true;
-        }
-        return;
+    if (requesterSection) requesterSection.hidden = !selectedAction;
+    if (materialSection) materialSection.hidden = true;
+    if (nonMaterialSection) nonMaterialSection.hidden = true;
+    if (auditOpinionChangesSection) {
+        auditOpinionChangesSection.hidden = true;
     }
 
-    if (requesterSection) {
-        requesterSection.hidden = false;
+    if (!selectedAction) {
+        return;
     }
 
     if (selectedAction.value === "audit_pdf") {
         if (materialSection) materialSection.hidden = false;
-        if (nonMaterialSection) nonMaterialSection.hidden = true;
-
         if (auditOpinionChangesSection) {
             auditOpinionChangesSection.hidden = false;
         }
-    } else if (selectedAction.value === "sfsac_only") {
-        if (materialSection) materialSection.hidden = true;
+    } else if (selectedAction.value === "non_material_pdf") {
         if (nonMaterialSection) nonMaterialSection.hidden = false;
-
-        if (auditOpinionChangesSection) {
-            auditOpinionChangesSection.hidden = true;
-        }
     }
 }
 

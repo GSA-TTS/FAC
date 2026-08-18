@@ -31,7 +31,7 @@ def check_resubmission_metadata(data, sar=None):
     if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
         errors.append({"error": err_material_change_required()})
 
-    if action == RESUBMISSION_ACTION.SFSAC_ONLY and not non_material:
+    if action == RESUBMISSION_ACTION.NON_MATERIAL_PDF and not non_material:
         errors.append({"error": err_non_material_change_required()})
 
     return errors

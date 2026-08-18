@@ -7,43 +7,19 @@
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large" id="legend-resubmission-start">Resubmitting an Audit</legend>
-                    <p><b>Resubmitting an audit should not be undertaken lightly.</b> A resubmission replaces the previously accepted audit and results in a new Federal Audit Clearinghouse (FAC) acceptance date.
-                        <b>Because of this impact, resubmissions must be completed in coordination between the auditee and certifying officials.</b>
-                        A resubmission can never change the UEI or the audit year from the original submission.
+                    <p> Resubmission is available to make updates to a previousy submitted report. Resubmission must be completed in coordination between the auditee and certifying officials. Depending on the updates, a resubmitted report may result in a new Federal Audit Clearinghouse (FAC) acceptance date.
+                        <b>A resubmission can never change the UEI or the audit year from the original submission.</b>
                         <br><br>
 
-                        Before proceeding, review the guidance below to determine whether resubmission is appropriate.
-                        <b>A resubmission is generally appropriate when material changes are required, including but not limited to: </b></p>
+                        Before proceeding, review the guidance below to determine the appropriate whether resubmission path. Resubmitted reports with material changes will result in a new FAC acceptance date. Non-material changes to reports will retain the original FAC acceptance date. All resubmission paths allow for updates to the SF-SAC data collection form. 
+                        <br></br>
+                        The following options are available for resubmission:</p>
+                        
                         <ul class="usa-list">
-                            <li>Material change to audit findings</li>
-                            <li>Addition or revision of corrective action plans</li>
-                            <li>Inclusion of missing finding elements (such as condition, criteria, cause, or effect)</li>
-                            <li>Correction to questioned costs or compliance determination</li>
-                            <li>Error in major program determination or low-risk auditee status</li>
-                            <li>Change to federal award amounts in the Schedule of Expenditures of Federal Awards (SEFA)</li>
-                            <li>Correction to Assistance Listing Number</li>
-                            <li>Supplementing an incomplete Single Audit package (for example, missing financial statements or required reports)</li>
-                            <li>Addition or correction to the required auditor report elements</li>
-                            <li>Revision to the auditor's report</li>
+                            <li>Material change to a PDF Audit report. This will result in a new FAC acceptance date.</li>
+                            <li>Non-material change to a PDF Audit report. This original FAC acceptance date will be retained.</li>
+                            <li>Updates to only the SF-SAC data collection form. The original FAC acceptance date will be retained.</li>
                         </ul>
-                    <hr>
-                    <p>Do <b>not</b> resubmit an audit due to non-material changes, including:</p>
-                        <ul class="usa-list">
-                            <li>Minor typographical or formatting errors</li>
-                            <li>Minor numerical rounding differences without material impact</li>
-                            <li>Non-material errors that do not change audit opinions, findings, or compliance determinations</li>
-                            <li>Updates that do not change audit opinions, findings, or compliance determinations</li>
-                            <li>Issues documented for resolution in a future audit</li>
-                            <li>SF-SAC-only corrections where the audit report itself is unchanged</li>
-                            <li>Updates to contact information or other non-substantive metadata</li>
-                            <li>Clarifications to narrative text that do not alter meaning</li>
-                        </ul>
-                    <p>
-                        <b>If your update falls into one of these categories, resubmission is not appropriate.</b>
-                        <br><br>
-                        Resubmission must be completed in coordination with certifying officials, and resubmission will change the acceptance date for your audit.
-                    </p>
-
                     <hr>
 
                     {% include "audit/resubmission_action_field.html" %}
@@ -130,11 +106,11 @@
                             id="audit_opinion_changes-label" 
                             for="audit_opinion_changes"
                         > 
-                            If resubmitting the auditor's report, identify the changes in the audit 
+                            If resubmitting the auditor's report, identify the changes in the audit
                             opinion that are the reason for the resubmission.
                         </label>
                         <div class="usa-hint">
-                            This field is optional.
+                            This field is required.
                         </div>
 
                         {% if form.audit_opinion_changes.errors %}

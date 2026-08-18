@@ -62,11 +62,21 @@ NON_MATERIAL_CHANGE_CHOICES = [
 RESUBMISSION_ACTION_CHOICES = [
     (
         RESUBMISSION_ACTION.AUDIT_PDF,
-        "I need to upload or edit the audit PDF package (with the option to also edit the SF-SAC data collection forms). I understand that this option will result in a new acceptance date for the submission.",
+        "I need to make material changes to the audit PDF package "
+        "(with the option to also edit the SF-SAC data collection forms). "
+        "I understand that this option will result in a new acceptance date "
+        "for the submission.",
+    ),
+    (
+        RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+        "I need to make non-material changes to the audit PDF package "
+        "(with the option to also edit the SF-SAC data collection forms). "
+        "I understand that the submission's acceptance date will not change.",
     ),
     (
         RESUBMISSION_ACTION.SFSAC_ONLY,
-        "I only need to modify SF-SAC Data Collection Form information. I understand that the submission's acceptance date will not change.",
+        "I need to make updates only to the SF-SAC data collection form. "
+        "I understand that the submission's acceptance date will not change.",
     ),
 ]
 
@@ -84,6 +94,7 @@ def _clean_resubmission_form(form):
     requester = cleaned_data.get("resubmission_requester")
     material = cleaned_data.get("material_change_reasons")
     non_material = cleaned_data.get("non_material_change_reasons")
+    audit_opinion_changes = cleaned_data.get("audit_opinion_changes")
 
     if not requester:
         form.add_error(
@@ -97,7 +108,13 @@ def _clean_resubmission_form(form):
             "Select at least one material change.",
         )
 
-    if action == RESUBMISSION_ACTION.SFSAC_ONLY and not non_material:
+    if action == RESUBMISSION_ACTION.AUDIT_PDF and not audit_opinion_changes:
+        form.add_error(
+            "audit_opinion_changes",
+            "Identify the changes in the audit opinion that are the reason for the resubmission.",
+        )
+
+    if action == RESUBMISSION_ACTION.NON_MATERIAL_PDF and not non_material:
         form.add_error(
             "non_material_change_reasons",
             "Select at least one non-material change.",
