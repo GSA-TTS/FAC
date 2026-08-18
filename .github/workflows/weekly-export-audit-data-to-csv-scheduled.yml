@@ -8,6 +8,9 @@ on:
         type: string
         description: The environment the workflow should run on.
 
+permissions:
+  contents: read
+  
 jobs:
   scheduled-audit-data-export:
     strategy:
