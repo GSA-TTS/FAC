@@ -121,7 +121,8 @@ def _clean_resubmission_form(form):
         )
 
     # Auditor opinion changes only apply to a full audit PDF resubmission, so if the user selects the SFSAC_ONLY option, we should clear out any input in that field.
-    if action != RESUBMISSION_ACTION.AUDIT_PDF:
+    # SF-SAC-only resubmissions do not include PDF edit details.
+    if action == RESUBMISSION_ACTION.SFSAC_ONLY:
         cleaned_data["audit_opinion_changes"] = ""
 
     return cleaned_data

@@ -26,8 +26,6 @@ class ResubmissionStartViewTests(TestCase):
     valid_audit_opinion_changes = (
         "The auditor's opinion changed due to revised findings in the audit report."
     )
-    valid_sfsac_resubmission_action = "sfsac_only"
-
     general_information = {
         "auditee_uei": "auditee_uei",
         "auditee_name": "auditee_name",
@@ -322,7 +320,7 @@ class ResubmissionStartViewTests(TestCase):
             "",
         )
 
-    def test_audit_opinion_changes_cleared_for_non_material_pdf_resubmission(self):
+    def test_audit_opinion_changes_saved_for_non_material_pdf_resubmission(self):
         self.client.force_login(user=self.user)
 
         response = self.client.post(
@@ -332,7 +330,7 @@ class ResubmissionStartViewTests(TestCase):
                 "non_material_change_reasons": self.valid_non_material_change_reasons,
                 "resubmission_action": self.valid_non_material_resubmission_action,
                 "resubmission_requester": self.valid_resubmission_requester,
-                "audit_opinion_changes": self.valid_audit_opinion_changes,
+                "audit_opinion_changes": "Corrected non-material PDF information.",
             },
         )
 
@@ -348,7 +346,7 @@ class ResubmissionStartViewTests(TestCase):
             self.user.profile.entry_form_data["resubmission_meta"][
                 "audit_opinion_changes"
             ],
-            "",
+            "Corrected non-material PDF information.",
         )
 
     def test_audit_opinion_changes_required_for_audit_pdf_resubmission(self):
