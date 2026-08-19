@@ -24,6 +24,7 @@ class ResubmissionActionEditViewTests(TestCase):
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": ["spelling"],
+                "sfsac_only_change_reasons": [],
                 "audit_opinion_changes": "Existing non-material PDF edits.",
             },
         )
@@ -138,6 +139,7 @@ class ResubmissionActionEditViewTests(TestCase):
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": [],
+                "sfsac_only_change_reasons": ["spelling"],
                 "audit_opinion_changes": "This should be removed.",
             },
         )
@@ -166,6 +168,7 @@ class ResubmissionActionEditViewTests(TestCase):
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": [],
+                "sfsac_only_change_reasons": ["spelling"],
                 "audit_opinion_changes": "",
             },
         )
