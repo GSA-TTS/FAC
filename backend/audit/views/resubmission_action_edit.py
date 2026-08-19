@@ -24,6 +24,7 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
                 "non_material_change_reasons": meta.get(
                     "non_material_change_reasons", []
                 ),
+                "audit_opinion_changes": meta.get("audit_opinion_changes", ""),
             }
         )
 
@@ -65,7 +66,9 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
         sac.resubmission_meta["non_material_change_reasons"] = form.cleaned_data[
             "non_material_change_reasons"
         ]
-
+        sac.resubmission_meta["audit_opinion_changes"] = form.cleaned_data[
+            "audit_opinion_changes"
+        ]
         sac.save()
 
         return redirect(

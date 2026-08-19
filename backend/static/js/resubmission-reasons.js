@@ -1,3 +1,15 @@
+function setSectionVisibility(section, visible) {
+    if (!section) {
+        return;
+    }
+
+    section.hidden = !visible;
+
+    section.querySelectorAll("input, textarea, select").forEach((field) => {
+        field.disabled = !visible;
+    });
+}
+
 function toggleReasonSections() {
     const selectedAction = document.querySelector(
         'input[name="resubmission_action"]:checked'
@@ -15,38 +27,26 @@ function toggleReasonSections() {
         "audit-opinion-changes-hint"
     );
 
-    // Reset all conditional sections first.
-    if (requesterSection) requesterSection.hidden = !selectedAction;
-    if (materialSection) materialSection.hidden = true;
-    if (nonMaterialSection) nonMaterialSection.hidden = true;
-    if (auditOpinionChangesSection) {
-        auditOpinionChangesSection.hidden = true;
-    }
+    // Reset conditional sections.
+    setSectionVisibility(requesterSection, Boolean(selectedAction));
+    setSectionVisibility(materialSection, false);
+    setSectionVisibility(nonMaterialSection, false);
+    setSectionVisibility(auditOpinionChangesSection, false);
 
     if (!selectedAction) {
         return;
     }
 
     if (selectedAction.value === "audit_pdf") {
-        if (materialSection) {
-            materialSection.hidden = false;
-        }
-
-        if (auditOpinionChangesSection) {
-            auditOpinionChangesSection.hidden = false;
-        }
+        setSectionVisibility(materialSection, true);
+        setSectionVisibility(auditOpinionChangesSection, true);
 
         if (auditOpinionChangesHint) {
             auditOpinionChangesHint.textContent = "This field is required.";
         }
     } else if (selectedAction.value === "non_material_pdf") {
-        if (nonMaterialSection) {
-            nonMaterialSection.hidden = false;
-        }
-
-        if (auditOpinionChangesSection) {
-            auditOpinionChangesSection.hidden = false;
-        }
+        setSectionVisibility(nonMaterialSection, true);
+        setSectionVisibility(auditOpinionChangesSection, true);
 
         if (auditOpinionChangesHint) {
             auditOpinionChangesHint.textContent = "This field is optional.";
@@ -54,12 +54,12 @@ function toggleReasonSections() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    document
-        .querySelectorAll('input[name="resubmission_action"]')
-        .forEach((radio) => {
-            radio.addEventListener("change", toggleReasonSections);
-        });
+// Populate the correct sections when the page first loads.
+document.addEventListener("DOMContentLoaded", toggleReasonSections);
 
-    toggleReasonSections();
+// Handle future radio changes, including on the edit page.
+document.addEventListener("change", (event) => {
+    if (event.target.matches('input[name="resubmission_action"]')) {
+        toggleReasonSections();
+    }
 });
