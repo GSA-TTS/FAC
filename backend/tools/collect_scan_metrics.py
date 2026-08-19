@@ -21,9 +21,8 @@ def _scan_file(file, filepath):
     try:
         logging.info(f"Scanning {filepath}")
         return requests.post(
-            "http://clamav-rest:9000/scan",
+            "http://clamav-rest:9000/v2/scan",
             files={"file": file},
-            data={"name": filepath},
             timeout=300,
         )
     except requests.exceptions.ConnectionError:
