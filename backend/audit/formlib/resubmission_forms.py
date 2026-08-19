@@ -38,12 +38,10 @@ NON_MATERIAL_CHANGE_CHOICES = [
         "aln_where_sefa_accurate",
         "Assistance Listing Numbers (ALNs) Corrections Where SEFA is Accurate",
     ),
-    ("data_entry", "Data Entry Corrections not Affecting Audit Conclusions"),
     (
         "direct_passthrough_where_sefa_accurate",
         "Direct vs. Pass-through Funding Corrections Where SEFA is Accurate",
     ),
-    ("ein", "Employer Identification Number (EIN) Corrections or Additions"),
     (
         "presentation",
         "Labelling or Presentation Corrections Not Impacting Reporting, Compliance, or Audit Conclusions",
@@ -53,6 +51,48 @@ NON_MATERIAL_CHANGE_CHOICES = [
         "Minor Numerical Rounding Corrections with No Material Affect on Expenditures, Major Program Determinations, Findings, or Compliance",
     ),
     ("spelling", "Spelling and Typographical Corrections"),
+    ("formatting", "Formatting Corrections"),
+    (
+        "questioned_costs_where_report_accurate",
+        "Questioned Costs Corrections Where SF-SAC is Accurate",
+    ),
+    (
+        "corrections_list_major_program",
+        "Corrections to Listed Major Programs, Type A Threshold, or Low-Risk Auditee Status When Audit Conclusions and SF-SAC Are Correct",
+    ),
+    ("immaterial", "Immaterial SEFA and Federal Program Reporting Errors"),
+]
+
+SFSAC_ONLY_CHANGE_CHOICES = [
+    (
+        "aln_where_sefa_accurate",
+        "Assistance Listing Numbers (ALNs) Corrections Where SEFA is Accurate",
+    ),
+    (
+        "data_entry",
+        "Data Entry Corrections not Affecting Audit Conclusions",
+    ),
+    (
+        "direct_passthrough_where_sefa_accurate",
+        "Direct vs. Pass-through Funding Corrections Where SEFA is Accurate",
+    ),
+    (
+        "ein",
+        "Employer Identification Number (EIN) Corrections or Additions",
+    ),
+    (
+        "presentation",
+        "Labelling or Presentation Corrections Not Impacting Reporting, Compliance, or Audit Conclusions",
+    ),
+    (
+        "rounding",
+        "Minor Numerical Rounding Corrections with No Material Affect on Expenditures, "
+        "Major Program Determinations, Findings, or Compliance",
+    ),
+    (
+        "spelling",
+        "Spelling and Typographical Corrections",
+    ),
     (
         "questioned_costs_where_report_accurate",
         "Questioned Costs Corrections Where Audit Report and Findings are Accurate",
@@ -95,6 +135,7 @@ def _clean_resubmission_form(form):
     material = cleaned_data.get("material_change_reasons")
     non_material = cleaned_data.get("non_material_change_reasons")
     audit_opinion_changes = cleaned_data.get("audit_opinion_changes")
+    sfsac_only = cleaned_data.get("sfsac_only_change_reasons")
 
     if not requester:
         form.add_error(
@@ -118,6 +159,12 @@ def _clean_resubmission_form(form):
         form.add_error(
             "non_material_change_reasons",
             "Select at least one non-material change.",
+        )
+
+    if action == RESUBMISSION_ACTION.SFSAC_ONLY and not sfsac_only:
+        form.add_error(
+            "sfsac_only_change_reasons",
+            "Select at least one SF-SAC only change.",
         )
 
     # SF-SAC-only resubmissions do not include PDF edit details.
@@ -155,6 +202,12 @@ class ResubmissionActionForm(forms.Form):
         widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
     )
 
+    sfsac_only_change_reasons = forms.MultipleChoiceField(
+        required=False,
+        choices=SFSAC_ONLY_CHANGE_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+    )
+
     audit_opinion_changes = forms.CharField(
         required=False,
         strip=True,
@@ -188,6 +241,12 @@ class ResubmissionForm(forms.Form):
     resubmission_requester = forms.MultipleChoiceField(
         required=False,
         choices=RESUBMISSION_REQUESTER_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+    )
+
+    sfsac_only_change_reasons = forms.MultipleChoiceField(
+        required=False,
+        choices=SFSAC_ONLY_CHANGE_CHOICES,
         widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
     )
 

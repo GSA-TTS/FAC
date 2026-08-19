@@ -20,6 +20,9 @@ function toggleReasonSections() {
     const nonMaterialSection = document.getElementById(
         "non-material-change-section"
     );
+    const sfsacOnlySection = document.getElementById(
+        "sfsac-only-change-section"
+    );
     const auditOpinionChangesSection = document.getElementById(
         "audit-opinion-changes-section"
     );
@@ -31,6 +34,7 @@ function toggleReasonSections() {
     setSectionVisibility(requesterSection, Boolean(selectedAction));
     setSectionVisibility(materialSection, false);
     setSectionVisibility(nonMaterialSection, false);
+    setSectionVisibility(sfsacOnlySection, false);
     setSectionVisibility(auditOpinionChangesSection, false);
 
     if (!selectedAction) {
@@ -51,6 +55,8 @@ function toggleReasonSections() {
         if (auditOpinionChangesHint) {
             auditOpinionChangesHint.textContent = "This field is optional.";
         }
+    } else if (selectedAction.value === "sfsac_only") {
+        setSectionVisibility(sfsacOnlySection, true);
     }
 }
 

@@ -21,6 +21,7 @@ def check_resubmission_metadata(data, sar=None):
     requester = resubmission_meta.get("resubmission_requester")
     material = resubmission_meta.get("material_change_reasons")
     non_material = resubmission_meta.get("non_material_change_reasons")
+    sfsac_only = resubmission_meta.get("sfsac_only_change_reasons")
 
     if not action:
         errors.append({"error": err_resubmission_type_required()})
@@ -32,6 +33,9 @@ def check_resubmission_metadata(data, sar=None):
         errors.append({"error": err_material_change_required()})
 
     if action == RESUBMISSION_ACTION.NON_MATERIAL_PDF and not non_material:
+        errors.append({"error": err_non_material_change_required()})
+
+    if action == RESUBMISSION_ACTION.SFSAC_ONLY and not sfsac_only:
         errors.append({"error": err_non_material_change_required()})
 
     return errors

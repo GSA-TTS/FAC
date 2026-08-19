@@ -62,6 +62,7 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": [],
+                "sfsac_only_change_reasons": ["spelling"],
             }
         )
 
@@ -107,6 +108,23 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
                 "resubmission_requester": ["auditor"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": [],
+            }
+        )
+
+        self.assertIn(
+            {"error": err_non_material_change_required()},
+            check_resubmission_metadata(data),
+        )
+
+    def test_missing_sfsac_only_reasons_returns_error(self):
+        data = self.make_data(
+            {
+                "previous_report_id": "2024-01-GSAFAC-0000000001",
+                "resubmission_action": RESUBMISSION_ACTION.SFSAC_ONLY,
+                "resubmission_requester": ["auditee"],
+                "material_change_reasons": [],
+                "non_material_change_reasons": [],
+                "sfsac_only_change_reasons": [],
             }
         )
 

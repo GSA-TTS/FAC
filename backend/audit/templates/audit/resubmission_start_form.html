@@ -12,7 +12,6 @@
                         <br><br>
 
                         Before proceeding, review the guidance below to determine the appropriate whether resubmission path. Resubmitted reports with material changes will result in a new FAC acceptance date. Non-material changes to reports will retain the original FAC acceptance date. All resubmission paths allow for updates to the SF-SAC data collection form. 
-                        <br></br>
                         The following options are available for resubmission:</p>
                         
                         <ul class="usa-list">
@@ -93,6 +92,35 @@
                                 <div class="usa-checkbox">
                                     {{ checkbox.tag }}
                                     <label class="usa-checkbox__label" for="{{ checkbox.id_for_label }}">
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
+
+                    <div id="sfsac-only-change-section" hidden>
+                        <fieldset
+                            class="usa-fieldset margin-top-4"
+                            aria-describedby="sfsac-only-change-hint"
+                        >
+                            <div class="usa-hint" id="sfsac-only-change-hint">
+                                Select one or more non-material changes that apply. This field is required.
+                            </div>
+
+                            {% if form.sfsac_only_change_reasons.errors %}
+                                <span class="usa-error-message margin-top-1">
+                                    {{ form.sfsac_only_change_reasons.errors|striptags }}
+                                </span>
+                            {% endif %}
+
+                            {% for checkbox in form.sfsac_only_change_reasons %}
+                                <div class="usa-checkbox">
+                                    {{ checkbox.tag }}
+                                    <label
+                                        class="usa-checkbox__label"
+                                        for="{{ checkbox.id_for_label }}"
+                                    >
                                         {{ checkbox.choice_label }}
                                     </label>
                                 </div>
