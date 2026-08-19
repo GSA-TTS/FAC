@@ -22,6 +22,7 @@ class ResubmissionStartViewTests(TestCase):
     valid_non_material_change_reasons = ["spelling"]
     valid_non_material_resubmission_action = "non_material_pdf"
     valid_sfsac_resubmission_action = "sfsac_only"
+    valid_sfsac_only_change_reasons = ["spelling"]
     valid_resubmission_requester = ["auditee"]
     valid_audit_opinion_changes = (
         "The auditor's opinion changed due to revised findings in the audit report."
@@ -167,6 +168,7 @@ class ResubmissionStartViewTests(TestCase):
                 "report_id": self.valid_report_id,
                 "resubmission_action": self.valid_sfsac_resubmission_action,
                 "resubmission_requester": self.valid_resubmission_requester,
+                "sfsac_only_change_reasons": self.valid_sfsac_only_change_reasons,
             },
         )
 
@@ -301,6 +303,7 @@ class ResubmissionStartViewTests(TestCase):
                 "report_id": self.valid_report_id,
                 "resubmission_action": self.valid_sfsac_resubmission_action,
                 "resubmission_requester": self.valid_resubmission_requester,
+                "sfsac_only_change_reasons": self.valid_sfsac_only_change_reasons,
                 "audit_opinion_changes": self.valid_audit_opinion_changes,
             },
         )
