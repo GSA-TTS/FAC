@@ -36,7 +36,7 @@ MATERIAL_CHANGE_CHOICES = [
 NON_MATERIAL_CHANGE_CHOICES = [
     (
         "aln_where_sefa_accurate",
-        "Assistance Listing Numbers (ALNs) Corrections Where SEFA is Accurate",
+        "Assistance Listing Numbers (ALNs) Corrections Where SF-SAC is Accurate",
     ),
     (
         "direct_passthrough_where_sefa_accurate",
