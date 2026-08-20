@@ -1,10 +1,21 @@
+import logging
+
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import View
 
 from audit.formlib import ResubmissionActionForm
 from audit.mixins import SingleAuditChecklistAccessRequiredMixin
-from audit.models import SingleAuditChecklist
+from audit.models import (
+    Audit,
+    SingleAuditChecklist,
+    SingleAuditReportFile,
+    SubmissionEvent,
+)
+from audit.models.constants import RESUBMISSION_ACTION
+from audit.views.upload_report_view import copy_previous_report_data
+
+logger = logging.getLogger(__name__)
 
 
 class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
@@ -41,6 +52,7 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         form = ResubmissionActionForm(request.POST)
 
+        # First, handle the form data.
         if not form.is_valid():
             return render(
                 request,
@@ -66,7 +78,32 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
             "non_material_change_reasons"
         ]
 
-        sac.save()
+        sac.save(
+            event_user=request.user,
+            event_type=SubmissionEvent.EventType.RESUBMISSION_META_UPDATED,
+        )
+
+        # Second, copy or delete the PDF report as needed.
+        resubmission_action = sac.resubmission_meta.get("resubmission_action")
+        previous_report_id = sac.resubmission_meta.get("previous_report_id")
+
+        if resubmission_action == RESUBMISSION_ACTION.SFSAC_ONLY:
+            audit = Audit.objects.find_audit_or_none(report_id)
+            try:
+                copy_previous_report_data(
+                    previous_report_id=previous_report_id,
+                    current_sac=sac,
+                    current_audit=audit,
+                    user=request.user,
+                )
+            except Exception as err:
+                logger.error(
+                    "Unexpected error copying SingleAuditReportFile in resubmission action edit: %s",
+                    err,
+                )
+        elif resubmission_action == RESUBMISSION_ACTION.AUDIT_PDF:
+            # 2026-08-11: The PDF will remain in s3. We think this is fine. For the user to submit, they'll have to overwrite the PDF anyways.
+            SingleAuditReportFile.objects.filter(sac=sac).delete()
 
         return redirect(
             reverse("audit:SubmissionProgress", kwargs={"report_id": report_id})

@@ -309,100 +309,98 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         return False
 
     # Resubmission SAC Creations
-    # Atomically create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist
+    # Create a new SAC row as a resubmission of this SAC. Assert that a resubmission does not already exist.
+    # Note that the access_and_submission_check above this call is ATOMIC. Catastrophic errors
+    # here will be rolled back from there.
     def initiate_resubmission(self, user=None):
-        # BEGIN ATOMIC BLOCK
-        with transaction.atomic():
-            if SingleAuditChecklist.objects.filter(
-                resubmission_meta__previous_report_id=self.report_id,
-                submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
-            ).exists():
-                raise ValidationError(
-                    f"A resubmission already exists for report_id {self.report_id}."
-                )
-
-            # Clone the record, including the top level audit type, all workbook data, and most form data.
-            # Excludes the certifications, tribal consent form, and cog/over assignments.
-            # PDF report form data is kept with the SingleAuditReportFile.
-            include_list = [
-                "audit_type",
-                "general_information",
-                "audit_information",
-                "federal_awards",
-                "corrective_action_plan",
-                "findings_text",
-                "findings_uniform_guidance",
-                "additional_ueis",
-                "additional_eins",
-                "secondary_auditors",
-                "notes_to_sefa",
-                "resubmission_meta",
-            ]
-            data = model_to_dict(self, fields=include_list)
-
-            # These are the fields that are pulled fresh from the pre-submission eligibility steps.
-            # UEI and fiscal period are also from pre-submission eligibility, but we can rely on them being copied from the previous record - they were validated then.
-            # "met_spending_threshold" and "is_usa_based" are always true. We store them as an user attestation, so we'll continue to do that and use the new values.
-            user_form_data = user.profile.entry_form_data
-            data["general_information"]["user_provided_organization_type"] = (
-                user_form_data["user_provided_organization_type"]
-            )
-            data["general_information"]["met_spending_threshold"] = user_form_data[
-                "met_spending_threshold"
-            ]
-            data["general_information"]["is_usa_based"] = user_form_data["is_usa_based"]
-
-            # Manually add back foreign key as instance
-            data["submitted_by"] = self.submitted_by
-
-            # We always need to update the data source on a resubmission.
-            # It is GSAFAC.
-            data["data_source"] = DATA_SOURCE_GSAFAC
-
-            # By default, the old version is 1. This means all resubmissions will be of at least version 2.
-            if data.get("resubmission_meta"):
-                old_version = data.get("resubmission_meta").get("version", 1)
-            else:
-                old_version = 1
-
-            resubmission_action = user_form_data.get("resubmission_meta", {}).get(
-                "resubmission_action"
+        if SingleAuditChecklist.objects.filter(
+            resubmission_meta__previous_report_id=self.report_id,
+            submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
+        ).exists():
+            raise ValidationError(
+                f"A resubmission already exists for report_id {self.report_id}."
             )
 
-            # Add/override fields
-            data.update(
-                {
-                    "submission_status": STATUS.IN_PROGRESS,
-                    "resubmission_meta": {
-                        "previous_report_id": self.report_id,
-                        "previous_row_id": self.id,
-                        "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
-                        "version": old_version + 1,
-                        "resubmission_action": resubmission_action,
-                    },
-                    "transition_name": [STATUS.IN_PROGRESS],
-                    "transition_date": [now()],
-                }
+        # Clone the record, including the top level audit type, all workbook data, and most form data.
+        # Excludes the certifications, tribal consent form, and cog/over assignments.
+        # PDF report form data is kept with the SingleAuditReportFile.
+        include_list = [
+            "audit_type",
+            "general_information",
+            "audit_information",
+            "federal_awards",
+            "corrective_action_plan",
+            "findings_text",
+            "findings_uniform_guidance",
+            "additional_ueis",
+            "additional_eins",
+            "secondary_auditors",
+            "notes_to_sefa",
+            "resubmission_meta",
+        ]
+        data = model_to_dict(self, fields=include_list)
+
+        # These are the fields that are pulled fresh from the pre-submission eligibility steps.
+        # UEI and fiscal period are also from pre-submission eligibility, but we can rely on them being copied from the previous record - they were validated then.
+        # "met_spending_threshold" and "is_usa_based" are always true. We store them as an user attestation, so we'll continue to do that and use the new values.
+        user_form_data = user.profile.entry_form_data
+        data["general_information"]["user_provided_organization_type"] = user_form_data[
+            "user_provided_organization_type"
+        ]
+        data["general_information"]["met_spending_threshold"] = user_form_data[
+            "met_spending_threshold"
+        ]
+        data["general_information"]["is_usa_based"] = user_form_data["is_usa_based"]
+
+        # Manually add back foreign key as instance
+        data["submitted_by"] = self.submitted_by
+
+        # The data source is always GSAFAC, even if the original was of another source.
+        data["data_source"] = DATA_SOURCE_GSAFAC
+
+        # By default, the old version is 1. This means all resubmissions will be of at least version 2.
+        if data.get("resubmission_meta"):
+            old_version = data.get("resubmission_meta").get("version", 1)
+        else:
+            old_version = 1
+
+        resubmission_action = user_form_data.get("resubmission_meta", {}).get(
+            "resubmission_action"
+        )
+
+        # Add/override fields
+        data.update(
+            {
+                "submission_status": STATUS.IN_PROGRESS,
+                "resubmission_meta": {
+                    "previous_report_id": self.report_id,
+                    "previous_row_id": self.id,
+                    "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
+                    "version": old_version + 1,
+                    "resubmission_action": resubmission_action,
+                },
+                "transition_name": [STATUS.IN_PROGRESS],
+                "transition_date": [now()],
+            }
+        )
+
+        resub = SingleAuditChecklist.objects.create(**data)
+
+        if user:
+            # Event on the new RESUB
+            SubmissionEvent.objects.create(
+                sac=resub,
+                user=user,
+                event=SubmissionEvent.EventType.RESUBMISSION_STARTED,
+            )
+            # Event on the original ORIG
+            SubmissionEvent.objects.create(
+                sac=self,
+                user=user,
+                event=SubmissionEvent.EventType.RESUBMISSION_INITIATED,
             )
 
-            resub = SingleAuditChecklist.objects.create(**data)
-
-            if user:
-                # Event on the new RESUB
-                SubmissionEvent.objects.create(
-                    sac=resub,
-                    user=user,
-                    event=SubmissionEvent.EventType.RESUBMISSION_STARTED,
-                )
-                # Event on the original ORIG
-                SubmissionEvent.objects.create(
-                    sac=self,
-                    user=user,
-                    event=SubmissionEvent.EventType.RESUBMISSION_INITIATED,
-                )
-
-            return resub
-        # END ATOMIC BLOCK
+        return resub
 
     def assign_cog_over(self):
         """

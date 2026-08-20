@@ -26,7 +26,7 @@
                         {% section_block report_id general_information %}
                         {% include "./resubmission_action.html" %}
                         {% section_block report_id audit_information %}
-                        {% section_block report_id single_audit_report %}
+                        {% single_audit_report_block report_id single_audit_report is_sfsac_only %}
                         {% section_block report_id federal_awards %}
                         {% section_block report_id notes_to_sefa %}
                         {% section_block report_id findings_uniform_guidance %}

@@ -93,6 +93,7 @@ FormSections = namedtuple(
         "ADDITIONAL_EINS",
         "SECONDARY_AUDITORS",
         "NOTES_TO_SEFA",
+        "RESUBMISSION_META",
     ),
 )
 # Note: we turn these into hyphenated lowercase for URLs, e.g. federal-awards
@@ -105,6 +106,7 @@ FORM_SECTIONS = FormSections(
     ADDITIONAL_EINS="AdditionalEins",
     SECONDARY_AUDITORS="SecondaryAuditors",
     NOTES_TO_SEFA="NotesToSefa",
+    RESUBMISSION_META="ResubmissionMeta",
 )
 
 SectionNames = namedtuple(
