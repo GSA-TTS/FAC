@@ -102,9 +102,7 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
                     err,
                 )
         elif resubmission_action == RESUBMISSION_ACTION.AUDIT_PDF:
-            # 2026-08-11:
-            # Should we just hide it, as though it were flagged for deletion?
-            # While the record is gone, the s3 object isn't. That's okay?
+            # 2026-08-11: The PDF will remain in s3. We think this is fine. For the user to submit, they'll have to overwrite the PDF anyways.
             SingleAuditReportFile.objects.filter(sac=sac).delete()
 
         return redirect(

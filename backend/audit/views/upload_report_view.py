@@ -299,8 +299,7 @@ def copy_previous_report_data(
         "date_created"
     )
 
-    # Remove any existing SAR rows for the current submission before copying
-    # 2026-08-11: Should we also remove the associated s3 object?
+    # Remove the SAR. The associated s3 file will be overwritten with the copy.
     SingleAuditReportFile.objects.filter(sac=current_sac).delete()
 
     # Copy the S3 object
