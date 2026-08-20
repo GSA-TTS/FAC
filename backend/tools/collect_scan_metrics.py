@@ -1,3 +1,5 @@
+# This script is currently broken and needs fixes before use
+
 import argparse
 import glob
 import logging
