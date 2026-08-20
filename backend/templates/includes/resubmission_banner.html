@@ -4,7 +4,7 @@
          id="resubmission-banner">
     <div class="usa-alert__body grid-container">
       <p class="usa-alert__text">
-          Resubmission of <a class="usa-link" href="{% url 'audit:SubmissionProgress' previous_report_id %}">{{ previous_report_id }}</a>
+          Resubmission of <a class="usa-link" href="{% url 'dissemination:Summary' previous_report_id %}">{{ previous_report_id }}</a>
           {% if submission.completed %}
             completed.
           {% else %}

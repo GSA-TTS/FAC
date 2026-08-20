@@ -49,8 +49,9 @@ class SubmissionEvent(models.Model):
         FAC_ADMINISTRATIVE_AUDITEE_NAME_REPLACEMENT = (
             "fac-administrative-auditee-name-replacement"
         )
-        RESUBMISSION_STARTED = "resubmission-started"
         RESUBMISSION_INITIATED = "resubmission-initiated"
+        RESUBMISSION_META_UPDATED = "resubmission-meta-updated"
+        RESUBMISSION_STARTED = "resubmission-started"
         RESUBMITTED = "resubmitted"
         FAC_ADMINISTRATIVE_RESUBMISSION_LINKAGE = (
             "fac-administrative-resubmission-linkage"
@@ -130,6 +131,10 @@ class SubmissionEvent(models.Model):
         (
             EventType.RESUBMISSION_INITIATED,
             _("A resubmission was started on this report."),
+        ),
+        (
+            EventType.RESUBMISSION_META_UPDATED,
+            _("Resubmission metadata updated"),
         ),
         (
             EventType.RESUBMISSION_STARTED,
