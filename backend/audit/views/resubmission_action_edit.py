@@ -85,7 +85,6 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
         sac.resubmission_meta["audit_opinion_changes"] = form.cleaned_data[
             "audit_opinion_changes"
         ]
-        sac.save()
 
         sac.save(
             event_user=request.user,
