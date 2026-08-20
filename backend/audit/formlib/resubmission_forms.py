@@ -40,7 +40,7 @@ NON_MATERIAL_CHANGE_CHOICES = [
     ),
     (
         "direct_passthrough_where_sefa_accurate",
-        "Direct vs. Pass-through Funding Corrections Where SEFA is Accurate",
+        "Direct vs. Pass-through Funding Corrections Where SF-SAC is Accurate",
     ),
     (
         "presentation",
