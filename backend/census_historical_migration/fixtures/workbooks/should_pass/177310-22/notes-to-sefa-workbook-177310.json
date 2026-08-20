@@ -31,7 +31,7 @@
                 ]
             },
             {
-                "name": "auditee_uei",
+                "name": "instructions_name",
                 "start_cell": {
                     "column": "B",
                     "row": "4"
@@ -39,6 +39,20 @@
                 "end_cell": {
                     "column": "B",
                     "row": "4"
+                },
+                "values": [
+                    "https://www.fac.gov/audit-resources/sf-sac/notes-to-sefa/"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
                 },
                 "values": [
                     "LJNSJ1C1KU15"
@@ -48,11 +62,11 @@
                 "name": "accounting_policies",
                 "start_cell": {
                     "column": "B",
-                    "row": "5"
+                    "row": "6"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "5"
+                    "row": "6"
                 },
                 "values": [
                     "NOTE 1 - BASIS OF ACCOUNTING: This Schedule is prepared on the same basis of accounting as the Central Valley School District's financial statements. The Central Valley School District uses the modified accrual basis of accounting. Expenditures represent only the federally funded portions of the program. District records should be consulted to determine amounts expended or matched from non-federal sources."
@@ -62,11 +76,11 @@
                 "name": "is_minimis_rate_used",
                 "start_cell": {
                     "column": "B",
-                    "row": "6"
+                    "row": "7"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "6"
+                    "row": "7"
                 },
                 "values": [
                     "N"
@@ -76,11 +90,11 @@
                 "name": "rate_explained",
                 "start_cell": {
                     "column": "B",
-                    "row": "7"
+                    "row": "8"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "7"
+                    "row": "8"
                 },
                 "values": [
                     "NOTE 2 - FEDERAL DE MINUS INDIRECT RATE: The Central Valley School District has not elected to use the 10-percent de minimis indirect cost rate allowed under the Uniform Guidance. The Central Valley School District used the federal restricted rate of 2.72% and federal unrestricted rate of 10.82%."
