@@ -45,12 +45,6 @@ import {
   id = "7b17e5b5-67bf-4e79-9be6-52d5f29dcac9"
 }
 
-# Backups bucket, belongs to meta module, in production env
-import {
-  to = module.s3-backups.cloudfoundry_service_instance.bucket
-  id = "040c4133-1efe-4281-a485-005960b58405"
-}
-
 ### preview
 import {
   to = module.environments["preview"].cloudfoundry_space.space

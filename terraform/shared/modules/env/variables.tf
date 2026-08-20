@@ -110,9 +110,21 @@ variable "pgrst_jwt_secret" {
   description = "the JWT signing secret for validating JWT tokens from api.data.gov"
 }
 
-variable "json_params" {
+variable "db_params" {
   type        = string
-  description = "Optional parameters used for service instance (-c)"
+  description = "Optional parameters used for service instance"
+}
+
+variable "snapshot_db_params" {
+  type        = string
+  description = "Optional parameters used for service instance"
+  default     = null
+}
+
+variable "metabase_db_params" {
+  type        = string
+  description = "Optional parameters used for service instance"
+  default     = null
 }
 
 variable "new_relic_account_id" {
