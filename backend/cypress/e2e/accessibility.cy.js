@@ -161,6 +161,5 @@ describe('A11y Testing on search pages', () => {
     });
   });
 
-  test_check_a11y('/dissemination/search/', 'basic search');
-  test_check_a11y('/dissemination/search/advanced/', 'advanced search');
+  test_check_a11y('/dissemination/search/', 'search');
 });

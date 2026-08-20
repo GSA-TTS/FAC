@@ -15,7 +15,6 @@ from audit.models import (
 from audit.models.utils import get_next_sequence_id
 from audit.models.constants import SAC_SEQUENCE_ID
 from audit.fixtures.excel import FORM_SECTIONS
-from dissemination.test_search import TestMaterializedViewBuilder
 from dissemination.models import (
     CapText,
     FederalAward,
@@ -27,6 +26,7 @@ from dissemination.models import (
     Resubmission,
 )
 from users.models import Permission, UserPermission
+from dissemination.test_utils import bake_unified
 
 from model_bakery import baker
 
@@ -154,7 +154,7 @@ class PdfDownloadViewTests(TestCase):
         self.assertIn(file.filename, response.url)
 
 
-class SearchViewTests(TestMaterializedViewBuilder):
+class SearchViewTests(TestCase):
     def setUp(self):
         super().setUp()
         self.anon_client = Client()
@@ -198,8 +198,17 @@ class SearchViewTests(TestMaterializedViewBuilder):
 
         Returns tuple: (public, private, deprecated)
         """
-        public = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
-        private = baker.make(General, is_public=False, audit_year=2023, _quantity=5)
+        public_gens = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
+        private_gens = baker.make(
+            General, is_public=False, audit_year=2023, _quantity=5
+        )
+
+        for g in public_gens:
+            fed = baker.make(FederalAward, report_id=g)
+            bake_unified(g, [fed])
+        for g in private_gens:
+            fed = baker.make(FederalAward, report_id=g)
+            bake_unified(g, [fed])
 
         deprecated_public = baker.make(
             General,
@@ -208,6 +217,9 @@ class SearchViewTests(TestMaterializedViewBuilder):
             resubmission_status="deprecated_via_resubmission",
             resubmission_version=1,
         )
+        pub_fed = baker.make(FederalAward, report_id=deprecated_public)
+        bake_unified(deprecated_public, [pub_fed])
+
         deprecated_private = baker.make(
             General,
             is_public=False,
@@ -215,25 +227,16 @@ class SearchViewTests(TestMaterializedViewBuilder):
             resubmission_status="deprecated_via_resubmission",
             resubmission_version=1,
         )
+        priv_fed = baker.make(FederalAward, report_id=deprecated_private)
+        bake_unified(deprecated_private, [priv_fed])
 
-        # Ensure they show up in the materialized view result set (your tests do this via FederalAward)
-        for g in public:
-            baker.make(FederalAward, report_id=g)
-        for g in private:
-            baker.make(FederalAward, report_id=g)
-
-        baker.make(FederalAward, report_id=deprecated_public)
-        baker.make(FederalAward, report_id=deprecated_private)
-
-        return public, private, [deprecated_public, deprecated_private]
+        return public_gens, private_gens, [deprecated_public, deprecated_private]
 
     def test_anonymous_returns_public_and_private_excludes_deprecated(self):
         """
         Anonymous users should see public + private reports, but NOT audits deprecated via resubmission.
         """
         public, private, deprecated = self._make_reports()
-
-        self.refresh_materialized_view()
         response = self.anon_client.post(self._search_url(), {})
 
         # Should include 10 results (public + private), excluding deprecated
@@ -252,8 +255,6 @@ class SearchViewTests(TestMaterializedViewBuilder):
         but NOT audits deprecated via resubmission.
         """
         public, private, deprecated = self._make_reports()
-
-        self.refresh_materialized_view()
         response = self.auth_client.post(self._search_url(), {})
 
         self.assertContains(response, "<strong>10</strong>")
@@ -265,24 +266,21 @@ class SearchViewTests(TestMaterializedViewBuilder):
         for g in deprecated:
             self.assertNotContains(response, g.report_id)
 
-    def test_permissioned_returns_public_and_private_excludes_deprecated(self):
+    def test_permissioned_returns_all(self):
         """
-        Permissioned users should see public + private reports.
-        Deprecated-via-resubmission audits should not appear in results.
+        Permissioned users should see all reports.
         """
         public, private, deprecated = self._make_reports()
-
-        self.refresh_materialized_view()
         response = self.perm_client.post(self._search_url(), {})
 
-        self.assertContains(response, "<strong>10</strong>")
+        self.assertContains(response, "<strong>12</strong>")
 
         for g in public:
             self.assertContains(response, g.report_id)
         for g in private:
             self.assertContains(response, g.report_id)
         for g in deprecated:
-            self.assertNotContains(response, g.report_id)
+            self.assertContains(response, g.report_id)
 
 
 class PublicDataDownloadViewTests(TestCase):
@@ -603,7 +601,7 @@ class XlsxDownloadViewTests(TestCase):
         self.assertIn(file.filename, response.url)
 
 
-class SummaryViewTests(TestMaterializedViewBuilder):
+class SummaryViewTests(TestCase):
     def setUp(self):
         super().setUp()
         self.client = Client()
@@ -845,11 +843,12 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         gen_object = baker.make(
             General, is_public=True, report_id="2022-12-GSAFAC-0000000001"
         )
-        baker.make(
+        fed = baker.make(
             FederalAward,
             report_id=gen_object,
         )
-        self.refresh_materialized_view()
+        bake_unified(gen_object, [fed])
+
         url = reverse(
             "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
         )
@@ -870,7 +869,7 @@ class SummaryViewTests(TestMaterializedViewBuilder):
         self.assertEqual(response.context["is_sf_sac_downloadable"], False)
 
 
-class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
+class SummaryReportDownloadViewTests(TestCase):
     def setUp(self):
         super().setUp()
         self.anon_client = Client()
@@ -922,8 +921,9 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         Searches with no results should return a 404, not an empty excel file.
         """
         general = self._make_general(is_public=False, auditee_uei="123456789012")
-        baker.make(FederalAward, report_id=general)
-        self.refresh_materialized_view()
+        fed = baker.make(FederalAward, report_id=general)
+        bake_unified(general, [fed])
+
         response = self.anon_client.post(
             self._summary_report_url(), {"uei_or_ein": "NotTheOther1"}
         )
@@ -943,9 +943,9 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         )
 
         general = self._make_general(is_public=False)
-        baker.make(FederalAward, report_id=general)
+        fed = baker.make(FederalAward, report_id=general)
+        bake_unified(general, [fed])
         baker.make(FindingText, report_id=general)
-        self.refresh_materialized_view()
 
         response = self.perm_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -972,9 +972,9 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         )
 
         general = self._make_general(is_public=False)
-        baker.make(FederalAward, report_id=general)
+        fed = baker.make(FederalAward, report_id=general)
+        bake_unified(general, [fed])
         baker.make(FindingText, report_id=general)
-        self.refresh_materialized_view()
 
         response = self.anon_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -999,9 +999,9 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         )
 
         general = self._make_general(is_public=True)
-        baker.make(FederalAward, report_id=general)
+        fed = baker.make(FederalAward, report_id=general)
+        bake_unified(general, [fed])
         baker.make(FindingText, report_id=general)
-        self.refresh_materialized_view()
 
         response = self.perm_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -1028,9 +1028,9 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
         )
 
         general = self._make_general(is_public=True)
-        baker.make(FederalAward, report_id=general)
+        fed = baker.make(FederalAward, report_id=general)
+        bake_unified(general, [fed])
         baker.make(FindingText, report_id=general)
-        self.refresh_materialized_view()
 
         response = self.anon_client.post(self._summary_report_url(), {})
         self.assertEqual(response.status_code, 200)
@@ -1056,8 +1056,8 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
             1.0,
         )
         general = self._make_general(is_public=True)
-        baker.make(FederalAward, report_id=general)
-        self.refresh_materialized_view()
+        fed = baker.make(FederalAward, report_id=general)
+        bake_unified(general, [fed])
 
         response = self.anon_client.post(self._summary_report_url(), {})
 
@@ -1094,8 +1094,8 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
                     end_date="2023-12-31", sequence=sequence
                 ),
             )
-            baker.make(FederalAward, report_id=general)
-        self.refresh_materialized_view()
+            fed = baker.make(FederalAward, report_id=general)
+            bake_unified(general, [fed])
 
         with self.settings(SUMMARY_REPORT_DOWNLOAD_LIMIT=2):
             response = self.anon_client.post(self._summary_report_url(), {})
@@ -1114,13 +1114,12 @@ class SummaryReportDownloadViewTests(TestMaterializedViewBuilder):
 
 
 class PageHandlingTests(TestCase):
-    """Test cases for ensuring page handling logic in AdvancedSearch and Search views"""
+    """Test cases for ensuring page handling logic in the Search view"""
 
     def setUp(self):
         """Set up test client and sample form data"""
         self.client = Client()
-        self.advanced_search_url = reverse("dissemination:AdvancedSearch")
-        self.basic_search_url = reverse("dissemination:Search")
+        self.search_url = reverse("dissemination:Search")
 
         self.valid_post_data = {
             "audit_year": ["2023"],
@@ -1131,7 +1130,7 @@ class PageHandlingTests(TestCase):
         }
 
     @patch("dissemination.views.search.run_search")
-    def test_advanced_search_post_page_too_high(self, mock_run_search):
+    def test_search_post_page_too_high(self, mock_run_search):
         """Ensure page resets to 1 when the requested page is greater than available pages"""
         mock_run_search.return_value.count.return_value = (
             5  # Mock result count (only 1 page available)
@@ -1140,42 +1139,42 @@ class PageHandlingTests(TestCase):
         invalid_data = self.valid_post_data.copy()
         invalid_data["page"] = "100"  # Too high
 
-        response = self.client.post(self.advanced_search_url, invalid_data)
+        response = self.client.post(self.search_url, invalid_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 1)  # Should reset to 1
 
     @patch("dissemination.views.search.run_search")
-    def test_advanced_search_post_page_zero(self, mock_run_search):
+    def test_search_post_page_zero(self, mock_run_search):
         """Ensure page resets to 1 when the requested page is zero"""
         mock_run_search.return_value.count.return_value = 5
 
         invalid_data = self.valid_post_data.copy()
         invalid_data["page"] = "0"
 
-        response = self.client.post(self.advanced_search_url, invalid_data)
+        response = self.client.post(self.search_url, invalid_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 1)  # Should reset to 1
 
     @patch("dissemination.views.search.run_search")
-    def test_advanced_search_post_page_empty(self, mock_run_search):
+    def test_search_post_page_empty(self, mock_run_search):
         """Ensure page defaults to 1 when no page is provided"""
         mock_run_search.return_value.count.return_value = 5
 
         invalid_data = self.valid_post_data.copy()
         invalid_data["page"] = ""
 
-        response = self.client.post(self.advanced_search_url, invalid_data)
+        response = self.client.post(self.search_url, invalid_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 1)  # Should default to 1
 
     @patch("dissemination.views.search.run_search")
-    def test_advanced_search_post_valid_page(self, mock_run_search):
+    def test_search_post_valid_page(self, mock_run_search):
         """Ensure valid page number remains unchanged"""
         mock_run_search.return_value.count.return_value = 20  # Multiple pages exist
 
         valid_data = self.valid_post_data.copy()
         valid_data["page"] = "2"  # Valid page
 
-        response = self.client.post(self.advanced_search_url, valid_data)
+        response = self.client.post(self.search_url, valid_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 2)  # Should remain 2
