@@ -18,6 +18,8 @@ from datetime import date
 
 logger = logging.getLogger(__name__)
 
+CHUNK_SIZE = 500
+
 
 class Command(BaseCommand):
     """
@@ -70,10 +72,8 @@ class Command(BaseCommand):
                 sac = SingleAuditChecklist.objects.get(report_id=report_id)
                 sac.redisseminate()
                 logger.info(f"Redisseminated: {report_id}.")
-                exit(0)
             except SingleAuditChecklist.DoesNotExist:
                 logger.error(f"No report with report_id found: {report_id}. Exiting.")
-                exit(-1)
         else:
             if year:
                 years = [year]
@@ -86,10 +86,12 @@ class Command(BaseCommand):
             for year in years:
                 logger.info(f"Working year {year}")
 
-                for sac in SingleAuditChecklist.objects.filter(
+                queryset = SingleAuditChecklist.objects.filter(
                     submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
                     general_information__auditee_fiscal_period_end__startswith=f"{year}",
-                ):
+                )
+
+                for sac in queryset.iterator(chunk_size=CHUNK_SIZE):
                     logger.info(f"Redisseminating {sac.report_id}.")
                     sac.redisseminate()
                     redisseminated[sac.report_id] = True
