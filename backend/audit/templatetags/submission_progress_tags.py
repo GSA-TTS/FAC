@@ -29,6 +29,22 @@ def section_block(report_id, section_info):
     return section_info | additional_info
 
 
+@register.inclusion_tag("audit/submission_checklist/single-audit-report.html")
+def single_audit_report_block(report_id, section_info, is_sfsac_only=False):
+    """
+    Largely a copy of the regular section block tag. We want to use the variable friendly names and
+    determine context in the view, rather than in HTML. This gets harder for each section with unique behavior.
+    """
+    title = section_info["friendly_title"]
+    if section_info.get("completed") is True:
+        title = f"{title} (Complete)"
+    return section_info | {
+        "report_id": report_id,
+        "title": title,
+        "is_sfsac_only": is_sfsac_only,
+    }
+
+
 """
 python manage.py test audit.test_submission_progress_view
 python manage.py shell

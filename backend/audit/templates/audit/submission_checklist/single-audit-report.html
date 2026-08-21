@@ -1,0 +1,44 @@
+{% load sprite_helper %}
+{% comment %}
+    The Single Audit Report (SAR) is a section block with some special display cases.
+
+    1. For SFSAC_ONLY resubmissions, the PDF is copied in from the previous submission.
+        This section is disabled, and only serves to show the user that the form exists.
+    2. For original submission or AUDIT_PDF resubmissions, it's a standard complete/incomplete check.
+
+    Context is provided by the single_audit_report_block inclusion tag in submission_progress_tags.py.
+    All section_info fields are available at the top level (e.g. title, text, completed, completed_by, etc.).
+{% endcomment %}
+<li class="usa-icon-list__item padding-bottom-105" id="upload-report">
+    {% if is_sfsac_only %}
+        {% comment %} 1. SFSAC_ONLY. Disabled state. {% endcomment %}
+        {% include "./icon-list-icon.html" with completed=False display="inactive" %}
+        <div class="text-disabled-dark">
+            <p class="text-bold margin-0">{{ title }}</p>
+            <p class="margin-0">{{ text }}</p>
+            <p class="margin-0 font-sans-xs">
+                <em>The audit report PDF from the previous submission will be used automatically for this resubmission.</em>
+            </p>
+        </div>
+    {% elif completed %}
+        {% comment %} 2a. Complete {% endcomment %}
+        {% include "./icon-list-icon.html" with completed=True display="complete" %}
+        <div class="text-success-darker">
+            <p class="text-bold text-underline margin-0">{{ title }}</p>
+            <p class="margin-0">{{ text }}</p>
+            {% include "./created-by.html" with name=completed_by time=completed_date %}
+            <p class="margin-0">
+                <a class="usa-link" href="{% url 'audit:UploadReport' report_id %}">{{ edit_text }}</a>
+            </p>
+        </div>
+    {% else %}
+        {% comment %} 2b. Incomplete {% endcomment %}
+        {% include "./icon-list-icon.html" with completed=False display="incomplete" %}
+        <div>
+            <p class="text-bold margin-0">
+                <a class="usa-link" href="{% url 'audit:UploadReport' report_id %}">{{ title }}</a>
+            </p>
+            <p class="margin-0">{{ text }}</p>
+        </div>
+    {% endif %}
+</li>

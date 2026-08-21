@@ -19,7 +19,11 @@
                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr> Indicates a required field.
                     </p>
                     {% if errors %}
-                        <span class="usa-error-message" role="alert">There were errors when attempting to submit the form. Scroll down for more details.</span>
+                        {% if errors.items %}
+                            <span class="usa-error-message" role="alert">There were errors when attempting to submit the form. Scroll down for more details.</span>
+                        {% else %}
+                            <span class="usa-error-message" role="alert">{{ errors }}</span>
+                        {% endif %}
                     {% endif %}
                     <fieldset class="usa-fieldset question"
                               aria-labelledby="certifying_auditee_contact_legend certifying_auditee_contact_instruction">
