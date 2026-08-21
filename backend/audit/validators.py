@@ -515,7 +515,6 @@ def _scan_file(file):
         return requests.post(
             settings.AV_SCAN_URL,
             files={"file": file},
-            data={"name": file.name},
             timeout=45,
         )
     # Common upload issues get their own messages. These messages display as form errors.
