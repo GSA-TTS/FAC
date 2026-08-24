@@ -21,3 +21,6 @@ toml==0.10.2
 types-pytz==2024.2.0.20241003
 types-requests==2.32.0.20241016
 whitenoise==6.7.0
+
+# via pip-tools
+pip==26.2.1
