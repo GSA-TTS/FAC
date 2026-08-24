@@ -1,3 +1,15 @@
+function setSectionVisibility(section, visible) {
+    if (!section) {
+        return;
+    }
+
+    section.hidden = !visible;
+
+    section.querySelectorAll("input, textarea, select").forEach((field) => {
+        field.disabled = !visible;
+    });
+}
+
 function toggleReasonSections() {
     const selectedAction = document.querySelector(
         'input[name="resubmission_action"]:checked'
@@ -8,47 +20,52 @@ function toggleReasonSections() {
     const nonMaterialSection = document.getElementById(
         "non-material-change-section"
     );
+    const sfsacOnlySection = document.getElementById(
+        "sfsac-only-change-section"
+    );
     const auditOpinionChangesSection = document.getElementById(
         "audit-opinion-changes-section"
     );
+    const auditOpinionChangesHint = document.getElementById(
+        "audit-opinion-changes-hint"
+    );
+
+    // Reset conditional sections.
+    setSectionVisibility(requesterSection, Boolean(selectedAction));
+    setSectionVisibility(materialSection, false);
+    setSectionVisibility(nonMaterialSection, false);
+    setSectionVisibility(sfsacOnlySection, false);
+    setSectionVisibility(auditOpinionChangesSection, false);
 
     if (!selectedAction) {
-        if (requesterSection) requesterSection.hidden = true;
-        if (materialSection) materialSection.hidden = true;
-        if (nonMaterialSection) nonMaterialSection.hidden = true;
-        if (auditOpinionChangesSection) {
-            auditOpinionChangesSection.hidden = true;
-        }
         return;
     }
 
-    if (requesterSection) {
-        requesterSection.hidden = false;
-    }
-
     if (selectedAction.value === "audit_pdf") {
-        if (materialSection) materialSection.hidden = false;
-        if (nonMaterialSection) nonMaterialSection.hidden = true;
+        setSectionVisibility(materialSection, true);
+        setSectionVisibility(auditOpinionChangesSection, true);
 
-        if (auditOpinionChangesSection) {
-            auditOpinionChangesSection.hidden = false;
+        if (auditOpinionChangesHint) {
+            auditOpinionChangesHint.textContent = "This field is required.";
+        }
+    } else if (selectedAction.value === "non_material_pdf") {
+        setSectionVisibility(nonMaterialSection, true);
+        setSectionVisibility(auditOpinionChangesSection, true);
+
+        if (auditOpinionChangesHint) {
+            auditOpinionChangesHint.textContent = "This field is optional.";
         }
     } else if (selectedAction.value === "sfsac_only") {
-        if (materialSection) materialSection.hidden = true;
-        if (nonMaterialSection) nonMaterialSection.hidden = false;
-
-        if (auditOpinionChangesSection) {
-            auditOpinionChangesSection.hidden = true;
-        }
+        setSectionVisibility(sfsacOnlySection, true);
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    document
-        .querySelectorAll('input[name="resubmission_action"]')
-        .forEach((radio) => {
-            radio.addEventListener("change", toggleReasonSections);
-        });
+// Populate the correct sections when the page first loads.
+document.addEventListener("DOMContentLoaded", toggleReasonSections);
 
-    toggleReasonSections();
+// Handle future radio changes, including on the edit page.
+document.addEventListener("change", (event) => {
+    if (event.target.matches('input[name="resubmission_action"]')) {
+        toggleReasonSections();
+    }
 });

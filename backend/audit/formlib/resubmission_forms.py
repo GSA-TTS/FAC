@@ -36,14 +36,12 @@ MATERIAL_CHANGE_CHOICES = [
 NON_MATERIAL_CHANGE_CHOICES = [
     (
         "aln_where_sefa_accurate",
-        "Assistance Listing Numbers (ALNs) Corrections Where SEFA is Accurate",
+        "Assistance Listing Numbers (ALNs) Corrections Where SF-SAC is Accurate",
     ),
-    ("data_entry", "Data Entry Corrections not Affecting Audit Conclusions"),
     (
         "direct_passthrough_where_sefa_accurate",
-        "Direct vs. Pass-through Funding Corrections Where SEFA is Accurate",
+        "Direct vs. Pass-through Funding Corrections Where SF-SAC is Accurate",
     ),
-    ("ein", "Employer Identification Number (EIN) Corrections or Additions"),
     (
         "presentation",
         "Labelling or Presentation Corrections Not Impacting Reporting, Compliance, or Audit Conclusions",
@@ -53,6 +51,48 @@ NON_MATERIAL_CHANGE_CHOICES = [
         "Minor Numerical Rounding Corrections with No Material Affect on Expenditures, Major Program Determinations, Findings, or Compliance",
     ),
     ("spelling", "Spelling and Typographical Corrections"),
+    ("formatting", "Formatting Corrections"),
+    (
+        "questioned_costs_where_report_accurate",
+        "Questioned Costs Corrections Where SF-SAC is Accurate",
+    ),
+    (
+        "corrections_list_major_program",
+        "Corrections to Listed Major Programs, Type A Threshold, or Low-Risk Auditee Status When Audit Conclusions and SF-SAC Are Correct",
+    ),
+    ("immaterial", "Immaterial SEFA and Federal Program Reporting Errors"),
+]
+
+SFSAC_ONLY_CHANGE_CHOICES = [
+    (
+        "aln_where_sefa_accurate",
+        "Assistance Listing Numbers (ALNs) Corrections Where SEFA is Accurate",
+    ),
+    (
+        "data_entry",
+        "Data Entry Corrections not Affecting Audit Conclusions",
+    ),
+    (
+        "direct_passthrough_where_sefa_accurate",
+        "Direct vs. Pass-through Funding Corrections Where SEFA is Accurate",
+    ),
+    (
+        "ein",
+        "Employer Identification Number (EIN) Corrections or Additions",
+    ),
+    (
+        "presentation",
+        "Labelling or Presentation Corrections Not Impacting Reporting, Compliance, or Audit Conclusions",
+    ),
+    (
+        "rounding",
+        "Minor Numerical Rounding Corrections with No Material Affect on Expenditures, "
+        "Major Program Determinations, Findings, or Compliance",
+    ),
+    (
+        "spelling",
+        "Spelling and Typographical Corrections",
+    ),
     (
         "questioned_costs_where_report_accurate",
         "Questioned Costs Corrections Where Audit Report and Findings are Accurate",
@@ -62,11 +102,21 @@ NON_MATERIAL_CHANGE_CHOICES = [
 RESUBMISSION_ACTION_CHOICES = [
     (
         RESUBMISSION_ACTION.AUDIT_PDF,
-        "I need to upload or edit the audit PDF package (with the option to also edit the SF-SAC data collection forms). I understand that this option will result in a new acceptance date for the submission.",
+        "I need to make material changes to the audit PDF package "
+        "(with the option to also edit the SF-SAC data collection forms). "
+        "I understand that this option will result in a new acceptance date "
+        "for the submission.",
+    ),
+    (
+        RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+        "I need to make non-material changes to the audit PDF package "
+        "(with the option to also edit the SF-SAC data collection forms). "
+        "I understand that the submission's acceptance date will not change.",
     ),
     (
         RESUBMISSION_ACTION.SFSAC_ONLY,
-        "I only need to modify SF-SAC Data Collection Form information. I understand that the submission's acceptance date will not change.",
+        "I need to make updates only to the SF-SAC data collection form. "
+        "I understand that the submission's acceptance date will not change.",
     ),
 ]
 
@@ -84,6 +134,8 @@ def _clean_resubmission_form(form):
     requester = cleaned_data.get("resubmission_requester")
     material = cleaned_data.get("material_change_reasons")
     non_material = cleaned_data.get("non_material_change_reasons")
+    audit_opinion_changes = cleaned_data.get("audit_opinion_changes")
+    sfsac_only = cleaned_data.get("sfsac_only_change_reasons")
 
     if not requester:
         form.add_error(
@@ -97,14 +149,26 @@ def _clean_resubmission_form(form):
             "Select at least one material change.",
         )
 
-    if action == RESUBMISSION_ACTION.SFSAC_ONLY and not non_material:
+    if action == RESUBMISSION_ACTION.AUDIT_PDF and not audit_opinion_changes:
+        form.add_error(
+            "audit_opinion_changes",
+            "Identify the changes in the audit opinion that are the reason for the resubmission.",
+        )
+
+    if action == RESUBMISSION_ACTION.NON_MATERIAL_PDF and not non_material:
         form.add_error(
             "non_material_change_reasons",
             "Select at least one non-material change.",
         )
 
-    # Auditor opinion changes only apply to a full audit PDF resubmission, so if the user selects the SFSAC_ONLY option, we should clear out any input in that field.
-    if action != RESUBMISSION_ACTION.AUDIT_PDF:
+    if action == RESUBMISSION_ACTION.SFSAC_ONLY and not sfsac_only:
+        form.add_error(
+            "sfsac_only_change_reasons",
+            "Select at least one SF-SAC only change.",
+        )
+
+    # SF-SAC-only resubmissions do not include PDF edit details.
+    if action == RESUBMISSION_ACTION.SFSAC_ONLY:
         cleaned_data["audit_opinion_changes"] = ""
 
     return cleaned_data
@@ -138,6 +202,24 @@ class ResubmissionActionForm(forms.Form):
         widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
     )
 
+    sfsac_only_change_reasons = forms.MultipleChoiceField(
+        required=False,
+        choices=SFSAC_ONLY_CHANGE_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+    )
+
+    audit_opinion_changes = forms.CharField(
+        required=False,
+        strip=True,
+        widget=forms.Textarea(
+            attrs={
+                "class": "usa-textarea",
+                "rows": 3,
+                "style": "height: 5rem; min-height: 5rem;",
+            }
+        ),
+    )
+
     def clean(self):
         super().clean()
         return _clean_resubmission_form(self)
@@ -159,6 +241,12 @@ class ResubmissionForm(forms.Form):
     resubmission_requester = forms.MultipleChoiceField(
         required=False,
         choices=RESUBMISSION_REQUESTER_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+    )
+
+    sfsac_only_change_reasons = forms.MultipleChoiceField(
+        required=False,
+        choices=SFSAC_ONLY_CHANGE_CHOICES,
         widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
     )
 
