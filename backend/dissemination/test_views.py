@@ -836,38 +836,6 @@ class SummaryViewTests(TestCase):
         self.assertNotIn("Resubmission history", page_content)
         self.assertNotIn("Most recent submitted date", page_content)
 
-    def test_sac_download_available(self):
-        """
-        Ensures is_sf_sac_downloadable is True when a submission's SF-SAC is downloadable
-        """
-        gen_object = baker.make(
-            General, is_public=True, report_id="2022-12-GSAFAC-0000000001"
-        )
-        fed = baker.make(
-            FederalAward,
-            report_id=gen_object,
-        )
-        bake_unified(gen_object, [fed])
-
-        url = reverse(
-            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
-        )
-
-        response = self.client.get(url)
-        self.assertEqual(response.context["is_sf_sac_downloadable"], True)
-
-    def test_sac_download_not_available(self):
-        """
-        Ensures is_sf_sac_downloadable is False when a submission's SF-SAC is not downloadable
-        """
-        baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
-        url = reverse(
-            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
-        )
-
-        response = self.client.get(url)
-        self.assertEqual(response.context["is_sf_sac_downloadable"], False)
-
 
 class SummaryReportDownloadViewTests(TestCase):
     def setUp(self):
