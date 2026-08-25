@@ -161,6 +161,52 @@ describe('A11y Testing on search pages', () => {
     });
   });
 
+  it('Displays EIN guidance', () => {
+    cy.visit('/dissemination/search/');
+
+    cy.get('#uei-ein-help')
+      .should('be.visible')
+      .and('contain.text', 'Enter EIN with no dashes.');
+  });
+
+  it('Removes dashes from EIN input', () => {
+    cy.visit('/dissemination/search/');
+
+    cy.get('#input_uei-or-ein')
+      .clear()
+      .type('12-3456789')
+      .should('have.value', '123456789');
+  });
+
+  it('Removes special characters from UEI/EIN input', () => {
+    cy.visit('/dissemination/search/');
+
+    cy.get('#input_uei-or-ein')
+      .clear()
+      .type('ABC-123 XYZ!')
+      .should('have.value', 'ABC123XYZ');
+  });
+
+  it('Preserves multiple UEI/EIN entries on separate lines', () => {
+    cy.visit('/dissemination/search/');
+
+    cy.get('#input_uei-or-ein')
+      .clear()
+      .type('12-3456789{enter}ABC-123-XYZ')
+      .should('have.value', '123456789\nABC123XYZ');
+  });
+
+  it('Associates EIN guidance with the UEI/EIN input', () => {
+    cy.visit('/dissemination/search/');
+
+    cy.get('#input_uei-or-ein')
+      .should('have.attr', 'aria-describedby', 'uei-ein-help');
+
+    cy.get('label[for="input_uei-or-ein"]')
+      .should('exist')
+      .and('contain.text', 'UEI or EIN');
+  });
+
   test_check_a11y('/dissemination/search/', 'basic search');
   test_check_a11y('/dissemination/search/advanced/', 'advanced search');
 });
