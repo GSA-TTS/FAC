@@ -5,7 +5,7 @@ module "database" {
   name          = "fac-db"
   tags          = ["rds"]
   rds_plan_name = var.database_plan
-  json_params   = var.json_params
+  json_params   = var.db_params
 }
 
 module "snapshot-database" {
@@ -16,7 +16,7 @@ module "snapshot-database" {
   name          = "fac-snapshot-db"
   tags          = ["rds"]
   rds_plan_name = var.snapshot_database_plan
-  json_params   = var.json_params
+  json_params   = var.snapshot_db_params
 }
 
 module "s3-public" {

@@ -18,7 +18,7 @@ module "preview" {
   clamav_instances      = 1
   clamav_memory         = "2048M"
   clamav_fs_instances   = 1
-  json_params = jsonencode(
+  db_params = jsonencode(
     {
       "storage" : 50,
     }
