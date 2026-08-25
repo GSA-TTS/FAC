@@ -6,7 +6,6 @@ from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
     CapText,
-    Unified,
     FederalAward,
     Finding,
     FindingText,
