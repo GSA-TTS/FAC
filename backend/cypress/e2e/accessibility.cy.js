@@ -172,30 +172,30 @@ describe('A11y Testing on search pages', () => {
   it('Removes dashes from EIN input', () => {
     cy.visit('/dissemination/search/');
 
-    cy.get('#input_uei-or-ein')
-      .clear()
-      .type('12-3456789')
-      .should('have.value', '123456789');
+    cy.get('#input_uei-or-ein').clear();
+    cy.get('#input_uei-or-ein').type('12-3456789');
+    cy.get('#input_uei-or-ein').should('have.value', '123456789');
   });
 
   it('Removes special characters from UEI/EIN input', () => {
     cy.visit('/dissemination/search/');
 
-    cy.get('#input_uei-or-ein')
-      .clear()
-      .type('ABC-123 XYZ!')
-      .should('have.value', 'ABC123XYZ');
+    cy.get('#input_uei-or-ein').clear();
+    cy.get('#input_uei-or-ein').type('ABC-123 XYZ!');
+    cy.get('#input_uei-or-ein').should('have.value', 'ABC123XYZ');
   });
 
   it('Preserves multiple UEI/EIN entries on separate lines', () => {
     cy.visit('/dissemination/search/');
 
-    cy.get('#input_uei-or-ein')
-      .clear()
-      .type('12-3456789{enter}ABC-123-XYZ')
-      .should('have.value', '123456789\nABC123XYZ');
+    cy.get('#input_uei-or-ein').clear();
+    cy.get('#input_uei-or-ein').type('12-3456789{enter}ABC-123-XYZ');
+    cy.get('#input_uei-or-ein').should(
+      'have.value',
+      '123456789\nABC123XYZ'
+    );
   });
-
+  
   it('Associates EIN guidance with the UEI/EIN input', () => {
     cy.visit('/dissemination/search/');
 
