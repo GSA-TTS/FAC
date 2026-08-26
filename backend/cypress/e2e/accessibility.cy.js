@@ -161,42 +161,40 @@ describe('A11y Testing on search pages', () => {
     });
   });
 
-  it('Displays EIN guidance', () => {
+  it('Displays UEI/EIN guidance', () => {
     cy.visit('/dissemination/search/');
 
     cy.get('#uei-ein-help')
       .should('be.visible')
-      .and('contain.text', 'Enter EIN with no dashes.');
+      .and(
+        'contain.text',
+        'Separate multiple UEIs or EINs by commas or newlines.'
+      );
   });
 
-  it('Removes dashes from EIN input', () => {
+  it('Allows dashes to remain in the UEI/EIN input before submission', () => {
     cy.visit('/dissemination/search/');
 
     cy.get('#input_uei-or-ein').clear();
     cy.get('#input_uei-or-ein').type('12-3456789');
-    cy.get('#input_uei-or-ein').should('have.value', '123456789');
+    cy.get('#input_uei-or-ein').should('have.value', '12-3456789');
   });
 
-  it('Removes special characters from UEI/EIN input', () => {
+  it('Allows multiple UEIs or EINs separated by commas or newlines', () => {
     cy.visit('/dissemination/search/');
 
     cy.get('#input_uei-or-ein').clear();
-    cy.get('#input_uei-or-ein').type('ABC-123 XYZ!');
-    cy.get('#input_uei-or-ein').should('have.value', 'ABC123XYZ');
-  });
+    cy.get('#input_uei-or-ein').type(
+      '12-3456789,987654321{enter}ABCDEFG12345'
+    );
 
-  it('Preserves multiple UEI/EIN entries on separate lines', () => {
-    cy.visit('/dissemination/search/');
-
-    cy.get('#input_uei-or-ein').clear();
-    cy.get('#input_uei-or-ein').type('12-3456789{enter}ABC-123-XYZ');
     cy.get('#input_uei-or-ein').should(
       'have.value',
-      '123456789\nABC123XYZ'
+      '12-3456789,987654321\nABCDEFG12345'
     );
   });
-  
-  it('Associates EIN guidance with the UEI/EIN input', () => {
+
+  it('Associates UEI/EIN guidance with the input', () => {
     cy.visit('/dissemination/search/');
 
     cy.get('#input_uei-or-ein')
