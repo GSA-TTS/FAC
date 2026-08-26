@@ -15,9 +15,12 @@ jsonnet==0.22.0
 model-bakery==1.20.0
 mypy==1.12.0
 pandas==2.2.3
-pip-tools==7.4.1
+pip-tools==7.6.1
 tblib==3.0.0
 toml==0.10.2
 types-pytz==2024.2.0.20241003
 types-requests==2.32.0.20241016
 whitenoise==6.7.0
+
+# via pip-tools
+pip==26.2.1
