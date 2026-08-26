@@ -230,6 +230,48 @@
                 "values": [
                     "Y"
                 ]
+            },
+            {
+                "name": "known_fraud",
+                "start_cell": {
+                    "column": "L",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "L",
+                    "row": "2"
+                },
+                "values": [
+                    null
+                ]
+            },
+            {
+                "name": "likely_fraud",
+                "start_cell": {
+                    "column": "M",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "M",
+                    "row": "2"
+                },
+                "values": [
+                    null
+                ]
+            },
+            {
+                "name": "significant_abuse",
+                "start_cell": {
+                    "column": "N",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "N",
+                    "row": "2"
+                },
+                "values": [
+                    null
+                ]
             }
         ]
     },

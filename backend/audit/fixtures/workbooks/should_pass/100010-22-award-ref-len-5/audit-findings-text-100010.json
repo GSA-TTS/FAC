@@ -98,6 +98,114 @@
                     "row": "1"
                 },
                 "values": []
+            },
+            {
+                "name": "known_qc_amount",
+                "start_cell": {
+                    "column": "D",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "D",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "likely_qc_amount",
+                "start_cell": {
+                    "column": "E",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "E",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "undetermined_qc_explanation",
+                "start_cell": {
+                    "column": "F",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "F",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "criteria",
+                "start_cell": {
+                    "column": "G",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "G",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "condition",
+                "start_cell": {
+                    "column": "H",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "H",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "cause",
+                "start_cell": {
+                    "column": "I",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "I",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "effect",
+                "start_cell": {
+                    "column": "J",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "J",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "recommendation",
+                "start_cell": {
+                    "column": "K",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "K",
+                    "row": "1"
+                },
+                "values": []
+            },
+            {
+                "name": "response",
+                "start_cell": {
+                    "column": "L",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "L",
+                    "row": "1"
+                },
+                "values": []
             }
         ]
     }
