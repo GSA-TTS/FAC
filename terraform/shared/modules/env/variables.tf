@@ -156,3 +156,15 @@ variable "denylist" {
     # appname    = [ "bad.example.com:443" ]
   }
 }
+
+variable "autoscale_instance_min" {
+  description = "Minimum number of application instances that can be scaled down to"
+  type        = number
+  default     = 1
+}
+
+variable "autoscale_instance_max" {
+  description = "Maximum number of application instances that can be scaled up to"
+  type        = number
+  default     = 1
+}

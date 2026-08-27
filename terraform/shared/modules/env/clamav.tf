@@ -27,6 +27,12 @@ module "clamav" {
 
 }
 
+resource "cloudfoundry_service_credential_binding" "autoscaler" {
+  type             = "app"
+  service_instance = cloudfoundry_service_instance.app_autoscaler.id
+  app              = module.clamav.app_id
+}
+
 module "file_scanner_clamav" {
   source = "github.com/gsa-tts/terraform-cloudgov//clamav?ref=v2.3.0"
 
