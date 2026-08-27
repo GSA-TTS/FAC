@@ -142,6 +142,7 @@ class AdvancedSearchForm(forms.Form):
         Split on the newlines. Strip all the resulting elements.
         """
         text_input = self.cleaned_data["uei_or_ein"]
+        text_input = text_input.replace("-", "")
         return clean_text_field(text_input)
 
     def clean_audit_year(self):
@@ -304,6 +305,7 @@ class SearchForm(forms.Form):
         Split on the newlines. Strip all the resulting elements.
         """
         text_input = self.cleaned_data["uei_or_ein"]
+        text_input = text_input.replace("-", "")
         return clean_text_field(text_input)
 
     def clean_audit_year(self):
