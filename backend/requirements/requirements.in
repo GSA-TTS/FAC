@@ -9,7 +9,7 @@ django-filter==24.3
 django-fsm==3.0.0
 django-storages[boto3]==1.14.2
 django==5.2.16
-djangorestframework==3.15.2
+djangorestframework==3.17.2
 django-viewflow==2.2.8
 environs[django]==11.0.0
 faker==30.5.0
