@@ -1,6 +1,6 @@
 # prepare_prod_data_for_local.bash
 
-The `prepare_prod_data_for_local` bash script is a menu-driven tool for repeatbly downloading data dumps from `production` and sanitizing them for local use.
+The `prepare_prod_data_for_local` bash script is a menu-driven tool for repeatably downloading data dumps from `production` and sanitizing them for local use. We generally keep them stored on [the GDrive](https://drive.google.com/drive/folders/1WymwJtdQ287SdgrOx__aEraoVTx7ig9D).
 
 ## goal
 
@@ -54,7 +54,7 @@ Once logged in, you will be prompted with a selection menu. To create the dump, 
 
 If you are feeling bold, select the option for running everything straight through. This runs steps 2-7.
 
-Upload the resulting file (e.g. `sanitized-20250731.dump`) to GDrive for sharing with the team. It is now ready for load via `manage_local_data.bash`.
+Upload the resulting file (e.g. `sanitized-20250731.dump`) to [the GDrive](https://drive.google.com/drive/folders/1WymwJtdQ287SdgrOx__aEraoVTx7ig9D) for sharing with the team. It is now ready for load via `manage_local_data.bash`.
 
 This file will contain 100% public data (disseminated and in-progress). To make sure no in-progress audits are Tribal submissions for which an attestation has not yet been made, we delete all `tribal` audits that do not yet have an attestation. This should guarantee that 100% of all in-progress is *also* public data.
 
@@ -66,12 +66,12 @@ The menu is roughly in order of use.
 
 This is an optional step.
 
-When we download a backup from `production`, we need to choose which dump we want to work with. These are named `MM-DD-HH` in the scheduled folder.
+When we download a backup from `production`, we need to choose which dump we want to work with. These are named `YYYY-MM-DDTHH:MM:SS-0400` in the scheduled folder. To find the backups that are available, follow the steps [here](https://github.com/GSA-TTS/fac-team/blob/main/infra/s3-connection.md) using the service-name `backups`. Your `ls` command to view the backups should look something like `aws s3 ls s3://cg-040c4133-1efe-4281-a485-005960b58405/backups/scheduled/`.
 
 The script sets a dump path:
 
 ```
-DESIRED_BACKUP="07-27-12"
+DESIRED_BACKUP="2026-08-27T19:10:01-0400"
 ```
 
 Generally, this should be updated and committed if a new dump is going to be worked with. However, for temporary/local testing, it is possible to specify the path. Be careful: no checking is performed when this value is entered. Better to verify the path exists and set it in the script.
