@@ -48,7 +48,7 @@ NON_MATERIAL_CHANGE_CHOICES = [
     ),
     (
         "rounding",
-        "Minor Numerical Rounding Corrections with No Material Affect on Expenditures, Major Program Determinations, Findings, or Compliance",
+        "Minor Numerical Rounding Corrections with No Material Effect on Expenditures, Major Program Determinations, Findings, or Compliance",
     ),
     ("spelling", "Spelling and Typographical Corrections"),
     ("formatting", "Formatting Corrections"),
@@ -86,7 +86,7 @@ SFSAC_ONLY_CHANGE_CHOICES = [
     ),
     (
         "rounding",
-        "Minor Numerical Rounding Corrections with No Material Affect on Expenditures, "
+        "Minor Numerical Rounding Corrections with No Material Effect on Expenditures, "
         "Major Program Determinations, Findings, or Compliance",
     ),
     (
