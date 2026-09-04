@@ -74,8 +74,8 @@ GENERAL_PARAMS = [
 
 def only_searching_on_general(params_dict):
     """
-    Returns True if the given params only contain fields that can be search on
-    the General model.
+    Returns True if the given params only contain fields that can be searched
+    on the General model.
     """
     for param, value in params_dict.items():
         if param == 'cog_or_oversight' and value == 'either':
@@ -101,14 +101,14 @@ def search(request, params):
     ##############
     # GENERAL
 
-    if is_advanced_search(params):
+    if not is_advanced_search(params) or only_searching_on_general(params):
+        # Don't bother querying the huge tables if General can be used instead
+        logger.info("search Searching `General`")
+        results = search_general(General, params)
+    else:
         if is_beta_search(params):
-            if only_searching_on_general(params):
-                logger.info("search Searching `General`")
-                results = search_general(General, params)
-            else:
-                logger.info("search Searching `Unified`")
-                results = search_general(Unified, params)
+            logger.info("search Searching `Unified`")
+            results = search_general(Unified, params)
         else:
             logger.info("search Searching `DisseminationCombined`")
             results = search_general(DisseminationCombined, params)
@@ -121,10 +121,6 @@ def search(request, params):
         results = search_major_program(results, params)
         results = search_passthrough_name(results, params)
         results = search_type_requirement(results, params)
-    else:
-        logger.info("search Searching `General`")
-        results = search_general(General, params)
-
     results = search_resubmissions(request, results, params)
     results = _sort_results(results, params)
     results = _make_distinct(results, params)
