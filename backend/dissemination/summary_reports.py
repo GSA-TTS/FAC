@@ -22,7 +22,7 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
-    DisseminationCombined,
+    Unified,
 )
 
 # TODO: Update Post SOC Launch -> This whole file can be deleted
@@ -113,7 +113,7 @@ columns = [
 # If one would like to add more fields that require preprocessing (such as "_aln"), ensure that they begin with an underscore.
 field_name_ordered = {
     "general": [
-        "report_id",
+        "report_id_id",
         "audit_year",
         "total_amount_expended",
         "entity_type",
@@ -177,7 +177,7 @@ field_name_ordered = {
         "resubmission_status",
     ],
     "federalaward": [
-        "report_id",
+        "report_id_id",
         "award_reference",
         "federal_agency_prefix",
         "federal_award_extension",
@@ -200,7 +200,7 @@ field_name_ordered = {
         "loan_balance",
     ],
     "finding": [
-        "report_id",
+        "report_id_id",
         "federal_agency_prefix",
         "federal_award_extension",
         "aln",
@@ -242,7 +242,7 @@ field_name_ordered = {
     "additionalein": ["report_id", "additional_ein"],
     "additionaluei": ["report_id", "additional_uei"],
     "passthrough": [
-        "report_id",
+        "report_id_id",
         "award_reference",
         "passthrough_name",
         "passthrough_id",
@@ -411,11 +411,11 @@ def process_combined_results(
     # Grab all the rows from the combined table into a local structure.
     # We'll do this in memory. This table flattens general, federalaward, and findings
     # so we can move much faster on those tables without extra lookups.
-    dc_results = DisseminationCombined.objects.all().filter(report_id__in=report_ids)
+    dc_results = Unified.objects.all().filter(report_id__in=report_ids)
 
     # Different tables want to be visited/filtered differently.
     visited = set()
-    # Do all of the names in the DisseminationCombined at the same time.
+    # Do all of the names in Unified at the same time.
     # That way, we only go through the results once.
     for obj in dc_results:
         for model_name in names_in_dc:
