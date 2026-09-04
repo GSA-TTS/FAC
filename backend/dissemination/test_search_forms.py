@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from dissemination.forms.search_forms import AdvancedSearchForm, SearchForm
+from dissemination.forms.search_forms import SearchForm
 
 
 class SearchFormTests(TestCase):
