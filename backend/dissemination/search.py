@@ -55,20 +55,20 @@ def is_beta_search(params_dict):
 
 
 GENERAL_PARAMS = [
-    'audit_years',
-    'uei_or_ein',
-    'entity_name',
-    'start_date',
-    'end_date',
-    'auditee_state',
-    'fy_end_month',
-    'report_id',
-    'page',
-    'order_by',
-    'order_direction',
-    'advanced_search_flag',
-    'beta_search_flag',
-    'LIMIT',
+    "audit_years",
+    "uei_or_ein",
+    "entity_name",
+    "start_date",
+    "end_date",
+    "auditee_state",
+    "fy_end_month",
+    "report_id",
+    "page",
+    "order_by",
+    "order_direction",
+    "advanced_search_flag",
+    "beta_search_flag",
+    "LIMIT",
 ]
 
 
@@ -78,7 +78,7 @@ def only_searching_on_general(params_dict):
     on the General model.
     """
     for param, value in params_dict.items():
-        if param == 'cog_or_oversight' and value == 'either':
+        if param == "cog_or_oversight" and value == "either":
             continue
         elif value and param not in GENERAL_PARAMS:
             return False
