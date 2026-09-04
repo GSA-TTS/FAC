@@ -71,7 +71,7 @@ echo -e "\n"
 # This can be changed via the menu.
 # Better, when a new backup is targeted, to
 # make the change and commit back to the repo.
-DESIRED_BACKUP="04-04-20"
+DESIRED_BACKUP="2026-08-27T19:10:01-0400"
 
 ############################################################
 # environment variables
@@ -91,7 +91,7 @@ source "tables.source"
 select_target_backup_for_download () {
   echo "select_target_backup_for_download"
   # https://stackoverflow.com/a/18546416
-  read -p "Target backup (MM-DD-HH): " TARGET
+  read -p "Target backup (YYYY-MM-DDTHH:MM:SS-0400): " TARGET
   DESIRED_BACKUP=$TARGET
   echo "Targeting ${TARGET}"
 }

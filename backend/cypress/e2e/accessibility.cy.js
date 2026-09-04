@@ -161,5 +161,50 @@ describe('A11y Testing on search pages', () => {
     });
   });
 
-  test_check_a11y('/dissemination/search/', 'search');
+  it('Displays UEI/EIN guidance', () => {
+    cy.visit('/dissemination/search/');
+
+    cy.get('#uei-ein-help')
+      .should('be.visible')
+      .and(
+        'contain.text',
+        'Separate multiple UEIs or EINs by commas or newlines.'
+      );
+  });
+
+  it('Allows dashes to remain in the UEI/EIN input before submission', () => {
+    cy.visit('/dissemination/search/');
+
+    cy.get('#input_uei-or-ein').clear();
+    cy.get('#input_uei-or-ein').type('12-3456789');
+    cy.get('#input_uei-or-ein').should('have.value', '12-3456789');
+  });
+
+  it('Allows multiple UEIs or EINs separated by commas or newlines', () => {
+    cy.visit('/dissemination/search/');
+
+    cy.get('#input_uei-or-ein').clear();
+    cy.get('#input_uei-or-ein').type(
+      '12-3456789,987654321{enter}ABCDEFG12345'
+    );
+
+    cy.get('#input_uei-or-ein').should(
+      'have.value',
+      '12-3456789,987654321\nABCDEFG12345'
+    );
+  });
+
+  it('Associates UEI/EIN guidance with the input', () => {
+    cy.visit('/dissemination/search/');
+
+    cy.get('#input_uei-or-ein')
+      .should('have.attr', 'aria-describedby', 'uei-ein-help');
+
+    cy.get('label[for="input_uei-or-ein"]')
+      .should('exist')
+      .and('contain.text', 'UEI or EIN');
+  });
+
+  test_check_a11y('/dissemination/search/', 'basic search');
+  test_check_a11y('/dissemination/search/advanced/', 'advanced search');
 });

@@ -16,3 +16,4 @@ services:
   - fac-logdrain
   - fac-snapshot-db
   - backups
+  - autoscaler
