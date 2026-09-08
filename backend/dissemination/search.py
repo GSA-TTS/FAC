@@ -54,6 +54,38 @@ def is_beta_search(params_dict):
     return params_dict.get("beta_search_flag", False)
 
 
+GENERAL_PARAMS = [
+    "audit_years",
+    "uei_or_ein",
+    "entity_name",
+    "start_date",
+    "end_date",
+    "auditee_state",
+    "fy_end_month",
+    "report_id",
+    "page",
+    "order_by",
+    "order_direction",
+    "advanced_search_flag",
+    "beta_search_flag",
+    "LIMIT",
+]
+
+
+def only_searching_on_general(params_dict):
+    """
+    Returns True if the given params only contain fields that can be searched
+    on the General model.
+    """
+    for param, value in params_dict.items():
+        if param == "cog_or_oversight" and value == "either":
+            continue
+        elif value and param not in GENERAL_PARAMS:
+            return False
+
+    return True
+
+
 def search(request, params):
     """
     Given any (or no) search fields, build and execute a query on the General table and return the results.
@@ -69,7 +101,11 @@ def search(request, params):
     ##############
     # GENERAL
 
-    if is_advanced_search(params):
+    if not is_advanced_search(params) or only_searching_on_general(params):
+        # Don't bother querying the huge tables if General can be used instead
+        logger.info("search Searching `General`")
+        results = search_general(General, params)
+    else:
         if is_beta_search(params):
             logger.info("search Searching `Unified`")
             results = search_general(Unified, params)
@@ -85,10 +121,6 @@ def search(request, params):
         results = search_major_program(results, params)
         results = search_passthrough_name(results, params)
         results = search_type_requirement(results, params)
-    else:
-        logger.info("search Searching `General`")
-        results = search_general(General, params)
-
     results = search_resubmissions(request, results, params)
     results = _sort_results(results, params)
     results = _make_distinct(results, params)
