@@ -47,6 +47,19 @@ variable "environment_variables" {
   type        = map(string)
 }
 
+variable "db_plan" {
+  type        = string
+  description = "Name of the Metabase RDS service plan name to create"
+  # See https://cloud.gov/docs/services/relational-database/#plans
+  default = "medium-gp-psql-redundant"
+}
+
+variable "db_params" {
+  type        = string
+  description = "Optional parameters used for service instance"
+  default     = null
+}
+
 # Example:
 # service_bindings = {
 #   my-service = "",

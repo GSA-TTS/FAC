@@ -3,7 +3,6 @@ locals {
 }
 
 module "cg-logshipper" {
-  # source      = "github.com/gsa-tts/terraform-cloudgov//logshipper?ref=v2.3.0"
   source      = "../cg-logshipper"
   name        = local.logshipper_name
   cf_org_name = var.cf_org_name
