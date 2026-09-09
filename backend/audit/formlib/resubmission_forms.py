@@ -5,7 +5,6 @@ from audit.check_resubmission_allowed import check_resubmission_allowed
 from audit.models.constants import STATUS, RESUBMISSION_ACTION
 from audit.models import SingleAuditChecklist
 
-
 MATERIAL_CHANGE_CHOICES = [
     (
         "major_program",
@@ -333,25 +332,15 @@ class ResubmissionForm(forms.Form):
         report_id = "".join(text_input.split())
 
         if len(report_id) > 25:
-            raise ValidationError(
-                "The given report ID is too long!"
-            )
+            raise ValidationError("The given report ID is too long!")
         elif len(report_id) < 25:
-            raise ValidationError(
-                "The given report ID is too short!"
-            )
+            raise ValidationError("The given report ID is too short!")
 
-        sac = _validate_report_id_for_resubmission(
-            report_id
-        )
+        sac = _validate_report_id_for_resubmission(report_id)
 
-        self.cleaned_data["previous_report_data"] = (
-            _gather_previous_report_data(sac)
-        )
+        self.cleaned_data["previous_report_data"] = _gather_previous_report_data(sac)
 
-        self.cleaned_data["resubmission_meta"] = (
-            _gather_resubmission_metadata(sac)
-        )
+        self.cleaned_data["resubmission_meta"] = _gather_resubmission_metadata(sac)
 
         return report_id
 
@@ -382,9 +371,7 @@ def _validate_report_id_for_resubmission(report_id):
             ],
         )
     except SingleAuditChecklist.DoesNotExist:
-        raise ValidationError(
-            "Audit to resubmit not found."
-        )
+        raise ValidationError("Audit to resubmit not found.")
 
     # Further validate the previous submission.
     allowed, reason = check_resubmission_allowed(sac)
