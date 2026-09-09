@@ -8,7 +8,7 @@ from audit.models import SingleAuditChecklist
 MATERIAL_CHANGE_CHOICES = [
     ("major_program", "Major Program Determination Errors"),
     (
-        "audit_findings",
+        "findings",
         "Audit Findings Errors or Omissions",
     ),
     ("sefa_reporting", "SEFA and Federal Program Reporting Errors"),
@@ -18,7 +18,7 @@ MATERIAL_CHANGE_CHOICES = [
         "low_risk",
         "Low-Risk Auditee Determination Errors",
     ),
-    ("auditor", "Audit Performed by an Auditor Not Meeting Professional Requirements"),
+    ("auditor_professional_requirements", "Audit Performed by an Auditor Not Meeting Professional Requirements"),
 ]
 
 NON_MATERIAL_CHANGE_CHOICES = [
@@ -65,7 +65,7 @@ SFSAC_ONLY_CHANGE_CHOICES = [
         "Inconsistencies Between the DCF (SF-SAC) and Audit Documentation",
     ),
     (
-        "typo",
+        "spelling",
         "Minor Typographical or Formatting Errors",
     ),
     (
