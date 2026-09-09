@@ -6,31 +6,19 @@ from audit.models.constants import STATUS, RESUBMISSION_ACTION
 from audit.models import SingleAuditChecklist
 
 MATERIAL_CHANGE_CHOICES = [
-    ("auditor_report", "Auditor's Report Corrections or Additions"),
+    ("major_program", "Major Program Determination Errors"),
     (
-        "awards",
-        "Awards Corrections or Additions (such as ALN, federal program name, cluster name, etc.)",
+        "audit_findings",
+        "Audit Findings Errors or Omissions",
     ),
-    ("corrective_action_plans", "Corrective Action Plan Corrections or Additions"),
-    ("direct_passthrough", "Direct vs. Pass-through Funding Corrections"),
-    ("financial_statements", "Financial Statements Corrections or Additions"),
+    ("sefa_reporting", "SEFA and Federal Program Reporting Errors"),
+    ("missing_components", "Missing or Incomplete Reporting Package Components"),
+    ("requirements_noncompliance", "Noncompliance with Audit Reporting Requirements"),
     (
-        "findings",
-        "Findings Corrections or Additions (such as condition, criteria, cause, effect, "
-        "material weakness, significant deficiency, etc.)",
+        "low_risk",
+        "Low-Risk Auditee Determination Errors",
     ),
-    ("internal_control", "Internal Control and Compliance Corrections or Additions"),
-    ("major_program", "Major Program Determination Corrections"),
-    (
-        "auditor_professional_requirements",
-        "Previous Audit Performed by an Auditor Not Meeting Professional Requirements",
-    ),
-    ("prior_findings", "Prior Findings Corrections or Additions"),
-    ("questioned_costs", "Questioned Costs Corrections or Additions"),
-    ("risk", "Risk Determination Correction"),
-    ("incomplete_audit_package", "Single Audit Package Completion"),
-    ("sefa_award_amounts", "SEFA Reporting Corrections or Additions"),
-    ("sf_sac", "SF-SAC Materially Incomplete or Inconsistent with Audit Report"),
+    ("auditor", "Audit Performed by an Auditor Not Meeting Professional Requirements"),
 ]
 
 NON_MATERIAL_CHANGE_CHOICES = [
@@ -65,37 +53,24 @@ NON_MATERIAL_CHANGE_CHOICES = [
 
 SFSAC_ONLY_CHANGE_CHOICES = [
     (
-        "aln_where_sefa_accurate",
-        "Assistance Listing Numbers (ALNs) Corrections Where SEFA is Accurate",
+        "sf_sac",
+        "Errors Limited to the DCF (SF-SAC)",
     ),
     (
-        "data_entry",
-        "Data Entry Corrections not Affecting Audit Conclusions",
+        "auditee_info",
+        "Incorrect or Missing Auditee Identification Information",
     ),
     (
-        "direct_passthrough_where_sefa_accurate",
-        "Direct vs. Pass-through Funding Corrections Where SEFA is Accurate",
+        "audit_sf_sac_inconsistent",
+        "Inconsistencies Between the DCF (SF-SAC) and Audit Documentation",
     ),
     (
-        "ein",
-        "Employer Identification Number (EIN) Corrections or Additions",
-    ),
-    (
-        "presentation",
-        "Labelling or Presentation Corrections Not Impacting Reporting, Compliance, or Audit Conclusions",
+        "typo",
+        "Minor Typographical or Formatting Errors",
     ),
     (
         "rounding",
-        "Minor Numerical Rounding Corrections with No Material Effect on Expenditures, "
-        "Major Program Determinations, Findings, or Compliance",
-    ),
-    (
-        "spelling",
-        "Spelling and Typographical Corrections",
-    ),
-    (
-        "questioned_costs_where_report_accurate",
-        "Questioned Costs Corrections Where Audit Report and Findings are Accurate",
+        "Minor Numerical Rounding Adjustments",
     ),
 ]
 
