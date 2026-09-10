@@ -622,7 +622,4 @@ class IntakeToDissemination(object):
             **(model_to_dict(pt) if pt else {}),
         }
 
-        # Since report_id is a FK, the model needs an instance of General, not a string
-        params.pop("report_id", None)
-
-        return Unified(report_id=gen, **params)
+        return Unified(report=gen, **params)
