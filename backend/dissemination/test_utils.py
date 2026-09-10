@@ -17,6 +17,6 @@ def bake_unified(gen_obj, other_objs=[]):
     for other_obj in other_objs:
         uni.update(model_to_dict(other_obj))
 
-    uni["report_id"] = gen_obj
+    uni["report"] = gen_obj
 
     return baker.make(Unified, **uni)

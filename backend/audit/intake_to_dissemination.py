@@ -616,10 +616,11 @@ class IntakeToDissemination(object):
         aln = f"{fed.federal_agency_prefix}.{fed.federal_award_extension}"
         params = {
             "aln": aln,
+            "report": gen,
             **model_to_dict(gen),
             **model_to_dict(fed),
             **(model_to_dict(fin) if fin else {}),
             **(model_to_dict(pt) if pt else {}),
         }
 
-        return Unified(report=gen, **params)
+        return Unified(**params)
