@@ -488,9 +488,7 @@ class SearchALNTests(TestCase):
             results_general_extention, params_extention
         )
         self.assertEqual(len(results_alns_extention), 1)
-        self.assertIn(
-            extension_object.report_id, results_alns_extention[0].report_id
-        )
+        self.assertIn(extension_object.report_id, results_alns_extention[0].report_id)
 
         # Both
         params_both = {"alns": ["12", "98.765"]}
