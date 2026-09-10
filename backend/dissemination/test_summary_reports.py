@@ -1,5 +1,6 @@
 from django.test import SimpleTestCase
-from dissemination.test_search import TestMaterializedViewBuilder
+from django.test import TestCase
+
 from dissemination.summary_reports import (
     can_read_tribal_disclaimer,
     cannot_read_tribal_disclaimer,
@@ -10,20 +11,21 @@ from dissemination.summary_reports import (
     separate_notes_single_fields_from_array_fields,
 )
 from dissemination.models import FederalAward, General, CapText, Note, FindingText
+from dissemination.test_utils import bake_unified
 
 from model_bakery import baker
 import openpyxl as pyxl
 
 
-class SummaryReportTests(TestMaterializedViewBuilder):
+class SummaryReportTests(TestCase):
     def test_generate_summary_report_returns_filename(self):
         """The filename returned should be correctly formatted"""
         general = baker.make(General, _quantity=100)
         report_ids = [g.report_id for g in general]
 
         for g in general:
-            baker.make(FederalAward, report_id=g)
-        self.refresh_materialized_view()
+            fed = baker.make(FederalAward, report_id=g)
+            bake_unified(g, [fed])
 
         filename, _ = generate_summary_report(report_ids)
 
@@ -38,11 +40,11 @@ class SummaryReportTests(TestMaterializedViewBuilder):
         tribal_report_ids = [g.report_id for g in tribal_general]
 
         for g in public_general:
-            baker.make(FederalAward, report_id=g)
+            fed = baker.make(FederalAward, report_id=g)
+            bake_unified(g, [fed])
         for g in tribal_general:
             baker.make(FederalAward, report_id=g)
-
-        self.refresh_materialized_view()
+            bake_unified(g, [fed])
 
         ls, _ = get_tribal_report_ids(public_report_ids + tribal_report_ids)
         self.assertEqual(
@@ -56,9 +58,8 @@ class SummaryReportTests(TestMaterializedViewBuilder):
         public_report_ids = [g.report_id for g in public_general]
 
         for g in public_general:
-            baker.make(FederalAward, report_id=g)
-
-        self.refresh_materialized_view()
+            fed = baker.make(FederalAward, report_id=g)
+            bake_unified(g, [fed])
 
         ls, _ = get_tribal_report_ids(public_report_ids)
         self.assertEqual(
@@ -72,9 +73,8 @@ class SummaryReportTests(TestMaterializedViewBuilder):
         tribal_report_ids = [g.report_id for g in tribal_general]
 
         for g in tribal_general:
-            baker.make(FederalAward, report_id=g)
-
-        self.refresh_materialized_view()
+            fed = baker.make(FederalAward, report_id=g)
+            bake_unified(g, [fed])
 
         ls, _ = get_tribal_report_ids(tribal_report_ids)
         # Somewhat misleadingly named - it asserts both count and content equivalence

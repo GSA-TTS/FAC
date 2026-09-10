@@ -22,7 +22,7 @@ from dissemination.models import (
     Note,
     Passthrough,
     SecondaryAuditor,
-    DisseminationCombined,
+    Unified,
 )
 
 # TODO: Update Post SOC Launch -> This whole file can be deleted
@@ -411,11 +411,11 @@ def process_combined_results(
     # Grab all the rows from the combined table into a local structure.
     # We'll do this in memory. This table flattens general, federalaward, and findings
     # so we can move much faster on those tables without extra lookups.
-    dc_results = DisseminationCombined.objects.all().filter(report_id__in=report_ids)
+    dc_results = Unified.objects.all().filter(report_id__in=report_ids)
 
     # Different tables want to be visited/filtered differently.
     visited = set()
-    # Do all of the names in the DisseminationCombined at the same time.
+    # Do all of the names in Unified at the same time.
     # That way, we only go through the results once.
     for obj in dc_results:
         for model_name in names_in_dc:

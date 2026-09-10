@@ -24,7 +24,7 @@ class searchPage {
         searchSubmitBtn: () => cy.get('input.usa-button[type="submit"][value="Search"]'),
         resetBtn: () => cy.get('input.usa-button[type="reset"][value="Reset Search"]'),
         searchTable: () => cy.get('.usa-table'),
-        advanceSearchBtn: () => cy.get('a[href="/dissemination/search/advanced/"]'),
+        searchBtn: () => cy.get('a[href="/dissemination/search/"]'),
         sfSacDownloadBtn: () => cy.get('a.usa-button p:contains("SF-SAC")'),
         singleAuditBtn: () => cy.get('a.usa-button p:contains("Single audit report")'),
         fiscalYearEndMonthBtn: () => cy.get('.usa-accordion__button:contains("Fiscal year end month")'),
