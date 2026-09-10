@@ -31,7 +31,7 @@
                 ]
             },
             {
-                "name": "auditee_uei",
+                "name": "instructions_name",
                 "start_cell": {
                     "column": "B",
                     "row": "4"
@@ -39,6 +39,20 @@
                 "end_cell": {
                     "column": "B",
                     "row": "4"
+                },
+                "values": [
+                    "https://www.fac.gov/audit-resources/sf-sac/notes-to-sefa/"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
                 },
                 "values": [
                     "ZUFJEU4NMK52"
@@ -48,11 +62,11 @@
                 "name": "accounting_policies",
                 "start_cell": {
                     "column": "B",
-                    "row": "5"
+                    "row": "6"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "5"
+                    "row": "6"
                 },
                 "values": [
                     "A. Reporting EntityThe reporting entity is defined in Note 1 to the BFS.The accompanying Schedule includes all federal financial assistance programs of the State of Maine reporting entity for the fiscal year ended June 30, 2022, with the exception of the discrete component units identified in Note 1 to the BFS.The discrete component units engaged other auditors.B. Basis of PresentationThe information in the accompanying Schedule of Expenditures of Federal Awards is presented in accordance with the Uniform Guidance.1) Federal AwardsA federal award is defined by the Uniform Guidance as federal financial assistance and federal cost-reimbursement contracts that non-federal agencies receive directly or indirectly from federal agencies or pass-through entities.Federal financial assistance is defined as assistance that non-federal entities receive or administer in the form of grants, loans, loan guarantees, property, cooperative agreements, interest subsidies, insurance, food commodities, direct appropriations and other assistance.Accordingly, non-cash federal assistance is included in federal financial assistance and, therefore, is reported on the Schedule of Expenditures of Federal Awards.Federal financial assistance does not include direct federal cash assistance to individuals.2) Type A and Type B ProgramsLevels of expenditures to be used in defining Type A and Type B federal financial assistance programs are specified by the Uniform Guidance.Type A programs for the State of Maine are those programs that equal or exceed $17.1 million in expenditures, distributions, or issuances for the year ended June 30, 2022.Programs audited as major programs are marked with asterisks in the accompanying schedule.C. Basis of AccountingThe information presented in the Schedule of Expenditures of Federal Awards is presented primarily on the cash basis of accounting, which is consistent with the other Federal grant reports.The fund level financial statements are reported on the modified accrual basis of accounting. Consequently, the schedules data may not be directly traceable to the financial statements."
@@ -62,11 +76,11 @@
                 "name": "is_minimis_rate_used",
                 "start_cell": {
                     "column": "B",
-                    "row": "6"
+                    "row": "7"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "6"
+                    "row": "7"
                 },
                 "values": [
                     "Both"
@@ -76,11 +90,11 @@
                 "name": "rate_explained",
                 "start_cell": {
                     "column": "B",
-                    "row": "7"
+                    "row": "8"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "7"
+                    "row": "8"
                 },
                 "values": [
                     "The State of Maine did not elect to use the 10% de minimis indirect cost rate with the exception of the following program:20.700 Pipeline Safety Program State Base Grant"
