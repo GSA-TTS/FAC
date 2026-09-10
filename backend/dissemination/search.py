@@ -12,9 +12,41 @@ from .searchlib.search_major_program import search_major_program
 from .searchlib.search_passthrough_name import search_passthrough_name
 from .searchlib.search_type_requirement import search_type_requirement
 from .searchlib.search_resubmissions import search_resubmissions
-from dissemination.models import Unified
+from dissemination.models import Unified, General
 
 logger = logging.getLogger(__name__)
+
+
+GENERAL_PARAMS = [
+    "audit_years",
+    "uei_or_ein",
+    "entity_name",
+    "start_date",
+    "end_date",
+    "auditee_state",
+    "fy_end_month",
+    "report_id",
+    "page",
+    "order_by",
+    "order_direction",
+    "advanced_search_flag",
+    "beta_search_flag",
+    "LIMIT",
+]
+
+
+def only_searching_on_general(params_dict):
+    """
+    Returns True if the given params only contain fields that can be searched
+    on the General model.
+    """
+    for param, value in params_dict.items():
+        if param == "cog_or_oversight" and value == "either":
+            continue
+        elif value and param not in GENERAL_PARAMS:
+            return False
+
+    return True
 
 
 def search(request, params):
@@ -28,16 +60,22 @@ def search(request, params):
     # Time the whole thing.
     t0 = time.time()
 
-    logger.info("search Searching `Unified`")
-    results = search_general(Unified, params)
-    results = search_alns(results, params)
-    results = search_cog_or_oversight(results, params)
-    results = search_federal_program_name(results, params)
-    results = search_findings(results, params)
-    results = search_direct_funding(results, params)
-    results = search_major_program(results, params)
-    results = search_passthrough_name(results, params)
-    results = search_type_requirement(results, params)
+    if only_searching_on_general(params):
+        # Don't bother querying the huge tables if General can be used instead
+        logger.info("search Searching `General`")
+        results = search_general(General, params)
+    else:
+        logger.info("search Searching `Unified`")
+        results = search_general(Unified, params)
+        results = search_alns(results, params)
+        results = search_cog_or_oversight(results, params)
+        results = search_federal_program_name(results, params)
+        results = search_findings(results, params)
+        results = search_direct_funding(results, params)
+        results = search_major_program(results, params)
+        results = search_passthrough_name(results, params)
+        results = search_type_requirement(results, params)
+
     results = search_resubmissions(request, results, params)
     results = _sort_results(results, params)
     results = _make_distinct(results, params)

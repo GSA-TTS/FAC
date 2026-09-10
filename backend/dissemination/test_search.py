@@ -12,6 +12,7 @@ from dissemination.models import (
     Unified,
 )
 from dissemination.search import (
+    only_searching_on_general,
     search_general,
     search_alns,
     search,
@@ -51,6 +52,34 @@ def assert_results_contain_private_and_public(cls, results):
 
 
 class SearchGeneralTests(TestCase):
+    def test_only_searching_on_general(self):
+        # Searching on General fields and not specifying cog/over searches on General
+        params = {
+            "audit_years": "2020",
+            "cog_or_oversight": "either",
+        }
+        self.assertTrue(only_searching_on_general(params))
+
+        # Having an advanced field can still search General if the value is empty
+        params = {
+            "audit_years": "2020",
+            "federal_program_name": "",
+        }
+        self.assertTrue(only_searching_on_general(params))
+
+        # Specifying cog/over can't search General
+        params = {
+            "audit_years": "2020",
+            "cog_or_oversight": "cog",
+        }
+        self.assertFalse(only_searching_on_general(params))
+
+        # A non-General field can't search General
+        params = {
+            "federal_program_name": "foo name",
+        }
+        self.assertFalse(only_searching_on_general(params))
+
     def test_empty_query(self):
         """
         Given empty query parameters, search_general should return all records
