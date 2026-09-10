@@ -479,7 +479,7 @@ class SearchALNTests(TestCase):
         results_alns_prefix = search_alns(results_general_prefix, params_prefix)
         self.assertEqual(len(results_alns_prefix), 1)
         # Check if the prefix_object's report_id is in the results
-        self.assertIn(prefix_object.report_id, results_alns_prefix[0].report_id_id)
+        self.assertIn(prefix_object.report_id, results_alns_prefix[0].report_id)
 
         # Prefix + extension
         params_extention = {"alns": ["98.765"]}
@@ -489,7 +489,7 @@ class SearchALNTests(TestCase):
         )
         self.assertEqual(len(results_alns_extention), 1)
         self.assertIn(
-            extension_object.report_id, results_alns_extention[0].report_id_id
+            extension_object.report_id, results_alns_extention[0].report_id
         )
 
         # Both
@@ -498,7 +498,7 @@ class SearchALNTests(TestCase):
         results_alns_both = search_alns(results_general_both, params_both)
 
         self.assertEqual(len(results_alns_both), 2)
-        result_report_ids = set(result.report_id_id for result in results_alns_both)
+        result_report_ids = set(result.report_id for result in results_alns_both)
         self.assertSetEqual(
             result_report_ids, {prefix_object.report_id, extension_object.report_id}
         )
@@ -627,19 +627,19 @@ class SearchFilterTests(TestCase):
         params = {"agency_name": 42, "cog_or_oversight": "either"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id_id, general_cog.report_id)
+        self.assertEqual(results[0].report_id, general_cog.report_id)
 
         # Cog with valid agency
         params = {"agency_name": 42, "cog_or_oversight": "cog"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id_id, general_cog.report_id)
+        self.assertEqual(results[0].report_id, general_cog.report_id)
 
         # Over with valid agency
         params = {"agency_name": 24, "cog_or_oversight": "oversight"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id_id, general_over.report_id)
+        self.assertEqual(results[0].report_id, general_over.report_id)
 
     def test_search_findings(self):
         """
@@ -716,14 +716,14 @@ class SearchFilterTests(TestCase):
         params = {"direct_funding": ["direct_funding"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id_id, general_direct.report_id)
+        self.assertEqual(results[0].report_id, general_direct.report_id)
 
         params = {
             "direct_funding": ["passthrough_funding"],
         }
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id_id, general_passthrough.report_id)
+        self.assertEqual(results[0].report_id, general_passthrough.report_id)
 
         # One can search on both, even if there's not much reason to.
         params = {
@@ -755,12 +755,12 @@ class SearchFilterTests(TestCase):
         params = {"major_program": ["True"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id_id, general_major.report_id)
+        self.assertEqual(results[0].report_id, general_major.report_id)
 
         params = {"major_program": ["False"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].report_id_id, general_non_major.report_id)
+        self.assertEqual(results[0].report_id, general_non_major.report_id)
 
     def test_search_type_requirement(self):
         """

@@ -113,7 +113,7 @@ columns = [
 # If one would like to add more fields that require preprocessing (such as "_aln"), ensure that they begin with an underscore.
 field_name_ordered = {
     "general": [
-        "report_id_id",
+        "report_id",
         "audit_year",
         "total_amount_expended",
         "entity_type",
@@ -177,7 +177,7 @@ field_name_ordered = {
         "resubmission_status",
     ],
     "federalaward": [
-        "report_id_id",
+        "report_id",
         "award_reference",
         "federal_agency_prefix",
         "federal_award_extension",
@@ -200,7 +200,7 @@ field_name_ordered = {
         "loan_balance",
     ],
     "finding": [
-        "report_id_id",
+        "report_id",
         "federal_agency_prefix",
         "federal_award_extension",
         "aln",
@@ -242,7 +242,7 @@ field_name_ordered = {
     "additionalein": ["report_id", "additional_ein"],
     "additionaluei": ["report_id", "additional_uei"],
     "passthrough": [
-        "report_id_id",
+        "report_id",
         "award_reference",
         "passthrough_name",
         "passthrough_id",
