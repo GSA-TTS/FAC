@@ -24,9 +24,14 @@
                 <tr>
                     <th scope="col" role="columnheader">Version</th>
                     <th scope="col" role="columnheader">Date</th>
+                    {% if include_private %}
                     <th scope="col" role="columnheader">Submission summary</th>
+                    {% endif %}
+                    <th scope="col" role="columnheader">Comparisons</th>
+                    {% if include_private %}
                     <th scope="col" role="columnheader">SF-SAC</th>
                     <th scope="col" role="columnheader">Report</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -40,12 +45,29 @@
                         <td>
                             {{ resub.report_id.fac_accepted_date }} 
                         </td>
+                        {% if include_private %}
                         <td>
+                            {% if report_id == resub.report_id.report_id %}
+                              {{ resub.report_id.report_id }}
+                            {% else %}
                             <a class="usa-link"
                                 href="{% url 'dissemination:Summary' report_id=resub.report_id.report_id %}">
                                 {{ resub.report_id.report_id }}
                             </a>
+                            {% endif %}
                         </td>
+                        {% endif %}
+                        <td>
+                            {% if report_id == resub.report_id.report_id %}
+                              {{ resub.report_id.report_id }}
+                            {% else %}
+                            <a class="usa-link"
+                                href="{% url 'audit:CompareSubmissions' report_id=resub.report_id.report_id route='search' %}">
+                                {{ resub.report_id.report_id }}
+                            </a>
+                            {% endif %}
+                        </td>
+                        {% if include_private %}
                         <td>
                             <a class="usa-link display-flex flex-column flex-align-center"
                                 href="{% url 'dissemination:SummaryReportDownload' report_id=resub.report_id.report_id %}"
@@ -70,6 +92,7 @@
                                 </svg>
                             </a>
                         </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>

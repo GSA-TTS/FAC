@@ -771,15 +771,17 @@ class SummaryViewTests(TestMaterializedViewBuilder):
 
     def test_resubmission_data_without_permissions(self):
         """
-        When a user is not permissioned, resubmission data should not be visible.
+        When a user is not permissioned, resubmission data should still be visible.
         """
         self.create_resubmissions()
         url = reverse(
             "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
         )
         response = self.client.get(url)
+        page_content = response.content.decode("utf-8")
 
-        self.assertNotIn("Resubmission history", response.content.decode("utf-8"))
+        self.assertIn("Resubmission history", page_content)
+        self.assertIn("Most recent submitted date", page_content)
 
     def test_resubmission_data_with_access(self):
         """
