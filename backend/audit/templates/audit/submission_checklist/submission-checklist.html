@@ -24,7 +24,7 @@
                     {% if not pre_submission_validation.completed %}
                         {% include "./key-info-preliminary.html" %}
                         {% section_block report_id general_information %}
-                        {% include "./resubmission_action.html" %}
+                        {% include "./resubmission_type.html" %}
                         {% section_block report_id audit_information %}
                         {% single_audit_report_block report_id single_audit_report is_sfsac_only %}
                         {% section_block report_id federal_awards %}

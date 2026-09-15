@@ -1,4 +1,4 @@
-{% if is_resubmission and resubmission_action_url %}
+{% if is_resubmission and resubmission_type_url %}
     <li class="usa-icon-list__item padding-bottom-105">
         {% include "./icon-list-icon.html" with completed=True %}
         <div class="text-success-darker">
@@ -11,7 +11,7 @@
             </p>
 
             <p class="margin-top-1">
-                <a class="usa-link" href="{{ resubmission_action_url }}">
+                <a class="usa-link" href="{{ resubmission_type_url }}">
                     Edit the Resubmission Form
                 </a>
             </p>
