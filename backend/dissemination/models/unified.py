@@ -136,7 +136,8 @@ class Unified(models.Model):
     passthroughs.
     """
 
-    report_id = models.ForeignKey(
+    # Report ID can still be accessed via report_id
+    report = models.ForeignKey(
         "General",
         help_text=REPORT_ID_FK_HELP_TEXT,
         on_delete=models.CASCADE,

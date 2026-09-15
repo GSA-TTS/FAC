@@ -616,13 +616,11 @@ class IntakeToDissemination(object):
         aln = f"{fed.federal_agency_prefix}.{fed.federal_award_extension}"
         params = {
             "aln": aln,
+            "report": gen,
             **model_to_dict(gen),
             **model_to_dict(fed),
             **(model_to_dict(fin) if fin else {}),
             **(model_to_dict(pt) if pt else {}),
         }
 
-        # Since report_id is a FK, the model needs an instance of General, not a string
-        params.pop("report_id", None)
-
-        return Unified(report_id=gen, **params)
+        return Unified(**params)

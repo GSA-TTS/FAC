@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 def _add_search_params_to_newrelic(search_parameters):
-    is_advanced = search_parameters["advanced_search_flag"]
     singles = [
         "start_date",
         "end_date",
@@ -26,9 +25,8 @@ def _add_search_params_to_newrelic(search_parameters):
         "names",
     ]
 
-    if is_advanced:
-        singles.append("cog_or_oversight")
-        multis.append("alns")
+    singles.append("cog_or_oversight")
+    multis.append("alns")
 
     newrelic.agent.add_custom_attributes(
         [(f"request.search.{k}", str(search_parameters[k])) for k in singles]
@@ -44,8 +42,7 @@ def _add_search_params_to_newrelic(search_parameters):
     )
 
 
-# TODO: Update Post SOC Launch -> Clean up to ignore basic/advanced
-def run_search(request, form_data, is_soc=False):
+def run_search(request, form_data):
     """
     Given cleaned form data, run the search.
     Returns the results QuerySet.
@@ -66,33 +63,24 @@ def run_search(request, form_data, is_soc=False):
     }
 
     search_parameters = basic_parameters.copy()
-    search_parameters["advanced_search_flag"] = form_data.get(
-        "advanced_search_flag", True
-    )
-    search_parameters["beta_search_flag"] = form_data.get("beta_search_flag", False)
 
-    if search_parameters["advanced_search_flag"]:
-        advanced_parameters = {
-            "agency_name": form_data["agency_name"],
-            "alns": form_data["aln"],
-            "cog_or_oversight": form_data["cog_or_oversight"],
-            "direct_funding": form_data["direct_funding"],
-            "federal_program_name": form_data["federal_program_name"],
-            "findings": form_data["findings"],
-            "major_program": form_data["major_program"],
-            "passthrough_name": form_data["passthrough_name"],
-            "type_requirement": form_data["type_requirement"],
-            "resubmissions": form_data["resubmissions"],
-        }
-        search_parameters.update(advanced_parameters)
+    advanced_parameters = {
+        "agency_name": form_data["agency_name"],
+        "alns": form_data["aln"],
+        "cog_or_oversight": form_data["cog_or_oversight"],
+        "direct_funding": form_data["direct_funding"],
+        "federal_program_name": form_data["federal_program_name"],
+        "findings": form_data["findings"],
+        "major_program": form_data["major_program"],
+        "passthrough_name": form_data["passthrough_name"],
+        "type_requirement": form_data["type_requirement"],
+        "resubmissions": form_data["resubmissions"],
+    }
+    search_parameters.update(advanced_parameters)
 
     _add_search_params_to_newrelic(search_parameters)
 
-    return (
-        _compare_searches(search_parameters)
-        if is_soc
-        else search_sac(request, search_parameters)
-    )
+    return search_sac(request, search_parameters)
 
 
 # TODO: Update Post SOC Launch -> This can go
