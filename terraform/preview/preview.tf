@@ -9,7 +9,7 @@ module "preview" {
   new_relic_api_key     = var.new_relic_api_key
   pgrst_jwt_secret      = var.pgrst_jwt_secret
 
-  database_plan         = "medium-gp-psql"
+  database_plan         = "medium-gp-psql-replica"
   postgrest_instances   = 1
   postgrest_memory      = "512M"
   swagger_instances     = 1
