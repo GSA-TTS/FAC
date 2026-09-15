@@ -31,7 +31,7 @@
                 ]
             },
             {
-                "name": "auditee_uei",
+                "name": "instructions_name",
                 "start_cell": {
                     "column": "B",
                     "row": "4"
@@ -39,6 +39,20 @@
                 "end_cell": {
                     "column": "B",
                     "row": "4"
+                },
+                "values": [
+                    "https://www.fac.gov/audit-resources/sf-sac/notes-to-sefa/"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
                 },
                 "values": [
                     "M1LVPE5GLSD9"
@@ -48,11 +62,11 @@
                 "name": "accounting_policies",
                 "start_cell": {
                     "column": "B",
-                    "row": "5"
+                    "row": "6"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "5"
+                    "row": "6"
                 },
                 "values": [
                     "The purpose of the schedule of expenditures of Federal awards (the Schedule) is to present a summary of those activities of Rutgers, The State University of New Jersey (the University) for the year ended June 30, 2022, which have been funded by the U.S. Government (Federal awards). For purposes of the Schedule, Federal awards include all Federal assistance and procurement relationships entered into directly between the University and the Federal Government and sub awards from non Federal organizations made under Federally sponsored agreements. The information in this schedule is presented in accordance with the requirements of Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Therefore, some amounts presented in this schedule may differ from amounts presented in, or used in the preparation of, the 2022 basic financial statements. Because the Schedule presents only a selected portion of the activities of the University, it is not intended to and does not present either the financial position, changes in financial position, or cash flows of the University. The accounting principles followed by the University in each of these areas and used in preparing the accompanying schedule are as follows:Student Financial AidDisbursements are recognized on the accrual basis of accounting for awards made to students and for allowable administrative expenses of running such programs.Awards Other Than Student Financial AidDisbursements (expenditures) for direct costs are recognized as incurred using the accrual method of accounting and the cost accounting principles contained in the Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Under those cost principles, certain types of expenditures are not allowable or are limited as to reimbursement. Moreover, expenditures include a portion of costs associated with general University activities which are allocated to Federal expenditures under negotiated formulas commonly referred to as facilities and administrative (F&A) costs rates. F&A costs applicable to these cost recoveries are classified as unrestricted expenses in the statements of revenues, expenses, and changes in net position. Credit disbursement amounts typically result from grant or contract closing adjustments or transfers."
@@ -62,11 +76,11 @@
                 "name": "is_minimis_rate_used",
                 "start_cell": {
                     "column": "B",
-                    "row": "6"
+                    "row": "7"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "6"
+                    "row": "7"
                 },
                 "values": [
                     "N"
@@ -76,11 +90,11 @@
                 "name": "rate_explained",
                 "start_cell": {
                     "column": "B",
-                    "row": "7"
+                    "row": "8"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "7"
+                    "row": "8"
                 },
                 "values": [
                     "The auditee did not use the de minimis cost rate."

@@ -79,6 +79,17 @@ meta_row_font = Font(
     color="00FFFFFF",
 )
 
+hyperlink_font = Font(
+    name="Calibri",
+    size=11,
+    bold=False,
+    italic=False,
+    vertAlign=None,
+    underline="single",
+    strike=False,
+    color="000563C1",
+)
+
 
 def process_spec(WBNT):
     """
@@ -171,6 +182,11 @@ def apply_cell_format(cell, format):
     """
     if format == "text":
         cell.number_format = "@"
+    elif format == "hyperlink":
+        if cell.value:
+            cell.hyperlink = str(cell.value)
+            cell.font = hyperlink_font
+
     elif format == "dollar":
         cell.number_format = "$#,##0"
 
@@ -375,16 +391,17 @@ def process_single_cells(wb, ws, sheet):
             f"{o.posn.range_cell}:{o.posn.range_cell}",
         )
         configure_validation(wb, ws, coord, o)
+
+        if o.value:
+            cell_reference = o.posn.range_cell
+            ws[cell_reference] = o.value
+
         if o.posn.format is not None:
             apply_cell_format(entry_cell_obj, o.posn.format)
 
         if sheet.header_height:
             row = int(o.posn.title_cell[1])
             ws.row_dimensions[row].height = sheet.header_height
-
-        if o.value:
-            cell_reference = o.posn.range_cell
-            ws[cell_reference] = o.value
 
 
 def process_meta_cells(wb, ws, sheet):
