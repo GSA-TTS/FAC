@@ -51,6 +51,8 @@ RUN apt-get -yq update && \
         ca-certificates \
         chromium \
         curl \
+        nodejs \
+        npm \
         unzip \
         # Make sure the client version
         # matches the DB version, locally
