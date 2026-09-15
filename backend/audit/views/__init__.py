@@ -37,7 +37,7 @@ from .tribal_data_consent import TribalDataConsent
 from .upload_report_view import UploadReportView
 from .unlock_after_certification import UnlockAfterCertificationView
 from .compare_submissions_view import CompareSubmissionsView
-from .resubmission_action_edit import ResubmissionActionEditView
+from .resubmission_type_edit import ResubmissionTypeEditView
 
 # In case we want to iterate through all the views for some reason:
 views_list = [
@@ -66,7 +66,7 @@ views_list = [
     RemoveEditorView,
     RemoveSubmissionView,
     ResubmissionStartView,
-    ResubmissionActionEditView,
+    ResubmissionTypeEditView,
     SingleAuditReportFileHandlerView,
     SubmissionProgressView,
     SubmissionView,

@@ -12,14 +12,14 @@ from audit.models import (
     SingleAuditReportFile,
     SubmissionEvent,
 )
-from audit.models.constants import RESUBMISSION_ACTION
+from audit.models.constants import RESUBMISSION_TYPE
 from audit.views.upload_report_view import copy_previous_report_data
 
 logger = logging.getLogger(__name__)
 
 
-class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
-    template_name = "audit/resubmission_action_edit.html"
+class ResubmissionTypeEditView(SingleAuditChecklistAccessRequiredMixin, View):
+    template_name = "audit/resubmission_type_edit.html"
 
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
@@ -29,7 +29,7 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
 
         form = ResubmissionActionForm(
             initial={
-                "resubmission_action": meta.get("resubmission_action"),
+                "resubmission_type": meta.get("resubmission_type"),
                 "resubmission_requester": meta.get("resubmission_requester", []),
                 "material_change_reasons": meta.get("material_change_reasons", []),
                 "non_material_change_reasons": meta.get(
@@ -67,8 +67,8 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
 
         sac.resubmission_meta = sac.resubmission_meta or {}
 
-        sac.resubmission_meta["resubmission_action"] = form.cleaned_data[
-            "resubmission_action"
+        sac.resubmission_meta["resubmission_type"] = form.cleaned_data[
+            "resubmission_type"
         ]
         sac.resubmission_meta["resubmission_requester"] = form.cleaned_data[
             "resubmission_requester"
@@ -92,10 +92,10 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
         )
 
         # Second, copy or delete the PDF report as needed.
-        resubmission_action = sac.resubmission_meta.get("resubmission_action")
+        resubmission_type = sac.resubmission_meta.get("resubmission_type")
         previous_report_id = sac.resubmission_meta.get("previous_report_id")
 
-        if resubmission_action == RESUBMISSION_ACTION.SFSAC_ONLY:
+        if resubmission_type == RESUBMISSION_TYPE.SFSAC_ONLY:
             audit = Audit.objects.find_audit_or_none(report_id)
             try:
                 copy_previous_report_data(
@@ -106,10 +106,10 @@ class ResubmissionActionEditView(SingleAuditChecklistAccessRequiredMixin, View):
                 )
             except Exception as err:
                 logger.error(
-                    "Unexpected error copying SingleAuditReportFile in resubmission action edit: %s",
+                    "Unexpected error copying SingleAuditReportFile in resubmission type edit: %s",
                     err,
                 )
-        elif resubmission_action == RESUBMISSION_ACTION.AUDIT_PDF:
+        elif resubmission_type == RESUBMISSION_TYPE.AUDIT_PDF:
             # 2026-08-11: The PDF will remain in s3. We think this is fine. For the user to submit, they'll have to overwrite the PDF anyways.
             SingleAuditReportFile.objects.filter(sac=sac).delete()
 

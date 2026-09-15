@@ -3,7 +3,7 @@ from copy import deepcopy
 from django.core.exceptions import ValidationError
 
 from audit.cross_validation.naming import NC, find_section_by_name
-from audit.models.constants import RESUBMISSION_ACTION
+from audit.models.constants import RESUBMISSION_TYPE
 from audit.models.submission_event import SubmissionEvent
 from audit.utils import Util
 from audit.validators import validate_general_information_complete_json
@@ -111,8 +111,8 @@ def progress_check(sac, sections, key):
         NC.ADDITIONAL_EINS: bool(general_info.get("multiple_eins_covered")),
         NC.SECONDARY_AUDITORS: bool(general_info.get("secondary_auditors_exist")),
         # Required always, except for SFSAC_ONLY resubmissions where the previous PDF is copied automatically.
-        NC.SINGLE_AUDIT_REPORT: resubmission_meta.get("resubmission_action", None)
-        != RESUBMISSION_ACTION.SFSAC_ONLY,
+        NC.SINGLE_AUDIT_REPORT: resubmission_meta.get("resubmission_type", None)
+        != RESUBMISSION_TYPE.SFSAC_ONLY,
         NC.RESUBMISSION_META: False,  # Never a required section, as it's metadata rather than a single form, but kept for naming.
         NC.TRIBAL_DATA_CONSENT: bool(
             general_info.get("user_provided_organization_type") == "tribal"

@@ -9,13 +9,13 @@
         Select whether you need to make material changes to the audit PDF package, non-material changes to the audit PDF package, or non-material changes to the SF-SAC data collection forms.
     </div>
 
-    {% if form.resubmission_action.errors %}
+    {% if form.resubmission_type.errors %}
         <span class="usa-error-message margin-top-1">
-            {{ form.resubmission_action.errors|striptags }}
+            {{ form.resubmission_type.errors|striptags }}
         </span>
     {% endif %}
 
-    {% for radio in form.resubmission_action %}
+    {% for radio in form.resubmission_type %}
         <div class="usa-radio">
             {{ radio.tag }}
             <label class="usa-radio__label" for="{{ radio.id_for_label }}">

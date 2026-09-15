@@ -7,7 +7,7 @@ describe('Full audit resubmission', () => {
       testLoginGovLogin();
 
       cy.visit('/audit/resubmission-start');
-      cy.get('#id_resubmission_action_0').check({ force: true });
+      cy.get('#id_resubmission_type_0').check({ force: true });
       cy.get('#id_resubmission_requester_0').check({ force: true });
       cy.get('#id_material_change_reasons_0').check({ force: true });
       cy.get('#report_id').type(previous_report_id_1);
@@ -18,7 +18,7 @@ describe('Full audit resubmission', () => {
         testLoginGovLogin();
 
         cy.visit('/audit/resubmission-start');
-        cy.get('#id_resubmission_action_0').check({ force: true });
+        cy.get('#id_resubmission_type_0').check({ force: true });
         cy.get('#id_resubmission_requester_0').check({ force: true });
         cy.get('#id_material_change_reasons_0').check({ force: true });
         cy.get('#report_id').type(previous_report_id_2);

@@ -5,7 +5,7 @@ from django.forms import model_to_dict
 from django.db import IntegrityError
 
 from audit.intakelib.transforms.xform_resize_award_references import _format_reference
-from audit.models.constants import RESUBMISSION_STATUS, RESUBMISSION_ACTION
+from audit.models.constants import RESUBMISSION_STATUS, RESUBMISSION_TYPE
 from audit.utils import Util
 from dissemination.models import (
     AdditionalEin,
@@ -337,9 +337,9 @@ class IntakeToDissemination(object):
         if self.mode == IntakeToDissemination.DISSEMINATION:
             # Non-material PDF and SF-SAC-only resubmissions keep the
             # previous submission's acceptance date.
-            if resubmission_meta and resubmission_meta.get("resubmission_action") in (
-                RESUBMISSION_ACTION.NON_MATERIAL_PDF,
-                RESUBMISSION_ACTION.SFSAC_ONLY,
+            if resubmission_meta and resubmission_meta.get("resubmission_type") in (
+                RESUBMISSION_TYPE.NON_MATERIAL_PDF,
+                RESUBMISSION_TYPE.SFSAC_ONLY,
             ):
                 previous_report_id = resubmission_meta.get("previous_report_id", "")
                 previous = General.objects.filter(report_id=previous_report_id).first()

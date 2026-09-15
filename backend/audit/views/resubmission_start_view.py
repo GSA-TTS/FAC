@@ -52,11 +52,11 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         resubmission_meta = form.cleaned_data["resubmission_meta"]
         material_change_reasons = form.cleaned_data["material_change_reasons"]
         non_material_change_reasons = form.cleaned_data["non_material_change_reasons"]
-        resubmission_action = form.cleaned_data["resubmission_action"]
+        resubmission_type = form.cleaned_data["resubmission_type"]
         resubmission_requester = form.cleaned_data["resubmission_requester"]
         audit_opinion_changes = form.cleaned_data["audit_opinion_changes"]
 
-        resubmission_meta["resubmission_action"] = resubmission_action
+        resubmission_meta["resubmission_type"] = resubmission_type
         resubmission_meta["resubmission_requester"] = resubmission_requester
         resubmission_meta["material_change_reasons"] = material_change_reasons
         resubmission_meta["non_material_change_reasons"] = non_material_change_reasons

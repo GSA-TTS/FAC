@@ -18,7 +18,7 @@ from audit.models import (
     SingleAuditReportFile,
     User,
 )
-from audit.models.constants import EventType, RESUBMISSION_ACTION
+from audit.models.constants import EventType, RESUBMISSION_TYPE
 from dissemination.file_downloads import copy_file
 
 logging.basicConfig(
@@ -129,12 +129,12 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             # SFSAC_ONLY resubmissions cannot upload manually. Kick them back to the checklist.
-            resubmission_action = (
-                sac.resubmission_meta.get("resubmission_action")
+            resubmission_type = (
+                sac.resubmission_meta.get("resubmission_type")
                 if sac.resubmission_meta
                 else None
             )
-            if resubmission_action == RESUBMISSION_ACTION.SFSAC_ONLY:
+            if resubmission_type == RESUBMISSION_TYPE.SFSAC_ONLY:
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
             sar = SingleAuditReportFile.objects.filter(sac_id=sac.id)

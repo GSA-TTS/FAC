@@ -18,10 +18,10 @@ class ResubmissionStartViewTests(TestCase):
     valid_report_id = "0123-01-SOURCE-0123456789"
     valid_sibling_report_id = "3210-10-SOURCE-9876543210"
     valid_material_change_reasons = ["findings"]
-    valid_resubmission_action = "audit_pdf"
+    valid_resubmission_type = "audit_pdf"
     valid_non_material_change_reasons = ["spelling"]
-    valid_non_material_resubmission_action = "non_material_pdf"
-    valid_sfsac_resubmission_action = "sfsac_only"
+    valid_non_material_resubmission_type = "non_material_pdf"
+    valid_sfsac_resubmission_type = "sfsac_only"
     valid_sfsac_only_change_reasons = ["spelling"]
     valid_resubmission_requester = ["auditee"]
     valid_audit_opinion_changes = (
@@ -71,7 +71,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.invalid_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
-                "resubmission_action": self.valid_resubmission_action,
+                "resubmission_type": self.valid_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
             },
         )
@@ -89,7 +89,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.nonexistent_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
-                "resubmission_action": self.valid_resubmission_action,
+                "resubmission_type": self.valid_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
             },
         )
@@ -107,7 +107,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.valid_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
-                "resubmission_action": self.valid_resubmission_action,
+                "resubmission_type": self.valid_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
                 "audit_opinion_changes": self.valid_audit_opinion_changes,
             },
@@ -126,7 +126,7 @@ class ResubmissionStartViewTests(TestCase):
             self.path_name,
             {
                 "report_id": self.valid_report_id,
-                "resubmission_action": self.valid_resubmission_action,
+                "resubmission_type": self.valid_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
             },
         )
@@ -139,7 +139,7 @@ class ResubmissionStartViewTests(TestCase):
             str(response.context["form"].errors),
         )
 
-    def test_resubmission_action_required(self):
+    def test_resubmission_type_required(self):
         """Test that a resubmission action must be selected."""
         self.client.force_login(user=self.user)
         response = self.client.post(
@@ -159,14 +159,14 @@ class ResubmissionStartViewTests(TestCase):
             str(response.context["form"].errors),
         )
 
-    def test_resubmission_action_saved_to_profile(self):
+    def test_resubmission_type_saved_to_profile(self):
         """Test that the selected resubmission action is saved to the user profile."""
         self.client.force_login(user=self.user)
         response = self.client.post(
             self.path_name,
             {
                 "report_id": self.valid_report_id,
-                "resubmission_action": self.valid_sfsac_resubmission_action,
+                "resubmission_type": self.valid_sfsac_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
                 "sfsac_only_change_reasons": self.valid_sfsac_only_change_reasons,
             },
@@ -181,9 +181,9 @@ class ResubmissionStartViewTests(TestCase):
         self.user.profile.refresh_from_db()
         self.assertEqual(
             self.user.profile.entry_form_data["resubmission_meta"][
-                "resubmission_action"
+                "resubmission_type"
             ],
-            self.valid_sfsac_resubmission_action,
+            self.valid_sfsac_resubmission_type,
         )
 
     def test_non_material_change_reasons_required(self):
@@ -193,7 +193,7 @@ class ResubmissionStartViewTests(TestCase):
             self.path_name,
             {
                 "report_id": self.valid_report_id,
-                "resubmission_action": self.valid_non_material_resubmission_action,
+                "resubmission_type": self.valid_non_material_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
             },
         )
@@ -214,7 +214,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.valid_report_id,
                 "non_material_change_reasons": self.valid_non_material_change_reasons,
-                "resubmission_action": self.valid_non_material_resubmission_action,
+                "resubmission_type": self.valid_non_material_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
             },
         )
@@ -234,7 +234,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.valid_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
-                "resubmission_action": self.valid_resubmission_action,
+                "resubmission_type": self.valid_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
                 "audit_opinion_changes": self.valid_audit_opinion_changes,
             },
@@ -272,7 +272,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.valid_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
-                "resubmission_action": self.valid_resubmission_action,
+                "resubmission_type": self.valid_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
                 "audit_opinion_changes": audit_opinion_changes,
             },
@@ -301,7 +301,7 @@ class ResubmissionStartViewTests(TestCase):
             self.path_name,
             {
                 "report_id": self.valid_report_id,
-                "resubmission_action": self.valid_sfsac_resubmission_action,
+                "resubmission_type": self.valid_sfsac_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
                 "sfsac_only_change_reasons": self.valid_sfsac_only_change_reasons,
                 "audit_opinion_changes": self.valid_audit_opinion_changes,
@@ -331,7 +331,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.valid_report_id,
                 "non_material_change_reasons": self.valid_non_material_change_reasons,
-                "resubmission_action": self.valid_non_material_resubmission_action,
+                "resubmission_type": self.valid_non_material_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
                 "audit_opinion_changes": "Corrected non-material PDF information.",
             },
@@ -360,7 +360,7 @@ class ResubmissionStartViewTests(TestCase):
             {
                 "report_id": self.valid_report_id,
                 "material_change_reasons": self.valid_material_change_reasons,
-                "resubmission_action": self.valid_resubmission_action,
+                "resubmission_type": self.valid_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
             },
         )

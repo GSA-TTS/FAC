@@ -228,7 +228,7 @@ SAC_SEQUENCE_ID = "public.audit_singleauditchecklist_id_seq"
 AUDIT_SEQUENCE_ID = "public.audit_audit_id_seq"
 
 
-class RESUBMISSION_ACTION:
+class RESUBMISSION_TYPE:
     AUDIT_PDF = "audit_pdf"
     NON_MATERIAL_PDF = "non_material_pdf"
     SFSAC_ONLY = "sfsac_only"

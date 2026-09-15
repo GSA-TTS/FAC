@@ -12,7 +12,7 @@ from audit.models import (
     SubmissionEvent,
     Audit,
 )
-from audit.models.constants import STATUS, AuditType, RESUBMISSION_ACTION
+from audit.models.constants import STATUS, AuditType, RESUBMISSION_TYPE
 from .constants import ACCESS_SUBMISSION_DATA_REQUIRED
 
 from audit.models.access_roles import AccessRole
@@ -144,8 +144,8 @@ def access_and_submission_check(user, data):
             # 3. For SFSAC_ONLY resubmissions, automatically copy the PDF from the previous submission.
             if (
                 previous_report_id
-                and resubmission_meta.get("resubmission_action")
-                == RESUBMISSION_ACTION.SFSAC_ONLY
+                and resubmission_meta.get("resubmission_type")
+                == RESUBMISSION_TYPE.SFSAC_ONLY
             ):
                 try:
                     copy_previous_report_data(
