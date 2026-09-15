@@ -1,4 +1,4 @@
-module "metabase-app" {
+module "metabase" {
   count = var.cf_space.name == "staging" || var.cf_space.name == "production" ? 1 : 0
 
   source        = "../metabase"
@@ -6,27 +6,15 @@ module "metabase-app" {
   cf_space_name = var.cf_space.name
   cf_space_id   = var.cf_space.id
   name          = "metabase"
-  app_memory    = "2048M"
-  disk_quota    = "3072M"
+  app_memory    = "4096M"
+  disk_quota    = "4096M"
+  db_plan       = var.metabase_database_plan
+  db_params     = var.metabase_db_params
   app_instances = 1
   environment_variables = {
     ENV = var.cf_space.name
   }
   service_bindings = {
-    "${module.database.database_name}"                        = ""
-    "${module.metabasedb[0].database_name}"                   = ""
     "${cloudfoundry_service_instance.proxy_credentials.name}" = ""
   }
-  depends_on = [module.metabasedb[0], module.database]
-}
-
-module "metabasedb" {
-  count = var.cf_space.name == "staging" || var.cf_space.name == "production" ? 1 : 0
-
-  source        = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.5.0"
-  cf_space_id   = var.cf_space.id
-  name          = "metabase-db"
-  tags          = ["rds"]
-  rds_plan_name = var.metabase_database_plan
-  json_params   = var.metabase_db_params
 }

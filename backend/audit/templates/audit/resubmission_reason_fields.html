@@ -70,3 +70,55 @@
         {% endfor %}
     </fieldset>
 </div>
+
+<div id="sfsac-only-change-section" hidden>
+    <fieldset
+        class="usa-fieldset margin-top-4"
+        aria-describedby="sfsac-only-change-hint"
+    >
+        <div class="usa-hint" id="sfsac-only-change-hint">
+            Select one or more non-material changes that apply. This field is required.
+        </div>
+
+        {% if form.sfsac_only_change_reasons.errors %}
+            <span class="usa-error-message margin-top-1">
+                {{ form.sfsac_only_change_reasons.errors|striptags }}
+            </span>
+        {% endif %}
+
+        {% for checkbox in form.sfsac_only_change_reasons %}
+            <div class="usa-checkbox">
+                {{ checkbox.tag }}
+                <label
+                    class="usa-checkbox__label"
+                    for="{{ checkbox.id_for_label }}"
+                >
+                    {{ checkbox.choice_label }}
+                </label>
+            </div>
+        {% endfor %}
+    </fieldset>
+</div>
+
+<div id="audit-opinion-changes-section" hidden>
+    <label
+        class="usa-label margin-top-4"
+        id="audit_opinion_changes-label"
+        for="audit_opinion_changes"
+    >
+        If resubmitting the auditor's report, identify the changes in the audit
+        opinion that are the reason for the resubmission.
+    </label>
+
+    <div class="usa-hint" id="audit-opinion-changes-hint">
+        This field is required.
+    </div>
+
+    {% if form.audit_opinion_changes.errors %}
+        <span class="usa-error-message margin-top-1">
+            {{ form.audit_opinion_changes.errors|striptags }}
+        </span>
+    {% endif %}
+
+    {{ form.audit_opinion_changes }}
+</div>

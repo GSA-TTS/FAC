@@ -20,12 +20,13 @@ class ResubmissionStartViewTests(TestCase):
     valid_material_change_reasons = ["findings"]
     valid_resubmission_action = "audit_pdf"
     valid_non_material_change_reasons = ["spelling"]
+    valid_non_material_resubmission_action = "non_material_pdf"
+    valid_sfsac_resubmission_action = "sfsac_only"
+    valid_sfsac_only_change_reasons = ["spelling"]
     valid_resubmission_requester = ["auditee"]
     valid_audit_opinion_changes = (
         "The auditor's opinion changed due to revised findings in the audit report."
     )
-    valid_sfsac_resubmission_action = "sfsac_only"
-
     general_information = {
         "auditee_uei": "auditee_uei",
         "auditee_name": "auditee_name",
@@ -108,6 +109,7 @@ class ResubmissionStartViewTests(TestCase):
                 "material_change_reasons": self.valid_material_change_reasons,
                 "resubmission_action": self.valid_resubmission_action,
                 "resubmission_requester": self.valid_resubmission_requester,
+                "audit_opinion_changes": self.valid_audit_opinion_changes,
             },
         )
 
@@ -164,9 +166,9 @@ class ResubmissionStartViewTests(TestCase):
             self.path_name,
             {
                 "report_id": self.valid_report_id,
-                "non_material_change_reasons": self.valid_non_material_change_reasons,
                 "resubmission_action": self.valid_sfsac_resubmission_action,
                 "resubmission_requester": self.valid_resubmission_requester,
+                "sfsac_only_change_reasons": self.valid_sfsac_only_change_reasons,
             },
         )
 
@@ -182,6 +184,45 @@ class ResubmissionStartViewTests(TestCase):
                 "resubmission_action"
             ],
             self.valid_sfsac_resubmission_action,
+        )
+
+    def test_non_material_change_reasons_required(self):
+        """Test that at least one non-material change reason must be selected."""
+        self.client.force_login(user=self.user)
+        response = self.client.post(
+            self.path_name,
+            {
+                "report_id": self.valid_report_id,
+                "resubmission_action": self.valid_non_material_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "audit/resubmission_start_form.html")
+        self.assertIn("form", response.context)
+        self.assertIn(
+            "Select at least one non-material change.",
+            str(response.context["form"].errors),
+        )
+
+    def test_valid_non_material_pdf_resubmission(self):
+        self.client.force_login(user=self.user)
+
+        response = self.client.post(
+            self.path_name,
+            {
+                "report_id": self.valid_report_id,
+                "non_material_change_reasons": self.valid_non_material_change_reasons,
+                "resubmission_action": self.valid_non_material_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("report_submission:eligibility"),
+            fetch_redirect_response=False,
         )
 
     def test_audit_opinion_changes_saved_for_audit_pdf_resubmission(self):
@@ -260,9 +301,9 @@ class ResubmissionStartViewTests(TestCase):
             self.path_name,
             {
                 "report_id": self.valid_report_id,
-                "non_material_change_reasons": self.valid_non_material_change_reasons,
                 "resubmission_action": self.valid_sfsac_resubmission_action,
                 "resubmission_requester": self.valid_resubmission_requester,
+                "sfsac_only_change_reasons": self.valid_sfsac_only_change_reasons,
                 "audit_opinion_changes": self.valid_audit_opinion_changes,
             },
         )
@@ -280,4 +321,52 @@ class ResubmissionStartViewTests(TestCase):
                 "audit_opinion_changes"
             ],
             "",
+        )
+
+    def test_audit_opinion_changes_saved_for_non_material_pdf_resubmission(self):
+        self.client.force_login(user=self.user)
+
+        response = self.client.post(
+            self.path_name,
+            {
+                "report_id": self.valid_report_id,
+                "non_material_change_reasons": self.valid_non_material_change_reasons,
+                "resubmission_action": self.valid_non_material_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
+                "audit_opinion_changes": "Corrected non-material PDF information.",
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("report_submission:eligibility"),
+            fetch_redirect_response=False,
+        )
+
+        self.user.profile.refresh_from_db()
+
+        self.assertEqual(
+            self.user.profile.entry_form_data["resubmission_meta"][
+                "audit_opinion_changes"
+            ],
+            "Corrected non-material PDF information.",
+        )
+
+    def test_audit_opinion_changes_required_for_audit_pdf_resubmission(self):
+        self.client.force_login(user=self.user)
+
+        response = self.client.post(
+            self.path_name,
+            {
+                "report_id": self.valid_report_id,
+                "material_change_reasons": self.valid_material_change_reasons,
+                "resubmission_action": self.valid_resubmission_action,
+                "resubmission_requester": self.valid_resubmission_requester,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            "Identify the changes in the audit opinion that are the reason for the resubmission.",
+            str(response.context["form"].errors),
         )

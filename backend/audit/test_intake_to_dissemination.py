@@ -420,7 +420,10 @@ class IntakeToDisseminationTests(TestCase):
         }
 
     @staticmethod
-    def _fake_resubmission(previous_report_id="2024-06-GSAFAC-0008675308"):
+    def _fake_resubmission(
+        previous_report_id="2024-06-GSAFAC-0008675308",
+        resubmission_action=RESUBMISSION_ACTION.SFSAC_ONLY,
+    ):
         return {
             "version": 2,
             "resubmission_status": "deprecated_via_resubmission",
@@ -428,7 +431,7 @@ class IntakeToDisseminationTests(TestCase):
             "next_report_id": "2024-06-GSAFAC-0008675310",
             "previous_row_id": 8675308,
             "previous_report_id": previous_report_id,
-            "resubmission_action": RESUBMISSION_ACTION.SFSAC_ONLY,
+            "resubmission_action": resubmission_action,
         }
 
     def test_load_general(self):
@@ -448,12 +451,13 @@ class IntakeToDisseminationTests(TestCase):
         )
 
     def test_load_general_sfsac_only(self):
-        """Resubmissions should use their parent's submitted_date"""
+        """SF-SAC-only resubmissions should use their parent's submitted_date."""
         parent = baker.make(General, submitted_date="2020-02-02")
 
         resub_sac = self._create_sac(
             resubmission_meta=self._fake_resubmission(
-                previous_report_id=parent.report_id
+                previous_report_id=parent.report_id,
+                resubmission_action=RESUBMISSION_ACTION.SFSAC_ONLY,
             )
         )
         self._run_state_transition(resub_sac)
@@ -463,7 +467,50 @@ class IntakeToDisseminationTests(TestCase):
         resub = General.objects.filter(report_id=resub_sac.report_id).first()
 
         self.assertEqual(
-            resub.submitted_date.strftime("%Y-%m-%d"), parent.submitted_date
+            resub.submitted_date.strftime("%Y-%m-%d"),
+            parent.submitted_date,
+        )
+
+    def test_load_general_non_material_pdf(self):
+        """Non-material PDF resubmissions should use their parent's submitted_date."""
+        parent = baker.make(General, submitted_date="2020-02-02")
+
+        resub_sac = self._create_sac(
+            resubmission_meta=self._fake_resubmission(
+                previous_report_id=parent.report_id,
+                resubmission_action=RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+            )
+        )
+        self._run_state_transition(resub_sac)
+        resub_intake = IntakeToDissemination(resub_sac)
+        resub_intake.load_all()
+        resub_intake.save_dissemination_objects()
+        resub = General.objects.filter(report_id=resub_sac.report_id).first()
+
+        self.assertEqual(
+            resub.submitted_date.strftime("%Y-%m-%d"),
+            parent.submitted_date,
+        )
+
+    def test_load_general_audit_pdf_uses_new_submitted_date(self):
+        """Material PDF resubmissions should use the new submission date."""
+        parent = baker.make(General, submitted_date="2020-02-02")
+
+        resub_sac = self._create_sac(
+            resubmission_meta=self._fake_resubmission(
+                previous_report_id=parent.report_id,
+                resubmission_action=RESUBMISSION_ACTION.AUDIT_PDF,
+            )
+        )
+        self._run_state_transition(resub_sac)
+        resub_intake = IntakeToDissemination(resub_sac)
+        resub_intake.load_all()
+        resub_intake.save_dissemination_objects()
+        resub = General.objects.filter(report_id=resub_sac.report_id).first()
+
+        self.assertNotEqual(
+            resub.submitted_date.strftime("%Y-%m-%d"),
+            parent.submitted_date,
         )
 
     def test_load_general_race_condition_logging(self):

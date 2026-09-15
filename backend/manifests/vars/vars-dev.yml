@@ -15,3 +15,4 @@ services:
   - smtp-proxy-creds
   - fac-logdrain
   - backups
+  - autoscaler

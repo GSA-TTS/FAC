@@ -4,5 +4,7 @@
 */terraform.tfstate.backup
 */deployer-creds.auto.tfvars
 shared/config/backend.tfvars
+shared/modules/cors/aws/*
+shared/modules/cors/awscliv2.zip
 */*.tfplan
 */*.zip

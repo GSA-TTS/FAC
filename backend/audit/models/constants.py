@@ -230,6 +230,7 @@ AUDIT_SEQUENCE_ID = "public.audit_audit_id_seq"
 
 class RESUBMISSION_ACTION:
     AUDIT_PDF = "audit_pdf"
+    NON_MATERIAL_PDF = "non_material_pdf"
     SFSAC_ONLY = "sfsac_only"
 
 

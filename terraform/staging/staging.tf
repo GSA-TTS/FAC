@@ -20,6 +20,8 @@ module "staging" {
   clamav_instances       = 1
   clamav_memory          = "2048M"
   clamav_fs_instances    = 1
+  autoscale_instance_min = 1
+  autoscale_instance_max = 2
   db_params = jsonencode(
     {
       "storage" : 50,
@@ -32,7 +34,7 @@ module "staging" {
   )
   metabase_db_params = jsonencode(
     {
-      "storage" : 50,
+      "storage" : 25,
     }
   )
 }

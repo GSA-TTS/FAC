@@ -10,7 +10,7 @@ services:
   # Metabase app
   #---------------------------------------------
   metabase:
-    image: metabase/metabase:latest
+    image: metabase/metabase:v0.63.16.7
     container_name: metabase
     hostname: metabase
     volumes:
@@ -35,12 +35,12 @@ services:
       retries: 5
 
   metabase-db:
-    image: "postgres:15"
+    image: "postgres:18"
     hostname: metabase-db
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
-      - metabase-db:/var/lib/postgresql/data/
+      - metabase-db:/var/lib/postgresql/
     ports:
       - "5433:5432"
     healthcheck:

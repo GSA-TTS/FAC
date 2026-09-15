@@ -335,11 +335,11 @@ class IntakeToDissemination(object):
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
 
         if self.mode == IntakeToDissemination.DISSEMINATION:
-            # Non-material resubmissions keep the previous submission's submission date
-            if (
-                resubmission_meta
-                and resubmission_meta.get("resubmission_action")
-                == RESUBMISSION_ACTION.SFSAC_ONLY
+            # Non-material PDF and SF-SAC-only resubmissions keep the
+            # previous submission's acceptance date.
+            if resubmission_meta and resubmission_meta.get("resubmission_action") in (
+                RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+                RESUBMISSION_ACTION.SFSAC_ONLY,
             ):
                 previous_report_id = resubmission_meta.get("previous_report_id", "")
                 previous = General.objects.filter(report_id=previous_report_id).first()

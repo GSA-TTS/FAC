@@ -10,8 +10,10 @@ module "production" {
   pgrst_jwt_secret       = var.pgrst_jwt_secret
   clamav_instances       = 2
   clamav_fs_instances    = 1
-  database_plan          = "xlarge-gp-psql-replica"
-  metabase_database_plan = "xlarge-gp-psql-redundant"
+  autoscale_instance_min = 2
+  autoscale_instance_max = 4
+  database_plan          = "xlarge-gp-psql-redundant"
+  metabase_database_plan = "large-gp-psql-redundant"
   snapshot_database_plan = "xlarge-gp-psql"
   postgrest_instances    = 2
   db_params = jsonencode(
@@ -26,7 +28,7 @@ module "production" {
   )
   metabase_db_params = jsonencode(
     {
-      "storage" : 75,
+      "storage" : 25,
     }
   )
 }
