@@ -48,7 +48,7 @@ class ExcelFile(models.Model):
 
     def save(self, *args, **kwargs):
         if self.sac.submission_status != STATUS.IN_PROGRESS:
-            raise LateChangeError("Attemtped Excel file upload")
+            raise LateChangeError("Attempted Excel file upload")
 
         self.filename = f"{self.sac.report_id}--{self.form_section}.xlsx"
 
