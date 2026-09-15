@@ -180,9 +180,7 @@ class ResubmissionStartViewTests(TestCase):
 
         self.user.profile.refresh_from_db()
         self.assertEqual(
-            self.user.profile.entry_form_data["resubmission_meta"][
-                "resubmission_type"
-            ],
+            self.user.profile.entry_form_data["resubmission_meta"]["resubmission_type"],
             self.valid_sfsac_resubmission_type,
         )
 
