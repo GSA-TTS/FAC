@@ -567,6 +567,26 @@ class IntakeToDissemination(object):
             resubmission_version, next_report_id
         )
 
+        # Collect the requester, action, audit opinion changes, and reason lists
+        requester = resubmission_meta.get("resubmission_requester")
+        audit_opinion_changes = resubmission_meta.get("audit_opinion_changes")
+        resubmission_type = resubmission_meta.get("resubmission_type")
+
+        # Depending on the chosen action, pick the appropriate reason list to
+        # include in the consolidated justification. We store the justification
+        # as a JSON array of reason codes when applicable.
+        justification = None
+        if resubmission_type == RESUBMISSION_TYPE.AUDIT_PDF:
+            reasons = resubmission_meta.get("material_change_reasons", [])
+            # include audit opinion changes text as part of justification if present
+            justification = reasons
+        elif resubmission_type == RESUBMISSION_TYPE.NON_MATERIAL_PDF:
+            reasons = resubmission_meta.get("non_material_change_reasons", [])
+            justification = reasons
+        elif resubmission_type == RESUBMISSION_TYPE.SFSAC_ONLY:
+            reasons = resubmission_meta.get("sfsac_only_change_reasons", [])
+            justification = reasons
+
         resubmission = Resubmission(
             report_id=self.loaded_objects["Generals"][
                 0
@@ -575,6 +595,10 @@ class IntakeToDissemination(object):
             status=resubmission_status,
             previous_report_id=previous_report_id,
             next_report_id=next_report_id,
+            resubmission_requester=requester,
+            audit_opinion_changes=audit_opinion_changes,
+            resubmission_type=resubmission_type,
+            resubmission_justification=justification,
         )
         self.loaded_objects["Resubmissions"] = [resubmission]
         return [resubmission]
