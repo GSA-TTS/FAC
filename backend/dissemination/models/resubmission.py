@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 from audit.models.constants import RESUBMISSION_STATUS_CHOICES
 from .constants import REPORT_ID_FK_HELP_TEXT
@@ -59,6 +60,38 @@ class Resubmission(models.Model):
         unique=True,
     )
 
+    # Who requested the resubmission. Stored as a JSON array of requester ids
+    # (matches values from audit.formlib.resubmission_forms.RESUBMISSION_REQUESTER_CHOICES)
+    resubmission_requester = ArrayField(
+        models.TextField("Resubmission Requester"),
+        size=None,
+        null=True,
+        blank=True,
+    )
+
+    # Open textfield description of changes to the audit opinion
+    audit_opinion_changes = models.TextField(
+        "Audit Opinion Changes",
+        null=True,
+        blank=True,
+    )
+
+    # Which resubmission type was chosen by the user
+    resubmission_type = models.TextField(
+        "Resubmission Type (Formerly Resubmission Action)",
+        null=True,
+        blank=True,
+    )
+
+    # Consolidated justification for the resubmission. This will contain the
+    # appropriate list of reason codes (depending on the chosen action) and
+    # is stored as JSON for clarity.
+    resubmission_justification = ArrayField(
+        models.TextField("Resubmission Justification"),
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         constraints = [
             models.CheckConstraint(
@@ -68,7 +101,6 @@ class Resubmission(models.Model):
         ]
 
     # Eventually:
-    # resubmission_justification. Either a TextField provided by the user, or a CharField with choices for predetermined justifications.
     # changed_fields. A TextField with a string of comma separated field names. i.e. "one_field, two_field, red_field, blue_field".
 
     def __str__(self):
