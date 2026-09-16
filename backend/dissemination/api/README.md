@@ -14,7 +14,9 @@ api_v1_1_1 is the same as v1_1_0, but it includes the combined table. This was a
 
 api_v1_2_0 relies on the `audit` tables, rather than the `dissemination` ones. The results it provides are the same, but the views are generated differently due to the data source, and it is somewhat more performant.
 
-api v1_3_x includes the unified view, more resubmission metadata, and associated additions.
+api v1_3_0 includes the `dissemination_unified` table.
+
+api v1_3_1 adds resubmission_requester, audit_opinion_changes, resubmission_type, and resubmission_justification columns to the `dissemination_resubmission` table.
 
 ## Comparing Results Between Versions
 
