@@ -16,7 +16,7 @@ api_v1_2_0 relies on the `audit` tables, rather than the `dissemination` ones. T
 
 api v1_3_0 includes the `dissemination_unified` table.
 
-api v1_3_1 adds resubmission_requester, audit_opinion_changes, resubmission_type, and resubmission_justification columns to the `dissemination_resubmission` table.
+api v1_3_1 adds resubmission_requester, audit_opinion_changes, resubmission_type, and resubmission_justification columns to the `dissemination_resubmission` view.
 
 ## Comparing Results Between Versions
 
