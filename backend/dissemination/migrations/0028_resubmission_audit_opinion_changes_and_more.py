@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
             field=models.TextField(
                 blank=True,
                 null=True,
-                verbose_name="Resubmission Type (Formerly Resubmission Action)",
+                verbose_name="Resubmission Type",
             ),
         ),
     ]

@@ -76,9 +76,9 @@ class Resubmission(models.Model):
         blank=True,
     )
 
-    # Which resubmission type was chosen by the user
+    # Which resubmission type was chosen by the user. Formerly "resubmission_action"
     resubmission_type = models.TextField(
-        "Resubmission Type (Formerly Resubmission Action)",
+        "Resubmission Type",
         null=True,
         blank=True,
     )
