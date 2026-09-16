@@ -51,8 +51,9 @@ RUN apt-get -yq update && \
         ca-certificates \
         chromium \
         curl \
-        nodejs \
-        npm \
+        # These helped some resolve js hot-loading locally, but appear not to work in the CI/CD pipeline.
+        # nodejs \
+        # npm \
         unzip \
         # Make sure the client version
         # matches the DB version, locally
