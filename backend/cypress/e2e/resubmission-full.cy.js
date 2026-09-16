@@ -10,6 +10,7 @@ describe('Full audit resubmission', () => {
       cy.get('#id_resubmission_type_0').check({ force: true });
       cy.get('#id_resubmission_requester_0').check({ force: true });
       cy.get('#id_material_change_reasons_0').check({ force: true });
+      cy.get('#audit_opinion_changes').type("Something is incorrect, so we're fixing it.");
       cy.get('#report_id').type(previous_report_id_1);
       cy.get('#continue').click();
       cy.url().should('include', '/report_submission/eligibility/');
@@ -21,6 +22,7 @@ describe('Full audit resubmission', () => {
         cy.get('#id_resubmission_type_0').check({ force: true });
         cy.get('#id_resubmission_requester_0').check({ force: true });
         cy.get('#id_material_change_reasons_0').check({ force: true });
+        cy.get('#audit_opinion_changes').type("Something is incorrect, so we're fixing it.");
         cy.get('#report_id').type(previous_report_id_2);
         cy.get('#continue').click();
         cy.url().should('include', '/report_submission/eligibility/');
