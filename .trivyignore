@@ -1,0 +1,3 @@
+
+# Found in Metabase image; risk accepted as we do not use the JDBC Driver for SQL Server
+CVE-2025-59250

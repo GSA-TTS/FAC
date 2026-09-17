@@ -21,6 +21,8 @@ jobs:
             short-name: postgrest
           - name: ghcr.io/gsa-tts/clamav-rest/clamav:latest
             short-name: clamav
+          - name: metabase/metabase:v0.63.16.7
+            short-name: metabase
 
     steps:
       - name: Checkout
@@ -50,6 +52,7 @@ jobs:
           scanners: 'vuln'
           timeout: 15m0s
           ignore-unfixed: true
+          trivyignores: '.trivyignore'
 
       - name: Tag Image
         run: |
