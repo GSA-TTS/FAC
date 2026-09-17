@@ -31,7 +31,7 @@
                 ]
             },
             {
-                "name": "auditee_uei",
+                "name": "instructions_name",
                 "start_cell": {
                     "column": "B",
                     "row": "4"
@@ -39,6 +39,20 @@
                 "end_cell": {
                     "column": "B",
                     "row": "4"
+                },
+                "values": [
+                    "https://www.fac.gov/audit-resources/sf-sac/federal-awards-audit-findings-text/"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
                 },
                 "values": [
                     "LBNNLRDE8793"
@@ -92,6 +106,141 @@
                 "values": [
                     "N",
                     "N"
+                ]
+            },
+            {
+                "name": "known_qc_amount",
+                "start_cell": {
+                    "column": "D",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "D",
+                    "row": "3"
+                },
+                "values": [
+                    null,
+                    null
+                ]
+            },
+            {
+                "name": "likely_qc_amount",
+                "start_cell": {
+                    "column": "E",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "E",
+                    "row": "3"
+                },
+                "values": [
+                    null,
+                    null
+                ]
+            },
+            {
+                "name": "undetermined_qc_explanation",
+                "start_cell": {
+                    "column": "F",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "F",
+                    "row": "3"
+                },
+                "values": [
+                    null,
+                    null
+                ]
+            },
+            {
+                "name": "criteria",
+                "start_cell": {
+                    "column": "G",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "G",
+                    "row": "3"
+                },
+                "values": [
+                    null,
+                    null
+                ]
+            },
+            {
+                "name": "condition",
+                "start_cell": {
+                    "column": "H",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "H",
+                    "row": "3"
+                },
+                "values": [
+                    null,
+                    null
+                ]
+            },
+            {
+                "name": "cause",
+                "start_cell": {
+                    "column": "I",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "I",
+                    "row": "3"
+                },
+                "values": [
+                    null,
+                    null
+                ]
+            },
+            {
+                "name": "effect",
+                "start_cell": {
+                    "column": "J",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "J",
+                    "row": "3"
+                },
+                "values": [
+                    null,
+                    null
+                ]
+            },
+            {
+                "name": "recommendation",
+                "start_cell": {
+                    "column": "K",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "K",
+                    "row": "3"
+                },
+                "values": [
+                    null,
+                    null
+                ]
+            },
+            {
+                "name": "response",
+                "start_cell": {
+                    "column": "L",
+                    "row": "2"
+                },
+                "end_cell": {
+                    "column": "L",
+                    "row": "3"
+                },
+                "values": [
+                    null,
+                    null
                 ]
             }
         ]

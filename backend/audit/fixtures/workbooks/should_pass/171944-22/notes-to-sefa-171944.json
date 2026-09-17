@@ -31,7 +31,7 @@
                 ]
             },
             {
-                "name": "auditee_uei",
+                "name": "instructions_name",
                 "start_cell": {
                     "column": "B",
                     "row": "4"
@@ -39,6 +39,20 @@
                 "end_cell": {
                     "column": "B",
                     "row": "4"
+                },
+                "values": [
+                    "https://www.fac.gov/audit-resources/sf-sac/notes-to-sefa/"
+                ]
+            },
+            {
+                "name": "auditee_uei",
+                "start_cell": {
+                    "column": "B",
+                    "row": "5"
+                },
+                "end_cell": {
+                    "column": "B",
+                    "row": "5"
                 },
                 "values": [
                     "JCJBPTJXYXH9"
@@ -48,11 +62,11 @@
                 "name": "accounting_policies",
                 "start_cell": {
                     "column": "B",
-                    "row": "5"
+                    "row": "6"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "5"
+                    "row": "6"
                 },
                 "values": [
                     "(a) Reporting Entity The State of Texas Schedule of Expenditures of Federal Awards (Schedule) includes the activity of all federal award programs administered by the primary government except for the federal activity of the Texas A&M Research Foundation (TAMRF), a blended component unit of the Texas A&M University System. TAMRF is excluded from the Schedule and is subject to a separate audit in compliance with the audit requirements of Title 2, U.S. Code of Federal Regulations, Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). The Schedule does not include the federal activity of discrete component units. These entities are legally separate from the State and are responsible for undergoing separate audits as needed to comply with the OMB Uniform Guidance. The federal activity of the following discrete component units is excluded from the Schedule: OneStar National Service Commission Teacher Retirement System of Texas Texas Appraiser Licensing and Certification Board Texas Boll Weevil Eradication Foundation Inc. Texas Health Insurance Risk Pool Texas State Affordable Housing Corporation (b) Basis of Presentation The Schedule presents total federal awards expended for each individual federal program during the fiscal year ended August 31, 2022. The information in the Schedule is presented in accordance with the requirements of OMB Uniform Guidance. Federal award program titles are reported as presented by Assistance Listing Number (ALN) in the System for Award Management (SAM). Federal award program titles not presented in the SAM are identified by federal agency number followed by (.XXX). U.S. Department of Education (ED) subprograms are identified by a subprogram alpha character after the ALN and presented by ED subprogram title. Federal award programs and subprograms include expenditures, pass-throughs to non-state agencies (i.e. payments to subrecipients), non-monetary assistance and loan programs. (c) Basis of Accounting The expenditures for each of the federal financial assistance programs are presented in the Schedule on the accounting basis as presented on the fund financial statements. For entities with governmental funds, expenditures are presented on a modified accrual basis. For entities with proprietary or fiduciary funds, expenditures are presented on the full accrual basis. Such expenditures are generally recognized following the cost principles contained in Title 2 U.S. Code of Federal Regulations, Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards, wherein certain types of expenditures are not allowable or are limited as to reimbursement for all awards with the exception of the Coronavirus Relief Fund (ALN 21.019) and those programs identified in Appendix I of the 2022 Compliance Supplement. ALN 21.019 follows criteria determined by the U.S. Department of Treasury for allowability of costs. Programs identified in Appendix I of the 2022 Compliance Supplement follow the cost principles contained in the Texas Grant Management Standards (TXGMS) issued by the Texas Comptroller of Public Accounts for allowability of costs. The expenditures in the Student Financial Assistance Cluster that meet the qualification for continuing compliance requirements include the beginning balance of outstanding loans from previous reporting periods, new loans processed in the current reporting period and the administrative cost recovered. Additional information on all loan expenditures can be seen in Note 5. Both the modified accrual and accrual basis of accounting incorporate an estimation approach to determine the amount of expenditures incurred if not yet billed by a vendor. Thus, those federal programs presenting negative amounts on the Schedule are the result of prior year estimates being overstated and/or reimbursements due back to the grantor."
@@ -62,11 +76,11 @@
                 "name": "is_minimis_rate_used",
                 "start_cell": {
                     "column": "B",
-                    "row": "6"
+                    "row": "7"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "6"
+                    "row": "7"
                 },
                 "values": [
                     "Both"
@@ -76,11 +90,11 @@
                 "name": "rate_explained",
                 "start_cell": {
                     "column": "B",
-                    "row": "7"
+                    "row": "8"
                 },
                 "end_cell": {
                     "column": "B",
-                    "row": "7"
+                    "row": "8"
                 },
                 "values": [
                     "The following state agencies elected to use the 10-percent de minimis indirect cost rate allowed under the Uniform Guidance: Commission on State Emergency Communications Soil and Water Conservation Board"

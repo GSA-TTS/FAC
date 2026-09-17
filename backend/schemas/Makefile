@@ -12,14 +12,9 @@ else
               ${SYSTEM_PYTHON}))
 endif
 
-# Example with workbook version: SAM_API_KEY=my-sam-key make all WORKBOOK_VERSION=1.1.10
-all: maybe_bump_workbook_version clean fetch_alns merge_aln_csvs source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json build_test_workbooks
+all: clean merge_aln_csvs source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json build_test_workbooks
 
-skip:
-	@echo "Skipping ALN fetch and merge (using existing data)..."
-	@$(MAKE) maybe_bump_workbook_version clean source_data build_xlsx format_jsonnet build_templates build_sections build_audit_json build_test_workbooks
-
-json: format_jsonnet build_templates build_audit_json
+json: format_jsonnet build_templates build_templates build_audit_json
 
 template_specs = $(wildcard source/excel/templates/*.jsonnet)
 section_specs = $(wildcard source/sections/*.jsonnet)
@@ -109,6 +104,10 @@ build_base_schemas:
 		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
 		jsonnet -o output/base/"$$base_name.json" "$$jsonnet_file"; \
 	done
+
+build_test_workbooks:
+	@echo "Building Cypress test workbooks..."
+	@${PYTHON} scripts/build_test_workbooks.py
 
 build_test_workbooks:
 	@echo "Building Cypress test workbooks..."
