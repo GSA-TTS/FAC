@@ -7,7 +7,7 @@ from model_bakery import baker
 from faker import Faker
 
 from audit.models import SingleAuditChecklist, User
-from audit.models.constants import STATUS, RESUBMISSION_ACTION
+from audit.models.constants import STATUS, RESUBMISSION_TYPE
 from audit.intake_to_dissemination import IntakeToDissemination
 from audit.test_views import AUDIT_JSON_FIXTURES, _load_json
 from audit.utils import Util
@@ -422,7 +422,7 @@ class IntakeToDisseminationTests(TestCase):
     @staticmethod
     def _fake_resubmission(
         previous_report_id="2024-06-GSAFAC-0008675308",
-        resubmission_action=RESUBMISSION_ACTION.SFSAC_ONLY,
+        resubmission_type=RESUBMISSION_TYPE.SFSAC_ONLY,
     ):
         return {
             "version": 2,
@@ -431,7 +431,7 @@ class IntakeToDisseminationTests(TestCase):
             "next_report_id": "2024-06-GSAFAC-0008675310",
             "previous_row_id": 8675308,
             "previous_report_id": previous_report_id,
-            "resubmission_action": resubmission_action,
+            "resubmission_type": resubmission_type,
         }
 
     def test_load_general(self):
@@ -457,7 +457,7 @@ class IntakeToDisseminationTests(TestCase):
         resub_sac = self._create_sac(
             resubmission_meta=self._fake_resubmission(
                 previous_report_id=parent.report_id,
-                resubmission_action=RESUBMISSION_ACTION.SFSAC_ONLY,
+                resubmission_type=RESUBMISSION_TYPE.SFSAC_ONLY,
             )
         )
         self._run_state_transition(resub_sac)
@@ -478,7 +478,7 @@ class IntakeToDisseminationTests(TestCase):
         resub_sac = self._create_sac(
             resubmission_meta=self._fake_resubmission(
                 previous_report_id=parent.report_id,
-                resubmission_action=RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+                resubmission_type=RESUBMISSION_TYPE.NON_MATERIAL_PDF,
             )
         )
         self._run_state_transition(resub_sac)
@@ -499,7 +499,7 @@ class IntakeToDisseminationTests(TestCase):
         resub_sac = self._create_sac(
             resubmission_meta=self._fake_resubmission(
                 previous_report_id=parent.report_id,
-                resubmission_action=RESUBMISSION_ACTION.AUDIT_PDF,
+                resubmission_type=RESUBMISSION_TYPE.AUDIT_PDF,
             )
         )
         self._run_state_transition(resub_sac)

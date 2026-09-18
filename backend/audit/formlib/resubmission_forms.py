@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from audit.check_resubmission_allowed import check_resubmission_allowed
-from audit.models.constants import STATUS, RESUBMISSION_ACTION
+from audit.models.constants import STATUS, RESUBMISSION_TYPE
 from audit.models import SingleAuditChecklist
 
 MATERIAL_CHANGE_CHOICES = [
@@ -101,22 +101,22 @@ SFSAC_ONLY_CHANGE_CHOICES = [
 ]
 
 
-RESUBMISSION_ACTION_CHOICES = [
+RESUBMISSION_TYPE_CHOICES = [
     (
-        RESUBMISSION_ACTION.AUDIT_PDF,
+        RESUBMISSION_TYPE.AUDIT_PDF,
         "I need to make material changes to the audit PDF package "
         "(with the option to also edit the SF-SAC data collection forms). "
         "I understand that this option will result in a new acceptance date "
         "for the submission.",
     ),
     (
-        RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+        RESUBMISSION_TYPE.NON_MATERIAL_PDF,
         "I need to make non-material changes to the audit PDF package "
         "(with the option to also edit the SF-SAC data collection forms). "
         "I understand that the submission's acceptance date will not change.",
     ),
     (
-        RESUBMISSION_ACTION.SFSAC_ONLY,
+        RESUBMISSION_TYPE.SFSAC_ONLY,
         "I need to make updates only to the SF-SAC data collection form. "
         "I understand that the submission's acceptance date will not change.",
     ),
@@ -142,7 +142,7 @@ RESUBMISSION_REQUESTER_CHOICES = [
 def _clean_resubmission_form(form):
     cleaned_data = form.cleaned_data
 
-    action = cleaned_data.get("resubmission_action")
+    action = cleaned_data.get("resubmission_type")
     requester = cleaned_data.get("resubmission_requester")
     material = cleaned_data.get("material_change_reasons")
     non_material = cleaned_data.get("non_material_change_reasons")
@@ -155,40 +155,40 @@ def _clean_resubmission_form(form):
             "Select at least one requester.",
         )
 
-    if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
+    if action == RESUBMISSION_TYPE.AUDIT_PDF and not material:
         form.add_error(
             "material_change_reasons",
             "Select at least one material change.",
         )
 
-    if action == RESUBMISSION_ACTION.AUDIT_PDF and not audit_opinion_changes:
+    if action == RESUBMISSION_TYPE.AUDIT_PDF and not audit_opinion_changes:
         form.add_error(
             "audit_opinion_changes",
             "Identify the changes in the audit opinion that are the reason for the resubmission.",
         )
 
-    if action == RESUBMISSION_ACTION.NON_MATERIAL_PDF and not non_material:
+    if action == RESUBMISSION_TYPE.NON_MATERIAL_PDF and not non_material:
         form.add_error(
             "non_material_change_reasons",
             "Select at least one non-material change.",
         )
 
-    if action == RESUBMISSION_ACTION.SFSAC_ONLY and not sfsac_only:
+    if action == RESUBMISSION_TYPE.SFSAC_ONLY and not sfsac_only:
         form.add_error(
             "sfsac_only_change_reasons",
             "Select at least one SF-SAC only change.",
         )
 
     # SF-SAC-only resubmissions do not include PDF edit details.
-    if action == RESUBMISSION_ACTION.SFSAC_ONLY:
+    if action == RESUBMISSION_TYPE.SFSAC_ONLY:
         cleaned_data["audit_opinion_changes"] = ""
 
     return cleaned_data
 
 
 class ResubmissionActionForm(forms.Form):
-    resubmission_action = forms.ChoiceField(
-        choices=RESUBMISSION_ACTION_CHOICES,
+    resubmission_type = forms.ChoiceField(
+        choices=RESUBMISSION_TYPE_CHOICES,
         widget=forms.RadioSelect(
             attrs={
                 "class": "usa-radio__input",
@@ -302,8 +302,8 @@ class ResubmissionForm(forms.Form):
         required=True,
     )
 
-    resubmission_action = forms.ChoiceField(
-        choices=RESUBMISSION_ACTION_CHOICES,
+    resubmission_type = forms.ChoiceField(
+        choices=RESUBMISSION_TYPE_CHOICES,
         widget=forms.RadioSelect(
             attrs={
                 "class": "usa-radio__input",
