@@ -21,6 +21,7 @@ from dissemination.models import (
     General,
     Note,
     Passthrough,
+    Resubmission,
     SecondaryAuditor,
     DisseminationCombined,
 )
@@ -38,6 +39,7 @@ models = [
     General,
     Note,
     Passthrough,
+    Resubmission,
     SecondaryAuditor,
 ]
 
@@ -260,6 +262,16 @@ field_name_ordered = {
         "contact_email",
         "contact_phone",
     ],
+    "resubmission": [
+        "version",
+        "status",
+        "resubmission_requester",
+        "audit_opinion_changes",
+        "resubmission_type",
+        "resubmission_justification",
+        "previous_report_id",
+        "next_report_id",
+    ],
 }
 
 restricted_model_names = ["captext", "findingtext", "note"]
@@ -348,6 +360,8 @@ def _get_attribute_or_data(obj, field_name):
     value = getattr(obj, field_name)
     if isinstance(value, General):
         value = value.report_id
+    if isinstance(value, list):
+        value = str(value)
     return value
 
 
@@ -532,6 +546,7 @@ def gather_report_data_pre_certification(i2d_data):
         "Notes": Note,
         "AdditionalUEIs": AdditionalUei,
         "AdditionalEINs": AdditionalEin,
+        "Resubmission": Resubmission,
     }
 
     # Move the IntakeToDissemination data to dissemination_data, under the proper naming scheme.

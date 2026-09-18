@@ -12,7 +12,7 @@ function setSectionVisibility(section, visible) {
 
 function toggleReasonSections() {
     const selectedAction = document.querySelector(
-        'input[name="resubmission_action"]:checked'
+        'input[name="resubmission_type"]:checked'
     );
 
     const requesterSection = document.getElementById("requester-section");
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", toggleReasonSections);
 
 // Handle future radio changes, including on the edit page.
 document.addEventListener("change", (event) => {
-    if (event.target.matches('input[name="resubmission_action"]')) {
+    if (event.target.matches('input[name="resubmission_type"]')) {
         toggleReasonSections();
     }
 });
