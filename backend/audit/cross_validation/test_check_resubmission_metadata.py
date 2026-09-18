@@ -10,7 +10,7 @@ from audit.cross_validation.errors import (
     err_resubmission_requester_required,
 )
 
-from audit.models.constants import RESUBMISSION_ACTION
+from audit.models.constants import RESUBMISSION_TYPE
 
 
 class CheckResubmissionMetadataTests(SimpleTestCase):
@@ -32,7 +32,7 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
         data = self.make_data(
             {
                 "previous_report_id": "2024-01-GSAFAC-0000000001",
-                "resubmission_action": RESUBMISSION_ACTION.AUDIT_PDF,
+                "resubmission_type": RESUBMISSION_TYPE.AUDIT_PDF,
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": ["findings"],
                 "non_material_change_reasons": [],
@@ -45,7 +45,7 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
         data = self.make_data(
             {
                 "previous_report_id": "2024-01-GSAFAC-0000000001",
-                "resubmission_action": RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+                "resubmission_type": RESUBMISSION_TYPE.NON_MATERIAL_PDF,
                 "resubmission_requester": ["auditor"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": ["spelling"],
@@ -58,7 +58,7 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
         data = self.make_data(
             {
                 "previous_report_id": "2024-01-GSAFAC-0000000001",
-                "resubmission_action": RESUBMISSION_ACTION.SFSAC_ONLY,
+                "resubmission_type": RESUBMISSION_TYPE.SFSAC_ONLY,
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": [],
@@ -72,7 +72,7 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
         data = self.make_data(
             {
                 "previous_report_id": "2024-01-GSAFAC-0000000001",
-                "resubmission_action": RESUBMISSION_ACTION.AUDIT_PDF,
+                "resubmission_type": RESUBMISSION_TYPE.AUDIT_PDF,
                 "resubmission_requester": [],
                 "material_change_reasons": ["findings"],
                 "non_material_change_reasons": [],
@@ -88,7 +88,7 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
         data = self.make_data(
             {
                 "previous_report_id": "2024-01-GSAFAC-0000000001",
-                "resubmission_action": RESUBMISSION_ACTION.AUDIT_PDF,
+                "resubmission_type": RESUBMISSION_TYPE.AUDIT_PDF,
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": [],
@@ -104,7 +104,7 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
         data = self.make_data(
             {
                 "previous_report_id": "2024-01-GSAFAC-0000000001",
-                "resubmission_action": RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+                "resubmission_type": RESUBMISSION_TYPE.NON_MATERIAL_PDF,
                 "resubmission_requester": ["auditor"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": [],
@@ -120,7 +120,7 @@ class CheckResubmissionMetadataTests(SimpleTestCase):
         data = self.make_data(
             {
                 "previous_report_id": "2024-01-GSAFAC-0000000001",
-                "resubmission_action": RESUBMISSION_ACTION.SFSAC_ONLY,
+                "resubmission_type": RESUBMISSION_TYPE.SFSAC_ONLY,
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": [],
