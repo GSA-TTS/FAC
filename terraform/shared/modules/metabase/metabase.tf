@@ -3,7 +3,6 @@ locals {
     "${module.database.database_name}" = ""
   }, var.service_bindings)
 
-  metabase_version = "v0.63.16.7"
 }
 
 data "cloudfoundry_domain" "public" {
@@ -20,7 +19,7 @@ data "cloudfoundry_space" "app_space" {
 }
 
 data "docker_registry_image" "metabase" {
-  name = "metabase/metabase:${local.metabase_version}"
+  name = "ghcr.io/gsa-tts/fac/metabase:latest"
 }
 
 resource "cloudfoundry_route" "app_route" {
