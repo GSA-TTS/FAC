@@ -6,7 +6,6 @@ from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
     CapText,
-    DisseminationCombined,
     FederalAward,
     Finding,
     FindingText,
@@ -47,9 +46,6 @@ class AuditSummaryView(View):
 
         include_private = include_private_results(request)
         include_private_and_public = include_private or general_data["is_public"]
-        is_sf_sac_downloadable = DisseminationCombined.objects.filter(
-            report_id=report_id
-        ).exists()
 
         # Add entity name and UEI to the context, for the footer.
         context = {
@@ -59,7 +55,6 @@ class AuditSummaryView(View):
             "data": self._get_audit_content(report_id, include_private_and_public),
             "general": general_data,
             "include_private": include_private,
-            "is_sf_sac_downloadable": is_sf_sac_downloadable,
             "resubmissions_list": self._get_resubmissions(report_id),
         }
 
