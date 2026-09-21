@@ -634,6 +634,7 @@ class SummaryViewTests(TestMaterializedViewBuilder):
             report_id=gen_v2,
             version=2,
             previous_report_id=gen_v1.report_id,
+            resubmission_type="audit_pdf",
         )
 
     def test_public_summary(self):

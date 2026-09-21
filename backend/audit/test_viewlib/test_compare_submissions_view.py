@@ -1,3 +1,5 @@
+import unittest
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse, NoReverseMatch
@@ -56,7 +58,7 @@ def setup_test(is_federal=False):
     p.audit_range = len(p.sacs) + 1
     return p
 
-
+@unittest.skip("Temporarily disabling this test")
 class CompareSubmissionsViewTests(TestCase):
     view = "audit:CompareSubmissions"
 

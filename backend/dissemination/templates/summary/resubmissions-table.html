@@ -1,3 +1,5 @@
+{% load resubmission_type_presentation %}
+
 {% comment %}
     Within the summary page. Assumes "resubmissions_list" exists and is populated.
 
@@ -8,24 +10,24 @@
 {% load sprite_helper %}
 <div class="grid-container margin-y-6">
     <h2 class="font-sans-2xl text-semibold margin-bottom-2 margin-top-3">Resubmission history</h2>
+    {% with resubmissions_list|last as most_recent_resubmission %}
     <p>
-        {% with resubmissions_list|last as most_recent_resubmission %}
-            {% if report_id == most_recent_resubmission.report_id.report_id %}
-                This is the most recent version.
-            {% else %}
-                This is version {{ general.resubmission_version }}. The most recent submission is version {{ resubmissions_list|length }}.
-            {% endif %}
-        {% endwith %}
+       You are viewing version
+        {% if report_id == most_recent_resubmission.report_id.report_id %}
+            {{ general.resubmission_version }}, the most recent version.
+        {% else %}
+            {{ general.resubmission_version }}. The most recent submission is version {{ resubmissions_list|length }}.
+        {% endif %}
     </p>
-
     <div class="usa-table-container--scrollable margin-0" tabindex="0">
         <table class="usa-table usa-table--striped usa-table--compact width-full">
             <thead>
                 <tr>
                     <th scope="col" role="columnheader">Version</th>
-                    <th scope="col" role="columnheader">Date</th>
+                    <th scope="col" role="columnheader">Change</th>
+                    <th scope="col" role="columnheader">Acc Date</th>
                     {% if include_private %}
-                    <th scope="col" role="columnheader">Submission summary</th>
+                    <th scope="col" role="columnheader">View</th>
                     {% endif %}
                     <th scope="col" role="columnheader">Comparisons</th>
                     {% if include_private %}
@@ -38,40 +40,60 @@
                 {% for resub in resubmissions_list %}
                     {% comment %} Highlight the active row with a "focus" border.
                     The transparent border is necessary to bring the focus out far enough to be visible. {% endcomment %}
-                    <tr {% if report_id == resub.report_id.report_id %}class="usa-focus border-1 border-transparent"{% endif %}>
+                    <tr>
                         <td>
-                            {{ resub.version }}
+                            {% if report_id == resub.report_id.report_id %}
+                            <span>&#x25BA;</span>
+                            {% else %}
+                            <span style="visibility: hidden;">&#x25BA;</span>
+                            {% endif %}
+                            {{ resub.version }} {{ resub.resubmission_meta }}
+                        </td>
+                        <td>
+                            {% comment %} Resubmission Type Tag {% endcomment %}
+                            {% if resub.version != 1 %}
+                              {% with resub.resubmission_type|resubmission_type_presentation as resub_type %}
+                                 {{resub_type.friendly_name}}
+                              {% endwith %}
+                            {% endif %}
                         </td>
                         <td>
                             {{ resub.report_id.fac_accepted_date }} 
                         </td>
                         {% if include_private %}
                         <td>
-                            {% if report_id == resub.report_id.report_id %}
-                              {{ resub.report_id.report_id }}
-                            {% else %}
-                            <a class="usa-link"
-                                href="{% url 'dissemination:Summary' report_id=resub.report_id.report_id %}">
-                                {{ resub.report_id.report_id }}
+                            {% if report_id != resub.report_id.report_id %}
+                            <a class="usa-link display-flex flex-column flex-align-center"
+                               href="{% url 'dissemination:Summary' report_id=resub.report_id.report_id %}"
+                               target="_blank">
+                                <svg class="usa-icon usa-icon--size-4"
+                                     aria-hidden="true"
+                                     focusable="false"
+                                     role="img">
+                                    {% uswds_sprite "visibility" %}
+                                </svg>
                             </a>
                             {% endif %}
                         </td>
                         {% endif %}
                         <td>
-                            {% if report_id == resub.report_id.report_id %}
-                              {{ resub.report_id.report_id }}
-                            {% else %}
+                            {% if resub.version != 1 %}
                             <a class="usa-link"
                                 href="{% url 'audit:CompareSubmissions' report_id=resub.report_id.report_id route='search' %}">
-                                {{ resub.report_id.report_id }}
+                                v{{ resub.version|add:"-1" }} &#x21C4; v{{ resub.version }}
                             </a>
                             {% endif %}
                         </td>
                         {% if include_private %}
                         <td>
                             <a class="usa-link display-flex flex-column flex-align-center"
-                                href="{% url 'dissemination:SummaryReportDownload' report_id=resub.report_id.report_id %}"
-                                target="_blank">
+                                target="_blank"
+                                {% if resub.report_id.report_id == most_recent_resubmission.report_id.report_id and not is_sf_sac_downloadable %}
+                                    aria-disabled="true"
+                                {% else %}
+                                    href="{% url 'dissemination:SummaryReportDownload' report_id=resub.report_id.report_id %}"
+                                {% endif %}
+                            >
                                 <svg class="usa-icon usa-icon--size-4"
                                     aria-hidden="true"
                                     focusable="false"
@@ -98,4 +120,5 @@
             </tbody>
         </table>
     </div>
+    {% endwith %}
 </div>
