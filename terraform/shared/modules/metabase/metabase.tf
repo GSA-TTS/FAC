@@ -49,8 +49,8 @@ resource "cloudfoundry_app" "app" {
   COMMAND
 
   routes = [{
-    route = cloudfoundry_route.app_route.url
-    port  = "http1"
+    route    = cloudfoundry_route.app_route.url
+    protocol = "http1"
   }]
 
   service_bindings = [
