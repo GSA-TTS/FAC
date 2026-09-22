@@ -34,10 +34,9 @@ module "s3-logshipper-storage" {
 }
 
 resource "cloudfoundry_route" "logshipper_route" {
-  space        = var.cf_space.id
-  domain       = data.cloudfoundry_domain.public.id
-  host         = "fac-${var.cf_space.name}-${var.name}"
-  destinations = [{ app_id = cloudfoundry_app.logshipper_app.id }]
+  space  = var.cf_space.id
+  domain = data.cloudfoundry_domain.public.id
+  host   = "fac-${var.cf_space.name}-${var.name}"
   # Yields something like: fac-dev-logshipper.app.cloud.gov
 }
 
@@ -90,6 +89,11 @@ resource "cloudfoundry_app" "logshipper_app" {
   instances         = var.logshipper_instances
   strategy          = "rolling"
   health_check_type = "process"
+
+  routes = [{
+    route = cloudfoundry_route.logshipper_route.url
+    port  = "http1"
+  }]
 
   sidecars = [{
     name          = "fluentbit"
