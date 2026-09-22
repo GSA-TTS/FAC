@@ -7,6 +7,7 @@ from audit.models import SingleAuditChecklist
 from dissemination.models import TribalApiAccessKeyIds
 from users.models import UserPermission
 from .models import CognizantAssignment, AssignmentTypeCode
+from .models.maintenance_banner import MaintenanceBanner
 
 import json
 from datetime import date
@@ -213,3 +214,25 @@ def add_custom_field_to_log(sender, instance, created, **kwargs):
             # write changes to instance.
             instance.change_message = json.dumps(change_message_json, cls=DateEncoder)
             instance.save()
+
+
+@admin.register(MaintenanceBanner)
+class MaintenanceBannerAdmin(admin.ModelAdmin):
+    list_display = (
+        "message",
+        "is_active",
+        "currently_active_status",
+        "start_time",
+        "end_time",
+    )
+    fields = ("is_active", "message", ("start_time", "end_time"))
+
+    @admin.display(boolean=True, description="Currently Visible?")
+    def currently_active_status(self, obj):
+        return obj.is_currently_active
+
+    def has_add_permission(self, request):
+        return not MaintenanceBanner.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False

@@ -2,6 +2,8 @@ from datetime import datetime, timezone
 
 from config import settings
 
+from support.models.maintenance_banner import MaintenanceBanner
+
 
 def static_site_url(request):
     """
@@ -25,41 +27,6 @@ def current_environment(request):
     Used in determining the display of the TEST SITE Banner.
     """
     return {"ENVIRONMENT": settings.ENVIRONMENT}
-
-
-def maintenance_banner(request):
-    """
-    Returns maintenance banner template context.
-    MAINTENANCE_BANNER is True if the banner should be displaying and False if not, based on settings.MAINTENANCE_BANNER_DATES.
-    MAINTENANCE_BANNER_START_TIME and MAINTENANCE_BANNER_END_TIME are None if the banner does not display.
-    MAINTENANCE_BANNER_MESSAGE is included if it exists alongside the banner dates.
-    """
-    current_time = datetime.now(timezone.utc)
-    context = {
-        "MAINTENANCE_BANNER": False,
-    }
-
-    # For every designated date range:
-    # If any start or end time is unavailable, something is misconfigured. So, disable the banner.
-    # If we are within the specified timeframes, enable the banner.
-    for date_range in settings.MAINTENANCE_BANNER_DATES:
-        start_time = date_range.get("start")
-        end_time = date_range.get("end")
-
-        if not start_time or not end_time:
-            return context
-
-        if current_time > start_time and current_time < end_time:
-            context["MAINTENANCE_BANNER"] = True
-            context = context | {
-                "MAINTENANCE_BANNER_START_TIME": start_time,
-                "MAINTENANCE_BANNER_END_TIME": end_time,
-                "MAINTENANCE_BANNER_MESSAGE": date_range.get("message", ""),
-            }
-            return context
-
-    # Base case - we are not within any of the given timeframes. Disable the banner.
-    return context
 
 
 def navigation_content(request):
@@ -189,3 +156,13 @@ def navigation_content(request):
             },
         ]
     }
+
+
+def active_maintenance_banner(request):
+    banner = MaintenanceBanner.objects.first()
+
+    # If a banner exists and its current schedule/status is valid, pass it to templates
+    if banner and banner.is_currently_active:
+        return {"active_maintenance_banner": banner}
+    else:
+        return {"active_maintenance_banner": None}
