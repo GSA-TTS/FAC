@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.urls import reverse

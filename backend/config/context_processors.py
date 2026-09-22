@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 from config import settings
 
 from support.models.maintenance_banner import MaintenanceBanner

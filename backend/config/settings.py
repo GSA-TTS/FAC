@@ -15,7 +15,7 @@ import logging
 import os
 import sys
 from base64 import b64decode
-from datetime import date, datetime, timezone
+from datetime import date
 
 import dj_database_url
 import environs
