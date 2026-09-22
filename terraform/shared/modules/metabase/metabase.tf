@@ -33,7 +33,7 @@ resource "cloudfoundry_app" "app" {
   name         = var.name
   space_name   = var.cf_space_name
   org_name     = var.cf_org_name
-  docker_image = "metabase/metabase@${data.docker_registry_image.metabase.sha256_digest}"
+  docker_image = "ghcr.io/gsa-tts/fac/metabase@${data.docker_registry_image.metabase.sha256_digest}"
 
   memory                     = var.app_memory
   disk_quota                 = var.disk_quota
@@ -49,8 +49,8 @@ resource "cloudfoundry_app" "app" {
   COMMAND
 
   routes = [{
-    route = cloudfoundry_route.app_route.url
-    port  = "http1"
+    route    = cloudfoundry_route.app_route.url
+    protocol = "http1"
   }]
 
   service_bindings = [
