@@ -42,18 +42,13 @@
                     The transparent border is necessary to bring the focus out far enough to be visible. {% endcomment %}
                     <tr>
                         <td>
-                            {% if report_id == resub.report_id.report_id %}
-                            <span>&#x25BA;</span>
-                            {% else %}
-                            <span style="visibility: hidden;">&#x25BA;</span>
-                            {% endif %}
                             {{ resub.version }} {{ resub.resubmission_meta }}
                         </td>
                         <td>
                             {% comment %} Resubmission Type Tag {% endcomment %}
                             {% if resub.version != 1 %}
                               {% with resub.resubmission_type|resubmission_type_presentation as resub_type %}
-                                 {{resub_type.friendly_name}}
+                                 {{ resub_type.friendly_name }}
                               {% endwith %}
                             {% endif %}
                         </td>

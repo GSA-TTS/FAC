@@ -59,7 +59,7 @@ def setup_test(is_federal=False):
     return p
 
 
-@unittest.skip("Temporarily disabling this test")
+@unittest.skip("Temporarily disabling these tests")
 class CompareSubmissionsViewTests(TestCase):
     view = "audit:CompareSubmissions"
 

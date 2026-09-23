@@ -1,5 +1,4 @@
 import unittest
-
 from django.test import TestCase
 from audit.viewlib.compare_two_submissions import (
     compare_report_ids,
@@ -13,9 +12,11 @@ from audit.viewlib.compare_two_submissions import (
     are_two_sacs_identical,
     _get_keysets,
 )
-from audit.models import SingleAuditChecklist
+
+from audit.models import SingleAuditChecklist, SubmissionEvent
 from model_bakery import baker
 from copy import deepcopy
+from audit.models.constants import STATUS, RESUBMISSION_STATUS
 
 
 def setup_mock_db():
@@ -185,7 +186,7 @@ def setup_mock_db():
         },
     }
 
-    sac_r1.save()
+    sac_r1.disseminate()
 
     sac_r2.general_information = {
         "ein": "316000427",
@@ -253,7 +254,7 @@ def setup_mock_db():
         },
     }
 
-    sac_r2.save()
+    sac_r2.disseminate()
 
     # Make R3 the same as R1, but with one difference
     sac_r3 = SingleAuditChecklist.objects.get(report_id=rids["rid_3"])
@@ -293,20 +294,30 @@ def setup_mock_db():
         0:-1
     ]
 
-    sac_r3.save()
+    sac_r3.disseminate()
 
     # Make these a resubmission sequence
-    sac_r1.resubmission_meta = {"next_report_id": sac_r2.report_id}
-    sac_r1.submission_status = "disseminated"
+    sac_r1.submission_status = STATUS.RESUBMITTED
+    sac_r1.resubmission_meta = {
+        "next_report_id": sac_r2.report_id,
+        "resubmission_status": "deprecated_via_resubmission",
+        "version": 1,
+    }
 
+    sac_r2.submission_status = STATUS.RESUBMITTED
     sac_r2.resubmission_meta = {
         "previous_report_id": sac_r1.report_id,
         "next_report_id": sac_r3.report_id,
+        "resubmission_status": "deprecated_via_resubmission",
+        "version": 2,
     }
-    sac_r2.submission_status = "resubmitted"
 
-    sac_r3.resubmission_meta = {"previous_report_id": sac_r2.report_id}
-    sac_r3.submission_status = "in_progress"
+    sac_r3.submission_status = STATUS.DISSEMINATED
+    sac_r3.resubmission_meta = {
+        "previous_report_id": sac_r2.report_id,
+        "resubmission_status": "most_recent",
+        "version": 3,
+    }
 
     sac_r1.save()
     sac_r2.save()
@@ -315,7 +326,7 @@ def setup_mock_db():
     return [sac_r1, sac_r2, sac_r3]
 
 
-@unittest.skip("Temporarily disabling this test")
+@unittest.skip("Temporarily disabling these tests")
 class CompareSubmissionTests(TestCase):
 
     def test_helpers(self):
