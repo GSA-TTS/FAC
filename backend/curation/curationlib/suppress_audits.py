@@ -174,10 +174,10 @@ def suppress_audit(report_id, email):
     - Marks the target SAC as FLAGGED_FOR_REMOVAL.
     """
 
-    try:
-        user = User.objects.get(email=email, is_staff=True)
-    except User.DoesNotExist as exc:
-        raise ValueError(f"No FAC staff user found for email: {email}") from exc
+    user = User.objects.filter(email=email, is_staff=True).order_by("id").first()
+
+    if user is None:
+        raise ValueError(f"No FAC staff user found for email: {email}")
 
     try:
         sac = SingleAuditChecklist.objects.select_for_update().get(report_id=report_id)

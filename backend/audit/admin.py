@@ -320,7 +320,7 @@ def flag_for_removal(modeladmin, request, queryset):
         )
 
 
-@admin.action(description="Administratively suppress selected disseminated report(s)")
+@admin.action(description="Suppress selected disseminated report(s)")
 def suppress_disseminated_reports(modeladmin, request, queryset):
     suppressed = []
     errors = []
