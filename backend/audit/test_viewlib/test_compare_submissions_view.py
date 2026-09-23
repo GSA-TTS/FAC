@@ -1,5 +1,3 @@
-import unittest
-
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse, NoReverseMatch
@@ -59,7 +57,6 @@ def setup_test(is_federal=False):
     return p
 
 
-@unittest.skip("Temporarily disabling these tests")
 class CompareSubmissionsViewTests(TestCase):
     view = "audit:CompareSubmissions"
 

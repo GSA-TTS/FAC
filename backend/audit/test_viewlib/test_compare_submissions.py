@@ -1,4 +1,3 @@
-import unittest
 from django.test import TestCase
 from audit.viewlib.compare_two_submissions import (
     compare_report_ids,
@@ -24,20 +23,11 @@ def setup_mock_db():
     true = True
     false = False
 
-    report_ids = [
-        "2025-01-FAKEDB-0000000001",
-        "2025-01-FAKEDB-0000000002",
-        "2025-01-FAKEDB-0000000003",
-    ]
-    rids = {}
-    for ndx, rid in enumerate(report_ids):
-        baker.make(SingleAuditChecklist, report_id=rid)
-        rids[f"rid_{ndx + 1}"] = rid
+    # Make these a resubmission sequence
 
-    sac_r1 = SingleAuditChecklist.objects.get(report_id=rids["rid_1"])
-    sac_r2 = SingleAuditChecklist.objects.get(report_id=rids["rid_2"])
-
-    sac_r1.general_information = {
+    sac_r1_report_id = "2025-01-FAKEDB-0000000001"
+    sac_r1_submission_status = STATUS.RESUBMITTED
+    sac_r1_general_information = {
         "ein": "370906335",
         "audit_type": "single-audit",
         "auditee_uei": "G9LDNMFWZHY7",
@@ -76,7 +66,7 @@ def setup_mock_db():
         "auditor_ein_not_an_ssn_attestation": True,
     }
 
-    sac_r1.federal_awards = {
+    sac_r1_federal_awards = {
         "Meta": {"section_name": "FederalAwardsExpended"},
         "FederalAwards": {
             "auditee_uei": "R5MQB3PSN2E3",
@@ -141,7 +131,7 @@ def setup_mock_db():
         },
     }
 
-    sac_r1.findings_uniform_guidance = {
+    sac_r1_findings_uniform_guidance = {
         "Meta": {"section_name": "FindingsUniformGuidance"},
         "FindingsUniformGuidance": {
             "auditee_uei": "MCQEFMM2LJA4",
@@ -186,9 +176,27 @@ def setup_mock_db():
         },
     }
 
-    sac_r1.disseminate()
+    sac_r1_resubmission_meta = {
+        "next_report_id": "2025-01-FAKEDB-0000000002",
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
+        "version": 1,
+    }
 
-    sac_r2.general_information = {
+    sac_r1 = baker.make(
+        SingleAuditChecklist,
+        report_id=sac_r1_report_id,
+        submission_status=sac_r1_submission_status,
+        general_information=sac_r1_general_information,
+        federal_awards=sac_r1_federal_awards,
+        findings_uniform_guidance=sac_r1_findings_uniform_guidance,
+        resubmission_meta=sac_r1_resubmission_meta,
+    )
+
+    sac_r1.save()
+
+    sac_r2_report_id = "2025-01-FAKEDB-0000000002"
+    sac_r2_submission_status = STATUS.RESUBMITTED
+    sac_r2_general_information = {
         "ein": "316000427",
         "audit_type": "single-audit",
         "auditee_uei": "RHVRCYWNTFX3",
@@ -227,7 +235,7 @@ def setup_mock_db():
         "auditor_ein_not_an_ssn_attestation": true,
     }
 
-    sac_r2.federal_awards = {
+    sac_r2_federal_awards = {
         "Meta": {"section_name": "FederalAwardsExpended"},
         "FederalAwards": {
             "auditee_uei": "JRRVW2KT4U71",
@@ -254,16 +262,34 @@ def setup_mock_db():
         },
     }
 
-    sac_r2.disseminate()
+    sac_r2_resubmission_meta = {
+        "previous_report_id": sac_r1.report_id,
+        "next_report_id": "2025-01-FAKEDB-0000000003",
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
+        "version": 2,
+    }
+
+    sac_r2 = baker.make(
+        SingleAuditChecklist,
+        report_id=sac_r2_report_id,
+        submission_status=sac_r2_submission_status,
+        general_information=sac_r2_general_information,
+        federal_awards=sac_r2_federal_awards,
+        resubmission_meta=sac_r2_resubmission_meta,
+    )
+
+    sac_r2.save()
 
     # Make R3 the same as R1, but with one difference
-    sac_r3 = SingleAuditChecklist.objects.get(report_id=rids["rid_3"])
-    sac_r3.general_information = sac_r1.general_information | {
+
+    sac_r3_report_id = "2025-01-FAKEDB-0000000003"
+    sac_r3_submission_status = STATUS.IN_PROGRESS
+    sac_r3_general_information = sac_r1.general_information | {
         "ein": "123456789",
     }
     # Simulate changing row 3
-    sac_r3.federal_awards = deepcopy(sac_r1.federal_awards)
-    sac_r3.federal_awards["FederalAwards"]["federal_awards"] = sac_r1.federal_awards[
+    sac_r3_federal_awards = deepcopy(sac_r1.federal_awards)
+    sac_r3_federal_awards["FederalAwards"]["federal_awards"] = sac_r1.federal_awards[
         "FederalAwards"
     ]["federal_awards"][0:-1] + [
         {
@@ -283,50 +309,38 @@ def setup_mock_db():
             "direct_or_indirect_award": {"is_direct": "Y"},
         }
     ]
-    sac_r3.federal_awards["FederalAwards"]["total_amount_expended"] = 3209366
-    sac_r3.findings_uniform_guidance = deepcopy(sac_r1.findings_uniform_guidance)
+    sac_r3_federal_awards["FederalAwards"]["total_amount_expended"] = 3209366
+    sac_r3_findings_uniform_guidance = deepcopy(sac_r1.findings_uniform_guidance)
     # Remove the last finding
-    sac_r3.findings_uniform_guidance["FindingsUniformGuidance"][
+    sac_r3_findings_uniform_guidance["FindingsUniformGuidance"][
         "findings_uniform_guidance_entries"
-    ] = sac_r3.findings_uniform_guidance["FindingsUniformGuidance"][
+    ] = sac_r3_findings_uniform_guidance["FindingsUniformGuidance"][
         "findings_uniform_guidance_entries"
     ][
         0:-1
     ]
 
-    sac_r3.disseminate()
-
-    # Make these a resubmission sequence
-    sac_r1.submission_status = STATUS.RESUBMITTED
-    sac_r1.resubmission_meta = {
-        "next_report_id": sac_r2.report_id,
-        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
-        "version": 1,
-    }
-
-    sac_r2.submission_status = STATUS.RESUBMITTED
-    sac_r2.resubmission_meta = {
-        "previous_report_id": sac_r1.report_id,
-        "next_report_id": sac_r3.report_id,
-        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
-        "version": 2,
-    }
-
-    sac_r3.submission_status = STATUS.DISSEMINATED
-    sac_r3.resubmission_meta = {
+    sac_r3_resubmission_meta = {
         "previous_report_id": sac_r2.report_id,
         "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
         "version": 3,
     }
 
-    sac_r1.save()
-    sac_r2.save()
+    sac_r3 = baker.make(
+        SingleAuditChecklist,
+        report_id=sac_r3_report_id,
+        submission_status=sac_r3_submission_status,
+        general_information=sac_r3_general_information,
+        federal_awards=sac_r3_federal_awards,
+        findings_uniform_guidance=sac_r3_findings_uniform_guidance,
+        resubmission_meta=sac_r3_resubmission_meta,
+    )
+
     sac_r3.save()
 
     return [sac_r1, sac_r2, sac_r3]
 
 
-@unittest.skip("Temporarily disabling these tests")
 class CompareSubmissionTests(TestCase):
 
     def test_helpers(self):
