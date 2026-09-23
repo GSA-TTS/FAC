@@ -161,11 +161,6 @@ def _clean_resubmission_form(form):
             "Select at least one material change.",
         )
 
-    if action == RESUBMISSION_TYPE.AUDIT_PDF and not audit_opinion_changes:
-        form.add_error(
-            "audit_opinion_changes",
-            "Identify the changes in the audit opinion that are the reason for the resubmission.",
-        )
 
     if action == RESUBMISSION_TYPE.NON_MATERIAL_PDF and not non_material:
         form.add_error(
