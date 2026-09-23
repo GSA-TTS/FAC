@@ -1,9 +1,8 @@
 locals {
-  app_id = cloudfoundry_app.metabase.id
   services = merge({
-
+    "${module.database.database_name}" = ""
   }, var.service_bindings)
-  metabase_version = "v0.59.2"
+
 }
 
 data "cloudfoundry_domain" "public" {
@@ -20,22 +19,21 @@ data "cloudfoundry_space" "app_space" {
 }
 
 data "docker_registry_image" "metabase" {
-  name = "metabase/metabase:${local.metabase_version}"
+  name = "ghcr.io/gsa-tts/fac/metabase:latest"
 }
 
 resource "cloudfoundry_route" "app_route" {
-  space        = data.cloudfoundry_space.app_space.id
-  domain       = data.cloudfoundry_domain.public.id
-  host         = var.cf_space_name == "production" ? "metabase" : "metabase-${replace(var.cf_space_name, ".", "-")}"
-  destinations = [{ app_id = cloudfoundry_app.metabase.id }]
+  space  = data.cloudfoundry_space.app_space.id
+  domain = data.cloudfoundry_domain.public.id
+  host   = var.cf_space_name == "production" ? "metabase" : "metabase-${replace(var.cf_space_name, ".", "-")}"
   # Yields something like: metabase-dev.app.cloud.gov
 }
 
-resource "cloudfoundry_app" "metabase" {
+resource "cloudfoundry_app" "app" {
   name         = var.name
   space_name   = var.cf_space_name
   org_name     = var.cf_org_name
-  docker_image = "metabase/metabase@${data.docker_registry_image.metabase.sha256_digest}"
+  docker_image = "ghcr.io/gsa-tts/fac/metabase@${data.docker_registry_image.metabase.sha256_digest}"
 
   memory                     = var.app_memory
   disk_quota                 = var.disk_quota
@@ -50,6 +48,11 @@ resource "cloudfoundry_app" "metabase" {
     ./app/run_metabase.sh
   COMMAND
 
+  routes = [{
+    route    = cloudfoundry_route.app_route.url
+    protocol = "http1"
+  }]
+
   service_bindings = [
     for service_name, params in local.services : {
       service_instance = service_name
@@ -60,4 +63,15 @@ resource "cloudfoundry_app" "metabase" {
     REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
     SSL_CERT_FILE      = "/etc/ssl/certs/ca-certificates.crt"
   }, var.environment_variables)
+
+  depends_on = [module.database]
+}
+
+module "database" {
+  source        = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.5.0"
+  cf_space_id   = var.cf_space_id
+  name          = "metabase-db"
+  tags          = ["rds"]
+  rds_plan_name = var.db_plan
+  json_params   = var.db_params
 }

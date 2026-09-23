@@ -237,9 +237,16 @@ def _sac_transition_helper(user, sac, flow, audit, audit_flow, target):
 
     elif target == STATUS.RESUBMITTED:
         flow.transition_to_resubmitted()
+        # There is an administrative override here.
+        # In the case of resubmission, the `resub_meta` JSON has changed. We treat this blob like
+        # any other mandatory SF-SAC section, which means redisseminating the SAC will result in a
+        # LateChangeError. So, we override that error here _only_, and in no other transition.
+        # "We the FAC are administratively deprecating this old audit because there is a new
+        # version that is more correct."
         sac.save(
             event_user=user,
             event_type=SubmissionEvent.EventType.RESUBMITTED,
+            administrative_override=True,
         )
         return True
 

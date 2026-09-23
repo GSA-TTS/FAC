@@ -1,6 +1,6 @@
 export function testLogoutGov() {
   cy.get('.usa-menu-btn').contains('Menu').click();
-  cy.get('button').contains('Sign out').click();
+  cy.get('nav.usa-nav button').contains('Sign out').click({ force: true });
   cy.origin(
     'https://idp.int.identitysandbox.gov/',
     {},

@@ -34,7 +34,7 @@ module "staging" {
   )
   metabase_db_params = jsonencode(
     {
-      "storage" : 50,
+      "storage" : 25,
     }
   )
 }

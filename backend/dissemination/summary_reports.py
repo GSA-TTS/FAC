@@ -21,8 +21,9 @@ from dissemination.models import (
     General,
     Note,
     Passthrough,
+    Resubmission,
     SecondaryAuditor,
-    DisseminationCombined,
+    Unified,
 )
 
 # TODO: Update Post SOC Launch -> This whole file can be deleted
@@ -38,6 +39,7 @@ models = [
     General,
     Note,
     Passthrough,
+    Resubmission,
     SecondaryAuditor,
 ]
 
@@ -260,6 +262,16 @@ field_name_ordered = {
         "contact_email",
         "contact_phone",
     ],
+    "resubmission": [
+        "version",
+        "status",
+        "resubmission_requester",
+        "audit_opinion_changes",
+        "resubmission_type",
+        "resubmission_justification",
+        "previous_report_id",
+        "next_report_id",
+    ],
 }
 
 restricted_model_names = ["captext", "findingtext", "note"]
@@ -348,6 +360,8 @@ def _get_attribute_or_data(obj, field_name):
     value = getattr(obj, field_name)
     if isinstance(value, General):
         value = value.report_id
+    if isinstance(value, list):
+        value = str(value)
     return value
 
 
@@ -411,11 +425,11 @@ def process_combined_results(
     # Grab all the rows from the combined table into a local structure.
     # We'll do this in memory. This table flattens general, federalaward, and findings
     # so we can move much faster on those tables without extra lookups.
-    dc_results = DisseminationCombined.objects.all().filter(report_id__in=report_ids)
+    dc_results = Unified.objects.all().filter(report_id__in=report_ids)
 
     # Different tables want to be visited/filtered differently.
     visited = set()
-    # Do all of the names in the DisseminationCombined at the same time.
+    # Do all of the names in Unified at the same time.
     # That way, we only go through the results once.
     for obj in dc_results:
         for model_name in names_in_dc:
@@ -532,6 +546,7 @@ def gather_report_data_pre_certification(i2d_data):
         "Notes": Note,
         "AdditionalUEIs": AdditionalUei,
         "AdditionalEINs": AdditionalEin,
+        "Resubmission": Resubmission,
     }
 
     # Move the IntakeToDissemination data to dissemination_data, under the proper naming scheme.

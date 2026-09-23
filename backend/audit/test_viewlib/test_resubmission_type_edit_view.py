@@ -5,7 +5,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from audit.models import Access, SingleAuditChecklist
-from audit.models.constants import RESUBMISSION_ACTION, STATUS
+from audit.models.constants import RESUBMISSION_TYPE, STATUS
 
 User = get_user_model()
 
@@ -20,7 +20,7 @@ class ResubmissionActionEditViewTests(TestCase):
             SingleAuditChecklist,
             submission_status=STATUS.IN_PROGRESS,
             resubmission_meta={
-                "resubmission_action": RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+                "resubmission_type": RESUBMISSION_TYPE.NON_MATERIAL_PDF,
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": ["spelling"],
@@ -48,8 +48,8 @@ class ResubmissionActionEditViewTests(TestCase):
         form = response.context["form"]
 
         self.assertEqual(
-            form.initial["resubmission_action"],
-            RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+            form.initial["resubmission_type"],
+            RESUBMISSION_TYPE.NON_MATERIAL_PDF,
         )
         self.assertEqual(
             form.initial["resubmission_requester"],
@@ -68,7 +68,7 @@ class ResubmissionActionEditViewTests(TestCase):
         response = self.client.post(
             self.path,
             {
-                "resubmission_action": RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+                "resubmission_type": RESUBMISSION_TYPE.NON_MATERIAL_PDF,
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": ["spelling"],
@@ -96,7 +96,7 @@ class ResubmissionActionEditViewTests(TestCase):
         response = self.client.post(
             self.path,
             {
-                "resubmission_action": RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+                "resubmission_type": RESUBMISSION_TYPE.NON_MATERIAL_PDF,
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": ["spelling"],
@@ -117,7 +117,7 @@ class ResubmissionActionEditViewTests(TestCase):
         response = self.client.post(
             self.path,
             {
-                "resubmission_action": RESUBMISSION_ACTION.AUDIT_PDF,
+                "resubmission_type": RESUBMISSION_TYPE.AUDIT_PDF,
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": ["findings"],
                 "non_material_change_reasons": [],
@@ -135,7 +135,7 @@ class ResubmissionActionEditViewTests(TestCase):
         response = self.client.post(
             self.path,
             {
-                "resubmission_action": RESUBMISSION_ACTION.SFSAC_ONLY,
+                "resubmission_type": RESUBMISSION_TYPE.SFSAC_ONLY,
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": [],
@@ -160,11 +160,11 @@ class ResubmissionActionEditViewTests(TestCase):
             "",
         )
 
-    def test_resubmission_action_can_be_changed(self):
+    def test_resubmission_type_can_be_changed(self):
         response = self.client.post(
             self.path,
             {
-                "resubmission_action": RESUBMISSION_ACTION.SFSAC_ONLY,
+                "resubmission_type": RESUBMISSION_TYPE.SFSAC_ONLY,
                 "resubmission_requester": ["auditee"],
                 "material_change_reasons": [],
                 "non_material_change_reasons": [],
@@ -185,6 +185,6 @@ class ResubmissionActionEditViewTests(TestCase):
         self.sac.refresh_from_db()
 
         self.assertEqual(
-            self.sac.resubmission_meta["resubmission_action"],
-            RESUBMISSION_ACTION.SFSAC_ONLY,
+            self.sac.resubmission_meta["resubmission_type"],
+            RESUBMISSION_TYPE.SFSAC_ONLY,
         )

@@ -14,7 +14,7 @@
 -- To quote the work of Dav Pilkey, "remember this now."
 
 
-CREATE OR REPLACE FUNCTION api_v1_1_1_functions.get_header(item text) RETURNS text
+CREATE OR REPLACE FUNCTION api_v1_3_1_functions.get_header(item text) RETURNS text
     AS $get_header$
     declare res text;
    	begin
@@ -23,16 +23,16 @@ CREATE OR REPLACE FUNCTION api_v1_1_1_functions.get_header(item text) RETURNS te
    end;
 $get_header$ LANGUAGE plpgsql;
 
-create or replace function api_v1_1_1_functions.get_api_key_uuid() returns TEXT
+create or replace function api_v1_3_1_functions.get_api_key_uuid() returns TEXT
 as $gaku$
 declare uuid text;
 begin
-	select api_v1_1_1_functions.get_header('x-api-user-id') into uuid;
+	select api_v1_3_1_functions.get_header('x-api-user-id') into uuid;
 	return uuid;
 end;
 $gaku$ LANGUAGE plpgsql;
 
-create or replace function api_v1_1_1_functions.has_tribal_data_access()
+create or replace function api_v1_3_1_functions.has_tribal_data_access()
 returns boolean
 as $has_tribal_data_access$
 DECLARE
@@ -40,7 +40,7 @@ DECLARE
     key_exists boolean;
 BEGIN
 
-    SELECT api_v1_1_1_functions.get_api_key_uuid() INTO uuid_header;
+    SELECT api_v1_3_1_functions.get_api_key_uuid() INTO uuid_header;
     SELECT
         CASE WHEN EXISTS (
             SELECT key_id
@@ -50,12 +50,23 @@ BEGIN
             ELSE 0::BOOLEAN
             END
         INTO key_exists;
-    RAISE INFO 'api_v1_1_1 has_tribal % %', uuid_header, key_exists;
+    RAISE INFO 'api_v1_3_1 has_tribal % %', uuid_header, key_exists;
     RETURN key_exists;
 END;
 $has_tribal_data_access$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(resubmission_status TEXT)
+CREATE OR REPLACE FUNCTION api_v1_3_1_functions.is_public_audit_or_authorized_user(is_public BOOLEAN)
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN (
+        is_public = true
+        OR
+        (is_public = false AND api_v1_3_1_functions.has_tribal_data_access())
+    );
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+CREATE OR REPLACE FUNCTION api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(resubmission_status TEXT)
 RETURNS BOOLEAN AS $$
 BEGIN
     RETURN (
@@ -63,23 +74,12 @@ BEGIN
         OR
         resubmission_status = 'most_recent'
         OR
-        api_v1_1_1_functions.has_tribal_data_access()
+        api_v1_3_1_functions.has_tribal_data_access()
     );
 END;
 $$ LANGUAGE plpgsql STABLE;
 
-CREATE OR REPLACE FUNCTION api_v1_1_1_functions.is_public_audit_or_authorized_user(is_public BOOLEAN)
-RETURNS BOOLEAN AS $$
-BEGIN
-    RETURN (
-        is_public = true
-        OR
-        (is_public = false AND api_v1_1_1_functions.has_tribal_data_access())
-    );
-END;
-$$ LANGUAGE plpgsql STABLE;
-
-CREATE OR REPLACE FUNCTION api_v1_1_1.request_file_access(
+CREATE OR REPLACE FUNCTION api_v1_3_1.request_file_access(
     report_id TEXT
 ) RETURNS JSON LANGUAGE plpgsql AS
 $$
@@ -90,7 +90,7 @@ DECLARE
     v_key_added_date DATE;
 BEGIN
 
-    SELECT api_v1_1_1_functions.get_api_key_uuid() INTO v_uuid_header;
+    SELECT api_v1_3_1_functions.get_api_key_uuid() INTO v_uuid_header;
 
     -- Check if the provided API key exists in public.dissemination_TribalApiAccessKeyIds
     SELECT

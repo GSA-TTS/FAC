@@ -3,7 +3,7 @@ begin;
 ---------------------------------------
 -- findings_text
 ---------------------------------------
-create view api_v1_1_1.findings_text as
+create view api_v1_3_1.findings_text as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -18,16 +18,16 @@ create view api_v1_1_1.findings_text as
     where
         ft.report_id = gen.report_id
         and
-        api_v1_1_1_functions.is_public_audit_or_authorized_user(gen.is_public)
+        api_v1_3_1_functions.is_public_audit_or_authorized_user(gen.is_public)
         and
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ft.id
 ;
 
 ---------------------------------------
 -- additional_ueis
 ---------------------------------------
-create view api_v1_1_1.additional_ueis as
+create view api_v1_3_1.additional_ueis as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -41,14 +41,14 @@ create view api_v1_1_1.additional_ueis as
     where
         gen.report_id = uei.report_id
         and
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by uei.id
 ;
 
 ---------------------------------------
 -- findings
 ---------------------------------------
-create view api_v1_1_1.findings as
+create view api_v1_3_1.findings as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -71,14 +71,14 @@ create view api_v1_1_1.findings as
     where
         finding.report_id = gen.report_id
         and
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by finding.id
 ;
 
 ---------------------------------------
 -- federal_awards
 ---------------------------------------
-create view api_v1_1_1.federal_awards as
+create view api_v1_3_1.federal_awards as
     select
         award.report_id,
         gen.auditee_uei,
@@ -110,7 +110,7 @@ create view api_v1_1_1.federal_awards as
     where
         award.report_id = gen.report_id
         and
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by award.id
 ;
 
@@ -118,7 +118,7 @@ create view api_v1_1_1.federal_awards as
 ---------------------------------------
 -- corrective_action_plans
 ---------------------------------------
-create view api_v1_1_1.corrective_action_plans as
+create view api_v1_3_1.corrective_action_plans as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -134,16 +134,16 @@ create view api_v1_1_1.corrective_action_plans as
     where
         ct.report_id = gen.report_id
         and
-        api_v1_1_1_functions.is_public_audit_or_authorized_user(gen.is_public)
+        api_v1_3_1_functions.is_public_audit_or_authorized_user(gen.is_public)
         and
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ct.id
 ;
 
 ---------------------------------------
 -- notes_to_sefa
 ---------------------------------------
-create view api_v1_1_1.notes_to_sefa as
+create view api_v1_3_1.notes_to_sefa as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -162,16 +162,16 @@ create view api_v1_1_1.notes_to_sefa as
     where
         note.report_id = gen.report_id
         and
-        api_v1_1_1_functions.is_public_audit_or_authorized_user(gen.is_public)
+        api_v1_3_1_functions.is_public_audit_or_authorized_user(gen.is_public)
         and
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by note.id
 ;
 
 ---------------------------------------
 -- passthrough
 ---------------------------------------
-create view api_v1_1_1.passthrough as
+create view api_v1_3_1.passthrough as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -187,7 +187,7 @@ create view api_v1_1_1.passthrough as
     where
         gen.report_id = pass.report_id
         and
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by pass.id
 ;
 
@@ -195,13 +195,13 @@ create view api_v1_1_1.passthrough as
 ---------------------------------------
 -- general
 ---------------------------------------
-create view api_v1_1_1.general as
+create view api_v1_3_1.general as
     select
         -- every table starts with report_id, UEI, and year
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
-        ---
+        --- auditee
         gen.auditee_certify_name,
         gen.auditee_certify_title,
         gen.auditee_contact_name,
@@ -230,8 +230,8 @@ create view api_v1_1_1.general as
         gen.auditor_foreign_address,
         gen.auditor_ein,
         -- agency
-        gen.cognizant_agency,
-        gen.oversight_agency,
+        coalesce(gen.cognizant_agency,'') as cognizant_agency,
+        coalesce(gen.oversight_agency,'') as oversight_agency,
         -- dates
         gen.date_created,
         gen.ready_for_certification_date,
@@ -276,14 +276,14 @@ create view api_v1_1_1.general as
     from
         dissemination_general gen
     where
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by gen.id
 ;
 
 ---------------------------------------
 -- secondary_auditors
 ---------------------------------------
-create view api_v1_1_1.secondary_auditors as
+create view api_v1_3_1.secondary_auditors as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -306,14 +306,14 @@ create view api_v1_1_1.secondary_auditors as
     where
         sa.report_id = gen.report_id
         and
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by sa.id
 ;
 
 ---------------------------------------
 -- additional_eins
 ---------------------------------------
-create view api_v1_1_1.additional_eins as
+create view api_v1_3_1.additional_eins as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -327,14 +327,14 @@ create view api_v1_1_1.additional_eins as
     where
         gen.report_id = ein.report_id
         and
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(gen.resubmission_status)
     order by ein.id
 ;
 
 ---------------------------------------
 -- resubmission
 ---------------------------------------
-create view api_v1_1_1.resubmission as
+create view api_v1_3_1.resubmission as
     with recursive chain as (
         -- Base case: start from each resubmission row
         select
@@ -378,6 +378,10 @@ create view api_v1_1_1.resubmission as
         ---
         resub.version,
         resub.status,
+        resub.resubmission_requester,
+        resub.audit_opinion_changes,
+        resub.resubmission_type,
+        resub.resubmission_justification,
         resub.previous_report_id,
         resub.next_report_id,
         original.original_submission_date
@@ -391,115 +395,115 @@ create view api_v1_1_1.resubmission as
     order by resub.id
 ;
 
--- Specify every field in dissemination_combined, omitting the id.
--- Generated fields like ALN are done in the creation of the table, not here.
-create view api_v1_1_1.combined as
+---------------------------------------
+-- unified
+---------------------------------------
+create view api_v1_3_1.unified as
     select
-        combined.report_id,
-        combined.award_reference,
-        combined.reference_number,
-        combined.aln,
-        combined.agencies_with_prior_findings,
-        combined.audit_period_covered,
-        combined.audit_type,
-        combined.audit_year,
-        combined.auditee_address_line_1,
-        combined.auditee_certified_date,
-        combined.auditee_certify_name,
-        combined.auditee_certify_title,
-        combined.auditee_city,
-        combined.auditee_contact_name,
-        combined.auditee_contact_title,
-        combined.auditee_ein,
-        combined.auditee_email,
-        combined.auditee_name,
-        combined.auditee_phone,
-        combined.auditee_state,
-        combined.auditee_uei,
-        combined.auditee_zip,
-        combined.auditor_address_line_1,
-        combined.auditor_certified_date,
-        combined.auditor_certify_name,
-        combined.auditor_certify_title,
-        combined.auditor_city,
-        combined.auditor_contact_name,
-        combined.auditor_contact_title,
-        combined.auditor_country,
-        combined.auditor_ein,
-        combined.auditor_email,
-        combined.auditor_firm_name,
-        combined.auditor_foreign_address,
-        combined.auditor_phone,
-        combined.auditor_state,
-        combined.auditor_zip,
-        combined.resubmission_version,
-        combined.resubmission_status,
-        combined.cognizant_agency,
-        combined.data_source,
-        combined.date_created,
-        combined.dollar_threshold,
-        combined.entity_type,
-        combined.fac_accepted_date,
-        combined.fy_end_date,
-        combined.fy_start_date,
-        combined.gaap_results,
-        combined.is_additional_ueis,
-        combined.is_aicpa_audit_guide_included,
-        combined.is_going_concern_included,
-        combined.is_internal_control_deficiency_disclosed,
-        combined.is_internal_control_material_weakness_disclosed,
-        combined.is_low_risk_auditee,
-        combined.is_material_noncompliance_disclosed,
-        combined.is_public,
-        combined.is_sp_framework_required,
-        combined.number_months,
-        combined.oversight_agency,
-        combined.ready_for_certification_date,
-        combined.sp_framework_basis,
-        combined.sp_framework_opinions,
-        combined.submitted_date,
-        combined.total_amount_expended,
-        combined.type_audit_code,
-        combined.additional_award_identification,
-        combined.amount_expended,
-        combined.cluster_name,
-        combined.cluster_total,
-        combined.federal_agency_prefix,
-        combined.federal_award_extension,
-        combined.federal_program_name,
-        combined.federal_program_total,
-        combined.findings_count,
-        combined.is_direct,
-        combined.is_loan,
-        combined.is_major,
-        combined.is_passthrough_award,
-        combined.loan_balance,
-        combined.audit_report_type,
-        combined.other_cluster_name,
-        combined.passthrough_amount,
-        combined.state_cluster_name,
-        combined.is_material_weakness,
-        combined.is_modified_opinion,
-        combined.is_other_findings,
-        combined.is_other_matters,
-        combined.is_questioned_costs,
-        combined.is_repeat_finding,
-        combined.is_significant_deficiency,
-        combined.prior_finding_ref_numbers,
-        combined.type_requirement,
-        combined.passthrough_name,
-        combined.passthrough_id
+        unified.report_id,
+        unified.award_reference,
+        unified.reference_number,
+        unified.aln,
+        unified.agencies_with_prior_findings,
+        unified.audit_period_covered,
+        unified.audit_type,
+        unified.audit_year,
+        unified.auditee_address_line_1,
+        unified.auditee_certified_date,
+        unified.auditee_certify_name,
+        unified.auditee_certify_title,
+        unified.auditee_city,
+        unified.auditee_contact_name,
+        unified.auditee_contact_title,
+        unified.auditee_ein,
+        unified.auditee_email,
+        unified.auditee_name,
+        unified.auditee_phone,
+        unified.auditee_state,
+        unified.auditee_uei,
+        unified.auditee_zip,
+        unified.auditor_address_line_1,
+        unified.auditor_certified_date,
+        unified.auditor_certify_name,
+        unified.auditor_certify_title,
+        unified.auditor_city,
+        unified.auditor_contact_name,
+        unified.auditor_contact_title,
+        unified.auditor_country,
+        unified.auditor_ein,
+        unified.auditor_email,
+        unified.auditor_firm_name,
+        unified.auditor_foreign_address,
+        unified.auditor_phone,
+        unified.auditor_state,
+        unified.auditor_zip,
+        unified.resubmission_version,
+        unified.resubmission_status,
+        unified.cognizant_agency,
+        unified.data_source,
+        unified.date_created,
+        unified.dollar_threshold,
+        unified.entity_type,
+        unified.fac_accepted_date,
+        unified.fy_end_date,
+        unified.fy_start_date,
+        unified.gaap_results,
+        unified.is_additional_ueis,
+        unified.is_aicpa_audit_guide_included,
+        unified.is_going_concern_included,
+        unified.is_internal_control_deficiency_disclosed,
+        unified.is_internal_control_material_weakness_disclosed,
+        unified.is_low_risk_auditee,
+        unified.is_material_noncompliance_disclosed,
+        unified.is_public,
+        unified.is_sp_framework_required,
+        unified.number_months,
+        unified.oversight_agency,
+        unified.ready_for_certification_date,
+        unified.sp_framework_basis,
+        unified.sp_framework_opinions,
+        unified.submitted_date,
+        unified.total_amount_expended,
+        unified.type_audit_code,
+        unified.additional_award_identification,
+        unified.amount_expended,
+        unified.cluster_name,
+        unified.cluster_total,
+        unified.federal_agency_prefix,
+        unified.federal_award_extension,
+        unified.federal_program_name,
+        unified.federal_program_total,
+        unified.findings_count,
+        unified.is_direct,
+        unified.is_loan,
+        unified.is_major,
+        unified.is_passthrough_award,
+        unified.loan_balance,
+        unified.audit_report_type,
+        unified.other_cluster_name,
+        unified.passthrough_amount,
+        unified.state_cluster_name,
+        unified.is_material_weakness,
+        unified.is_modified_opinion,
+        unified.is_other_findings,
+        unified.is_other_matters,
+        unified.is_questioned_costs,
+        unified.is_repeat_finding,
+        unified.is_significant_deficiency,
+        unified.prior_finding_ref_numbers,
+        unified.type_requirement,
+        unified.passthrough_name,
+        unified.passthrough_id
     from
-        dissemination_combined combined
+        dissemination_unified unified
     where
-        api_v1_1_1_functions.is_public_audit_or_authorized_user(combined.is_public)
+        api_v1_3_1_functions.is_public_audit_or_authorized_user(unified.is_public)
         and
-        api_v1_1_1_functions.is_most_recent_audit_or_authorized_user(combined.resubmission_status)
-    order by combined.id
+        api_v1_3_1_functions.is_most_recent_audit_or_authorized_user(unified.resubmission_status)
+    order by unified.id
 ;
 
 commit;
 
 notify pgrst,
        'reload schema';
-

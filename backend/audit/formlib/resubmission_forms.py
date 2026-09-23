@@ -2,36 +2,40 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from audit.check_resubmission_allowed import check_resubmission_allowed
-from audit.models.constants import STATUS, RESUBMISSION_ACTION
+from audit.models.constants import STATUS, RESUBMISSION_TYPE
 from audit.models import SingleAuditChecklist
 
 MATERIAL_CHANGE_CHOICES = [
-    ("auditor_report", "Auditor's Report Corrections or Additions"),
     (
-        "awards",
-        "Awards Corrections or Additions (such as ALN, federal program name, cluster name, etc.)",
+        "major_program",
+        "Major Program Determination Errors",
     ),
-    ("corrective_action_plans", "Corrective Action Plan Corrections or Additions"),
-    ("direct_passthrough", "Direct vs. Pass-through Funding Corrections"),
-    ("financial_statements", "Financial Statements Corrections or Additions"),
     (
         "findings",
-        "Findings Corrections or Additions (such as condition, criteria, cause, effect, "
-        "material weakness, significant deficiency, etc.)",
+        "Audit Findings Errors or Omissions",
     ),
-    ("internal_control", "Internal Control and Compliance Corrections or Additions"),
-    ("major_program", "Major Program Determination Corrections"),
+    (
+        "sefa_award_amounts",
+        "SEFA and Federal Program Reporting Errors",
+    ),
+    (
+        "incomplete_audit_package",
+        "Missing or Incomplete Reporting Package Components",
+    ),
+    (
+        "requirements_noncompliance",
+        "Noncompliance with Audit Reporting Requirements",
+    ),
+    (
+        "risk",
+        "Low-Risk Auditee Determination Errors",
+    ),
     (
         "auditor_professional_requirements",
-        "Previous Audit Performed by an Auditor Not Meeting Professional Requirements",
+        "Audit Performed by an Auditor Not Meeting Professional Requirements",
     ),
-    ("prior_findings", "Prior Findings Corrections or Additions"),
-    ("questioned_costs", "Questioned Costs Corrections or Additions"),
-    ("risk", "Risk Determination Correction"),
-    ("incomplete_audit_package", "Single Audit Package Completion"),
-    ("sefa_award_amounts", "SEFA Reporting Corrections or Additions"),
-    ("sf_sac", "SF-SAC Materially Incomplete or Inconsistent with Audit Report"),
 ]
+
 
 NON_MATERIAL_CHANGE_CHOICES = [
     (
@@ -50,8 +54,14 @@ NON_MATERIAL_CHANGE_CHOICES = [
         "rounding",
         "Minor Numerical Rounding Corrections with No Material Effect on Expenditures, Major Program Determinations, Findings, or Compliance",
     ),
-    ("spelling", "Spelling and Typographical Corrections"),
-    ("formatting", "Formatting Corrections"),
+    (
+        "spelling",
+        "Spelling and Typographical Corrections",
+    ),
+    (
+        "formatting",
+        "Formatting Corrections",
+    ),
     (
         "questioned_costs_where_report_accurate",
         "Questioned Costs Corrections Where SF-SAC is Accurate",
@@ -60,77 +70,79 @@ NON_MATERIAL_CHANGE_CHOICES = [
         "corrections_list_major_program",
         "Corrections to Listed Major Programs, Type A Threshold, or Low-Risk Auditee Status When Audit Conclusions and SF-SAC Are Correct",
     ),
-    ("immaterial", "Immaterial SEFA and Federal Program Reporting Errors"),
+    (
+        "immaterial",
+        "Immaterial SEFA and Federal Program Reporting Errors",
+    ),
 ]
+
 
 SFSAC_ONLY_CHANGE_CHOICES = [
     (
-        "aln_where_sefa_accurate",
-        "Assistance Listing Numbers (ALNs) Corrections Where SEFA is Accurate",
+        "sf_sac",
+        "Errors Limited to the DCF (SF-SAC)",
     ),
     (
-        "data_entry",
-        "Data Entry Corrections not Affecting Audit Conclusions",
+        "auditee_info",
+        "Incorrect or Missing Auditee Identification Information",
     ),
     (
-        "direct_passthrough_where_sefa_accurate",
-        "Direct vs. Pass-through Funding Corrections Where SEFA is Accurate",
-    ),
-    (
-        "ein",
-        "Employer Identification Number (EIN) Corrections or Additions",
-    ),
-    (
-        "presentation",
-        "Labelling or Presentation Corrections Not Impacting Reporting, Compliance, or Audit Conclusions",
-    ),
-    (
-        "rounding",
-        "Minor Numerical Rounding Corrections with No Material Effect on Expenditures, "
-        "Major Program Determinations, Findings, or Compliance",
+        "audit_sf_sac_inconsistent",
+        "Inconsistencies Between the DCF (SF-SAC) and Audit Documentation",
     ),
     (
         "spelling",
-        "Spelling and Typographical Corrections",
+        "Minor Typographical or Formatting Errors",
     ),
     (
-        "questioned_costs_where_report_accurate",
-        "Questioned Costs Corrections Where Audit Report and Findings are Accurate",
+        "rounding",
+        "Minor Numerical Rounding Adjustments",
     ),
 ]
 
-RESUBMISSION_ACTION_CHOICES = [
+
+RESUBMISSION_TYPE_CHOICES = [
     (
-        RESUBMISSION_ACTION.AUDIT_PDF,
+        RESUBMISSION_TYPE.AUDIT_PDF,
         "I need to make material changes to the audit PDF package "
         "(with the option to also edit the SF-SAC data collection forms). "
         "I understand that this option will result in a new acceptance date "
         "for the submission.",
     ),
     (
-        RESUBMISSION_ACTION.NON_MATERIAL_PDF,
+        RESUBMISSION_TYPE.NON_MATERIAL_PDF,
         "I need to make non-material changes to the audit PDF package "
         "(with the option to also edit the SF-SAC data collection forms). "
         "I understand that the submission's acceptance date will not change.",
     ),
     (
-        RESUBMISSION_ACTION.SFSAC_ONLY,
+        RESUBMISSION_TYPE.SFSAC_ONLY,
         "I need to make updates only to the SF-SAC data collection form. "
         "I understand that the submission's acceptance date will not change.",
     ),
 ]
 
+
 RESUBMISSION_REQUESTER_CHOICES = [
-    ("auditee", "The Auditee is requesting this resubmission."),
-    ("auditor", "The Auditor is requesting this resubmission."),
-    ("oversight_official", "An Oversight Official is requesting this resubmission."),
+    (
+        "auditee",
+        "The Auditee is requesting this resubmission.",
+    ),
+    (
+        "auditor",
+        "The Auditor is requesting this resubmission.",
+    ),
+    (
+        "oversight_official",
+        "An Oversight Official is requesting this resubmission.",
+    ),
 ]
 
 
 def _clean_resubmission_form(form):
     cleaned_data = form.cleaned_data
 
-    action = cleaned_data.get("resubmission_action")
+    action = cleaned_data.get("resubmission_type")
     requester = cleaned_data.get("resubmission_requester")
     material = cleaned_data.get("material_change_reasons")
     non_material = cleaned_data.get("non_material_change_reasons")
@@ -143,41 +155,45 @@ def _clean_resubmission_form(form):
             "Select at least one requester.",
         )
 
-    if action == RESUBMISSION_ACTION.AUDIT_PDF and not material:
+    if action == RESUBMISSION_TYPE.AUDIT_PDF and not material:
         form.add_error(
             "material_change_reasons",
             "Select at least one material change.",
         )
 
-    if action == RESUBMISSION_ACTION.AUDIT_PDF and not audit_opinion_changes:
+    if action == RESUBMISSION_TYPE.AUDIT_PDF and not audit_opinion_changes:
         form.add_error(
             "audit_opinion_changes",
             "Identify the changes in the audit opinion that are the reason for the resubmission.",
         )
 
-    if action == RESUBMISSION_ACTION.NON_MATERIAL_PDF and not non_material:
+    if action == RESUBMISSION_TYPE.NON_MATERIAL_PDF and not non_material:
         form.add_error(
             "non_material_change_reasons",
             "Select at least one non-material change.",
         )
 
-    if action == RESUBMISSION_ACTION.SFSAC_ONLY and not sfsac_only:
+    if action == RESUBMISSION_TYPE.SFSAC_ONLY and not sfsac_only:
         form.add_error(
             "sfsac_only_change_reasons",
             "Select at least one SF-SAC only change.",
         )
 
     # SF-SAC-only resubmissions do not include PDF edit details.
-    if action == RESUBMISSION_ACTION.SFSAC_ONLY:
+    if action == RESUBMISSION_TYPE.SFSAC_ONLY:
         cleaned_data["audit_opinion_changes"] = ""
 
     return cleaned_data
 
 
 class ResubmissionActionForm(forms.Form):
-    resubmission_action = forms.ChoiceField(
-        choices=RESUBMISSION_ACTION_CHOICES,
-        widget=forms.RadioSelect(attrs={"class": "usa-radio__input"}),
+    resubmission_type = forms.ChoiceField(
+        choices=RESUBMISSION_TYPE_CHOICES,
+        widget=forms.RadioSelect(
+            attrs={
+                "class": "usa-radio__input",
+            }
+        ),
         required=True,
         error_messages={
             "required": "Select the type of change you need to make.",
@@ -187,25 +203,41 @@ class ResubmissionActionForm(forms.Form):
     resubmission_requester = forms.MultipleChoiceField(
         required=False,
         choices=RESUBMISSION_REQUESTER_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                "class": "usa-checkbox__input",
+            }
+        ),
     )
 
     material_change_reasons = forms.MultipleChoiceField(
         required=False,
         choices=MATERIAL_CHANGE_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                "class": "usa-checkbox__input",
+            }
+        ),
     )
 
     non_material_change_reasons = forms.MultipleChoiceField(
         required=False,
         choices=NON_MATERIAL_CHANGE_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                "class": "usa-checkbox__input",
+            }
+        ),
     )
 
     sfsac_only_change_reasons = forms.MultipleChoiceField(
         required=False,
         choices=SFSAC_ONLY_CHANGE_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                "class": "usa-checkbox__input",
+            }
+        ),
     )
 
     audit_opinion_changes = forms.CharField(
@@ -229,32 +261,54 @@ class ResubmissionForm(forms.Form):
     material_change_reasons = forms.MultipleChoiceField(
         required=False,
         choices=MATERIAL_CHANGE_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                "class": "usa-checkbox__input",
+            }
+        ),
     )
 
     non_material_change_reasons = forms.MultipleChoiceField(
         required=False,
         choices=NON_MATERIAL_CHANGE_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                "class": "usa-checkbox__input",
+            }
+        ),
     )
 
     resubmission_requester = forms.MultipleChoiceField(
         required=False,
         choices=RESUBMISSION_REQUESTER_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                "class": "usa-checkbox__input",
+            }
+        ),
     )
 
     sfsac_only_change_reasons = forms.MultipleChoiceField(
         required=False,
         choices=SFSAC_ONLY_CHANGE_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "usa-checkbox__input"}),
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                "class": "usa-checkbox__input",
+            }
+        ),
     )
 
-    report_id = forms.CharField(required=True)
+    report_id = forms.CharField(
+        required=True,
+    )
 
-    resubmission_action = forms.ChoiceField(
-        choices=RESUBMISSION_ACTION_CHOICES,
-        widget=forms.RadioSelect(attrs={"class": "usa-radio__input"}),
+    resubmission_type = forms.ChoiceField(
+        choices=RESUBMISSION_TYPE_CHOICES,
+        widget=forms.RadioSelect(
+            attrs={
+                "class": "usa-radio__input",
+            }
+        ),
         required=True,
         error_messages={
             "required": "Select the type of change you need to make.",
@@ -283,7 +337,9 @@ class ResubmissionForm(forms.Form):
             raise ValidationError("The given report ID is too short!")
 
         sac = _validate_report_id_for_resubmission(report_id)
+
         self.cleaned_data["previous_report_data"] = _gather_previous_report_data(sac)
+
         self.cleaned_data["resubmission_meta"] = _gather_resubmission_metadata(sac)
 
         return report_id
@@ -295,23 +351,31 @@ class ResubmissionForm(forms.Form):
 
 def _validate_report_id_for_resubmission(report_id):
     """
-    Given a report_id, determine if it points at a SAC that is eligible for resubmission.
-    If not, raise a `ValidatonError` with a helpful message.
+    Given a report_id, determine if it points at a SAC
+    that is eligible for resubmission.
 
-    When run by an overridden `clean_{fieldname}` function, `ValidationError`s will be captured and
-    added to the form, to be presented to the user.
+    If not, raise a ValidationError with a helpful message.
+
+    When run by an overridden clean_{fieldname} function,
+    ValidationErrors will be captured and added to the form,
+    to be presented to the user.
     """
+
     # See if a previous submission matches with the given report_id.
     try:
         sac = SingleAuditChecklist.objects.get(
             report_id=report_id,
-            submission_status__in=[STATUS.DISSEMINATED, STATUS.RESUBMITTED],
+            submission_status__in=[
+                STATUS.DISSEMINATED,
+                STATUS.RESUBMITTED,
+            ],
         )
     except SingleAuditChecklist.DoesNotExist:
         raise ValidationError("Audit to resubmit not found.")
 
     # Further validate the previous submission.
     allowed, reason = check_resubmission_allowed(sac)
+
     if not allowed:
         raise ValidationError(reason)
 
@@ -320,22 +384,40 @@ def _validate_report_id_for_resubmission(report_id):
 
 def _gather_previous_report_data(sac):
     """
-    Given a sac, return an object containing the UEI and fiscal period.
+    Given a SAC, return an object containing
+    the UEI and fiscal period.
     """
+
     return {
-        "auditee_uei": getattr(sac, "auditee_uei").upper(),
-        "auditee_name": getattr(sac, "auditee_name"),
-        "auditee_fiscal_period_start": getattr(sac, "auditee_fiscal_period_start"),
-        "auditee_fiscal_period_end": getattr(sac, "auditee_fiscal_period_end"),
+        "auditee_uei": getattr(
+            sac,
+            "auditee_uei",
+        ).upper(),
+        "auditee_name": getattr(
+            sac,
+            "auditee_name",
+        ),
+        "auditee_fiscal_period_start": getattr(
+            sac,
+            "auditee_fiscal_period_start",
+        ),
+        "auditee_fiscal_period_end": getattr(
+            sac,
+            "auditee_fiscal_period_end",
+        ),
     }
 
 
 def _gather_resubmission_metadata(sac):
     """
-    Given a sac, return an object containing its row_id, report_id, and the next version number.
+    Given a SAC, return an object containing its
+    row_id, report_id, and the next version number.
 
-    If the SAC has resubmission_meta with a version, bump it by one. If not, assume the next version number is 2.
+    If the SAC has resubmission_meta with a version,
+    bump it by one. If not, assume the next version
+    number is 2.
     """
+
     if getattr(sac, "resubmission_meta"):
         version = sac.resubmission_meta["version"] + 1
     else:

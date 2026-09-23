@@ -19,7 +19,7 @@ from dissemination.file_downloads import (
     get_filename,
     get_filename_from_audit,
 )
-from dissemination.forms.search_forms import AdvancedSearchForm
+from dissemination.forms.search_forms import SearchForm
 from dissemination.mixins import ReportAccessRequiredMixin, FederalAccessRequiredMixin
 from dissemination.models import (
     General,
@@ -198,7 +198,7 @@ class MultipleSummaryReportDownloadView(View):
         3. Generate a summary report with the report_ids, which goes into into S3
         4. Redirect to the download url of this new report
         """
-        form = AdvancedSearchForm(request.POST)
+        form = SearchForm(request.POST)
         # TODO SOT: Enable for testing
         # use_audit = request.GET.get("beta", "N") == "Y"
         use_audit = False
@@ -206,12 +206,11 @@ class MultipleSummaryReportDownloadView(View):
         try:
             if form.is_valid():
                 form_data = form.cleaned_data
-                form_data["advanced_search_flag"] = True
             else:
-                raise ValidationError("Form error in Search POST.")
+                raise BadRequest("Form error in Search POST.")
 
             include_private = include_private_results(request)
-            results = run_search(request, form_data, use_audit)
+            results = run_search(request, form_data)
             results = results[:SUMMARY_REPORT_DOWNLOAD_LIMIT]  # Hard limit XLSX size
 
             if len(results) == 0:
@@ -233,15 +232,10 @@ class MultipleSummaryReportDownloadView(View):
             return response
 
         except Http404 as err:
-            logger.info(
+            logger.error(
                 "No results found for MultipleSummaryReportDownloadView post. Suggests an improper or old form submission."
             )
             raise Http404 from err
-        except Exception as err:
-            logger.info(
-                "Unexpected error in MultipleSummaryReportDownloadView post:\n%s", err
-            )
-            raise BadRequest(err)
 
 
 class FindingsSummaryReportDownloadView(FederalAccessRequiredMixin, View):
@@ -252,12 +246,11 @@ class FindingsSummaryReportDownloadView(FederalAccessRequiredMixin, View):
         3. Generate a summary report with the report_ids, which goes into into S3
         4. Redirect to the download url of this new report
         """
-        form = AdvancedSearchForm(request.POST)
+        form = SearchForm(request.POST)
 
         try:
             if form.is_valid():
                 form_data = form.cleaned_data
-                form_data["advanced_search_flag"] = True
             else:
                 raise ValidationError("Form error in Search POST.")
             results = run_search(request, form_data)
