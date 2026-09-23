@@ -86,6 +86,8 @@ TARGET_TABLES=(
   "public-dissemination_federalaward.dump"
   "public-dissemination_finding.dump"
   "public-dissemination_findingtext.dump"
+  "public-dissemination_resubmission.dump"
+  "public-dissemination_unified.dump"
   "public-dissemination_invalidauditrecord.dump"
   # Not bothering with these at this point.
   # "public-dissemination_issuedescriptionrecord.dump"
