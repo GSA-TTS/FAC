@@ -1,4 +1,5 @@
 {% load resubmission_type_presentation %}
+{% load static %}
 
 {% comment %}
     Within the summary page. Assumes "resubmissions_list" exists and is populated.
@@ -23,16 +24,16 @@
         <table class="usa-table usa-table--striped usa-table--compact width-full">
             <thead>
                 <tr>
-                    <th scope="col" role="columnheader">Version</th>
-                    <th scope="col" role="columnheader">Change</th>
-                    <th scope="col" role="columnheader">Acc Date</th>
+                    <th scope="col" role="columnheader" class="text-center">Version</th>
+                    <th scope="col" role="columnheader" class="text-center">Change</th>
+                    <th scope="col" role="columnheader" class="text-center">Acc Date</th>
                     {% if include_private %}
-                    <th scope="col" role="columnheader">View</th>
+                    <th scope="col" role="columnheader" class="text-center">View</th>
                     {% endif %}
-                    <th scope="col" role="columnheader">Comparisons</th>
+                    <th scope="col" role="columnheader" class="text-center">Comparisons</th>
                     {% if include_private %}
-                    <th scope="col" role="columnheader">SF-SAC</th>
-                    <th scope="col" role="columnheader">Report</th>
+                    <th scope="col" role="columnheader" class="text-center">SF-SAC</th>
+                    <th scope="col" role="columnheader" class="text-center">Report</th>
                     {% endif %}
                 </tr>
             </thead>
@@ -41,10 +42,20 @@
                     {% comment %} Highlight the active row with a "focus" border.
                     The transparent border is necessary to bring the focus out far enough to be visible. {% endcomment %}
                     <tr>
-                        <td>
+                        <td class="text-center">
+                            {% if report_id == resub.report_id.report_id %}
+                                <svg class="usa-icon margin-right-1" aria-hidden="true" role="img">
+                                 {% uswds_sprite "navigate_next" %}
+                                </svg>
+                            {% endif %}
                             {{ resub.version }} {{ resub.resubmission_meta }}
+                            {% if report_id == resub.report_id.report_id %}
+                                <svg class="usa-icon margin-left-1" aria-hidden="true" role="img">
+                                 {% uswds_sprite "navigate_before" %}
+                                </svg>
+                            {% endif %}
                         </td>
-                        <td>
+                        <td class="text-center">
                             {% comment %} Resubmission Type Tag {% endcomment %}
                             {% if resub.version != 1 %}
                               {% with resub.resubmission_type|resubmission_type_presentation as resub_type %}
@@ -52,11 +63,11 @@
                               {% endwith %}
                             {% endif %}
                         </td>
-                        <td>
+                        <td class="text-center">
                             {{ resub.report_id.fac_accepted_date }} 
                         </td>
                         {% if include_private %}
-                        <td>
+                        <td class="text-center">
                             {% if report_id != resub.report_id.report_id %}
                             <a class="usa-link display-flex flex-column flex-align-center"
                                href="{% url 'dissemination:Summary' report_id=resub.report_id.report_id %}"
@@ -71,7 +82,7 @@
                             {% endif %}
                         </td>
                         {% endif %}
-                        <td>
+                        <td class="text-center">
                             {% if resub.version != 1 %}
                             <a class="usa-link"
                                 href="{% url 'audit:CompareSubmissions' report_id=resub.report_id.report_id route='search' %}">
@@ -80,7 +91,7 @@
                             {% endif %}
                         </td>
                         {% if include_private %}
-                        <td>
+                        <td class="text-center">
                             <a class="usa-link display-flex flex-column flex-align-center"
                                 target="_blank"
                                 {% if resub.report_id.report_id == most_recent_resubmission.report_id.report_id and not is_sf_sac_downloadable %}
@@ -97,7 +108,7 @@
                                 </svg>
                             </a>
                         </td>
-                        <td>
+                        <td class="text-center">
                             <a class="usa-link display-flex flex-column flex-align-center"
                                 href="{% url 'dissemination:PdfDownload' report_id=resub.report_id.report_id %}"
                                 target="_blank">
