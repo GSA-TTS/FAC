@@ -13,7 +13,7 @@ from audit.viewlib.compare_two_submissions import (
     _get_keysets,
 )
 
-from audit.models import SingleAuditChecklist, SubmissionEvent
+from audit.models import SingleAuditChecklist
 from model_bakery import baker
 from copy import deepcopy
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
@@ -300,7 +300,7 @@ def setup_mock_db():
     sac_r1.submission_status = STATUS.RESUBMITTED
     sac_r1.resubmission_meta = {
         "next_report_id": sac_r2.report_id,
-        "resubmission_status": "deprecated_via_resubmission",
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
         "version": 1,
     }
 
@@ -308,14 +308,14 @@ def setup_mock_db():
     sac_r2.resubmission_meta = {
         "previous_report_id": sac_r1.report_id,
         "next_report_id": sac_r3.report_id,
-        "resubmission_status": "deprecated_via_resubmission",
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
         "version": 2,
     }
 
     sac_r3.submission_status = STATUS.DISSEMINATED
     sac_r3.resubmission_meta = {
         "previous_report_id": sac_r2.report_id,
-        "resubmission_status": "most_recent",
+        "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
         "version": 3,
     }
 
