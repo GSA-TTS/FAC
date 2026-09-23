@@ -49,6 +49,8 @@ from dissemination.remove_workbook_artifacts import (
     remove_workbook_artifacts,
 )
 
+from curation.curationlib.suppress_audits import suppress_audit
+
 logger = logging.getLogger(__name__)
 
 # As per ADR #0041, the retention period for flagged reports is 6 months. That is 180 days.
@@ -318,6 +320,42 @@ def flag_for_removal(modeladmin, request, queryset):
         )
 
 
+@admin.action(description="Administratively suppress selected disseminated report(s)")
+def suppress_disseminated_reports(modeladmin, request, queryset):
+    suppressed = []
+    errors = []
+
+    for sac in queryset:
+        try:
+            suppress_audit(
+                report_id=sac.report_id,
+                email=request.user.email,
+            )
+            suppressed.append(sac.report_id)
+
+        except (ValueError, RuntimeError) as exc:
+            logger.error(
+                "Failed to administratively suppress report %s: %s",
+                sac.report_id,
+                str(exc),
+            )
+            errors.append(f"{sac.report_id}: {str(exc)}")
+
+    if suppressed:
+        modeladmin.message_user(
+            request,
+            f"Successfully suppressed report(s) ({', '.join(suppressed)}).",
+            level=messages.SUCCESS,
+        )
+
+    if errors:
+        modeladmin.message_user(
+            request,
+            "Unable to suppress report(s): " + "; ".join(errors),
+            level=messages.ERROR,
+        )
+
+
 @admin.action(description="Flag selected report(s) for removal")
 def flag_audit_for_removal(modeladmin, request, queryset):
 
@@ -466,7 +504,12 @@ class SACAdmin(admin.ModelAdmin):
         "general_information__auditee_uei",
         "report_id",
     )
-    actions = [revert_to_in_progress, flag_for_removal, delete_flagged_records]
+    actions = [
+        revert_to_in_progress,
+        flag_for_removal,
+        suppress_disseminated_reports,
+        delete_flagged_records,
+    ]
 
     def get_search_results(self, request, queryset, search_term):
         """Extend default search to include certifying auditee/auditor emails."""
