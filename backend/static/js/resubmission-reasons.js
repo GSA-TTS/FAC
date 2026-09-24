@@ -26,9 +26,6 @@ function toggleReasonSections() {
     const auditOpinionChangesSection = document.getElementById(
         "audit-opinion-changes-section"
     );
-    const auditOpinionChangesHint = document.getElementById(
-        "audit-opinion-changes-hint"
-    );
 
     // Reset conditional sections.
     setSectionVisibility(requesterSection, Boolean(selectedAction));
@@ -44,17 +41,9 @@ function toggleReasonSections() {
     if (selectedAction.value === "audit_pdf") {
         setSectionVisibility(materialSection, true);
         setSectionVisibility(auditOpinionChangesSection, true);
-
-        if (auditOpinionChangesHint) {
-            auditOpinionChangesHint.textContent = "This field is required.";
-        }
     } else if (selectedAction.value === "non_material_pdf") {
         setSectionVisibility(nonMaterialSection, true);
         setSectionVisibility(auditOpinionChangesSection, true);
-
-        if (auditOpinionChangesHint) {
-            auditOpinionChangesHint.textContent = "This field is optional.";
-        }
     } else if (selectedAction.value === "sfsac_only") {
         setSectionVisibility(sfsacOnlySection, true);
     }

@@ -146,7 +146,6 @@ def _clean_resubmission_form(form):
     requester = cleaned_data.get("resubmission_requester")
     material = cleaned_data.get("material_change_reasons")
     non_material = cleaned_data.get("non_material_change_reasons")
-    audit_opinion_changes = cleaned_data.get("audit_opinion_changes")
     sfsac_only = cleaned_data.get("sfsac_only_change_reasons")
 
     if not requester:
@@ -159,12 +158,6 @@ def _clean_resubmission_form(form):
         form.add_error(
             "material_change_reasons",
             "Select at least one material change.",
-        )
-
-    if action == RESUBMISSION_TYPE.AUDIT_PDF and not audit_opinion_changes:
-        form.add_error(
-            "audit_opinion_changes",
-            "Identify the changes in the audit opinion that are the reason for the resubmission.",
         )
 
     if action == RESUBMISSION_TYPE.NON_MATERIAL_PDF and not non_material:
