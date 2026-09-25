@@ -12,7 +12,6 @@ from audit.mixins import (
     LoginRequiredMixin,
 )
 
-from audit.models.constants import STATUS
 from users.models import UserPermission
 
 
