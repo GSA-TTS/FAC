@@ -108,6 +108,10 @@ class NotDeprecatedOrFederalAccessRequiredMixin:
 
     def dispatch(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
+        try:
+            General.objects.get(report_id=report_id)
+        except General.DoesNotExist:
+            raise Http404()
 
         resubmission = Resubmission.objects.filter(report_id=report_id).first()
 
