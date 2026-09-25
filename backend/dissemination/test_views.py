@@ -13,7 +13,7 @@ from audit.models import (
     generate_sac_report_id,
 )
 from audit.models.utils import get_next_sequence_id
-from audit.models.constants import SAC_SEQUENCE_ID
+from audit.models.constants import SAC_SEQUENCE_ID, RESUBMISSION_STATUS
 from audit.fixtures.excel import FORM_SECTIONS
 from dissemination.models import (
     CapText,
@@ -835,6 +835,126 @@ class SummaryViewTests(TestCase):
 
         self.assertNotIn("Resubmission history", page_content)
         self.assertNotIn("Most recent submitted date", page_content)
+
+    def test_no_resubmission_object_is_open(self):
+        """
+        If a record has no Resubmission object, access should be open to all users.
+        """
+        general = baker.make(
+            General,
+            report_id="2022-12-GSAFAC-0000000003",
+            is_public=True,
+        )
+
+        url = reverse("dissemination:Summary", kwargs={"report_id": general.report_id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_most_recent_resubmission_is_open(self):
+        """
+        If a record is not deprecated, access should be open to all users.
+        """
+        general = baker.make(
+            General,
+            report_id="2022-12-GSAFAC-0000000004",
+            is_public=True,
+            resubmission_status="most_recent",
+            resubmission_version=1,
+        )
+        baker.make(
+            Resubmission,
+            report_id=general,
+            status=RESUBMISSION_STATUS.MOST_RECENT,
+            version=1,
+        )
+
+        url = reverse("dissemination:Summary", kwargs={"report_id": general.report_id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_deprecated_resubmission_denied_for_anonymous(self):
+        """
+        If a record is deprecated, anonymous users should be denied access.
+        """
+        general = baker.make(
+            General,
+            report_id="2022-12-GSAFAC-0000000005",
+            is_public=True,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
+        baker.make(
+            Resubmission,
+            report_id=general,
+            status=RESUBMISSION_STATUS.DEPRECATED,
+            version=1,
+        )
+
+        url = reverse("dissemination:Summary", kwargs={"report_id": general.report_id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_deprecated_resubmission_denied_for_unpermissioned_user(self):
+        """
+        If a record is deprecated, non-priviledged users should be denied access.
+        """
+        general = baker.make(
+            General,
+            report_id="2022-12-GSAFAC-0000000006",
+            is_public=True,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
+        baker.make(
+            Resubmission,
+            report_id=general,
+            status=RESUBMISSION_STATUS.DEPRECATED,
+            version=1,
+        )
+
+        user = baker.make(User)
+        self.client.force_login(user)
+
+        url = reverse("dissemination:Summary", kwargs={"report_id": general.report_id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_deprecated_resubmission_allowed_for_permissioned_user(self):
+        """
+        If a record is deprecated, users with federal access should be permitted.
+        """
+        general = baker.make(
+            General,
+            report_id="2022-12-GSAFAC-0000000007",
+            is_public=True,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
+        baker.make(
+            Resubmission,
+            report_id=general,
+            status=RESUBMISSION_STATUS.DEPRECATED,
+            version=1,
+        )
+
+        user = baker.make(User)
+        permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
+        baker.make(
+            UserPermission,
+            email=user.email,
+            user=user,
+            permission=permission,
+        )
+        self.client.force_login(user)
+
+        url = reverse("dissemination:Summary", kwargs={"report_id": general.report_id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
 
 
 class SummaryReportDownloadViewTests(TestCase):
