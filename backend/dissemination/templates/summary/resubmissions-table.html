@@ -29,9 +29,7 @@
                     <th scope="col" role="columnheader" class="text-center">Acc Date</th>
                     {% if include_private %}
                     <th scope="col" role="columnheader" class="text-center">View</th>
-                    {% endif %}
                     <th scope="col" role="columnheader" class="text-center">Comparisons</th>
-                    {% if include_private %}
                     <th scope="col" role="columnheader" class="text-center">SF-SAC</th>
                     <th scope="col" role="columnheader" class="text-center">Report</th>
                     {% endif %}
@@ -81,7 +79,6 @@
                             </a>
                             {% endif %}
                         </td>
-                        {% endif %}
                         <td class="text-center">
                             {% if resub.version != 1 %}
                             <a class="usa-link"
@@ -90,7 +87,6 @@
                             </a>
                             {% endif %}
                         </td>
-                        {% if include_private %}
                         <td class="text-center">
                             <a class="usa-link display-flex flex-column flex-align-center"
                                 target="_blank"

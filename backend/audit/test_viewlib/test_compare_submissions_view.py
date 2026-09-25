@@ -154,8 +154,8 @@ class CompareSubmissionsViewTests(TestCase):
             )
             self.assertEqual(res.status_code, 200)
 
-    def test_without_login_on_search_summary(self):
-        """test unauthenticated user is allowed to view comparison via search summary"""
+    def test_fail_without_login_on_search_summary(self):
+        """test unauthenticated user is not allowed to view comparison via search summary"""
         p = setup_test()
 
         response = p.client.get(
@@ -165,7 +165,7 @@ class CompareSubmissionsViewTests(TestCase):
             ),
             follow=True,
         )
-        self.assertTemplateUsed(response, "audit/compare_submissions.html")
+        self.assertTemplateUsed(response, "400.html")
 
     def test_fail_on_search_summary_for_in_progress_report(self):
         """test unauthenticated user cannot access to an 'in-progress' report via search summary"""
@@ -182,7 +182,7 @@ class CompareSubmissionsViewTests(TestCase):
             follow=True,
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
 
     def test_feds_on_search_summary_for_in_progress_report(self):
         """fed user can view an comparison w/ an audit that is in-progress"""

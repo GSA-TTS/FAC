@@ -23,9 +23,12 @@ def setup_mock_db():
     true = True
     false = False
 
+    sac_r1_report_id = "2025-01-FAKEDB-0000000001"
+    sac_r2_report_id = "2025-01-FAKEDB-0000000002"
+    sac_r3_report_id = "2025-01-FAKEDB-0000000003"
+
     # Make these a resubmission sequence
 
-    sac_r1_report_id = "2025-01-FAKEDB-0000000001"
     sac_r1_submission_status = STATUS.RESUBMITTED
     sac_r1_general_information = {
         "ein": "370906335",
@@ -177,7 +180,7 @@ def setup_mock_db():
     }
 
     sac_r1_resubmission_meta = {
-        "next_report_id": "2025-01-FAKEDB-0000000002",
+        "next_report_id": sac_r2_report_id,
         "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
         "version": 1,
     }
@@ -194,7 +197,6 @@ def setup_mock_db():
 
     sac_r1.save()
 
-    sac_r2_report_id = "2025-01-FAKEDB-0000000002"
     sac_r2_submission_status = STATUS.RESUBMITTED
     sac_r2_general_information = {
         "ein": "316000427",
@@ -263,8 +265,8 @@ def setup_mock_db():
     }
 
     sac_r2_resubmission_meta = {
-        "previous_report_id": sac_r1.report_id,
-        "next_report_id": "2025-01-FAKEDB-0000000003",
+        "previous_report_id": sac_r1_report_id,
+        "next_report_id": sac_r3_report_id,
         "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
         "version": 2,
     }
@@ -282,7 +284,6 @@ def setup_mock_db():
 
     # Make R3 the same as R1, but with one difference
 
-    sac_r3_report_id = "2025-01-FAKEDB-0000000003"
     sac_r3_submission_status = STATUS.IN_PROGRESS
     sac_r3_general_information = sac_r1.general_information | {
         "ein": "123456789",
@@ -321,7 +322,7 @@ def setup_mock_db():
     ]
 
     sac_r3_resubmission_meta = {
-        "previous_report_id": sac_r2.report_id,
+        "previous_report_id": sac_r2_report_id,
         "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
         "version": 3,
     }

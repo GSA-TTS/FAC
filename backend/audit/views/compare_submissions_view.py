@@ -8,6 +8,10 @@ from audit.models import (
     Access,
 )
 
+from audit.mixins import (
+    LoginRequiredMixin,
+)
+
 from audit.models.constants import STATUS
 from users.models import UserPermission
 
@@ -17,7 +21,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class CompareSubmissionsView(generic.View):
+class CompareSubmissionsView(LoginRequiredMixin, generic.View):
 
     def get(self, request, report_id, route):
         current_user = request.user
@@ -40,17 +44,15 @@ class CompareSubmissionsView(generic.View):
             )
 
         #############################################
-        # in both flows below:
-        # - federal or users associated w/audit:
-        #   - can see all comparisons
+        # We are doing the permissions checking here instead of a mixin.
+        # Why? Becuase we do not have conditional mixins.
+        # To start, you must be logged in.
         #
-        # in submission flow:
+        # in submission or search flow:
         # - un/authenticated:
         #   - have no access
         #
-        # in search flow:
-        # - un/authenticated:
-        #   - can see comparisons that are either resubmitted or disseminated
+        # For all other users, they must be associated with the audit.
 
         # Get the accesses for this SAC
 
@@ -63,21 +65,18 @@ class CompareSubmissionsView(generic.View):
             user_id=current_user.id
         ).exists()
 
-        has_access = is_authenticated and (is_on_audit or is_federal_user)
-
-        statuses = [STATUS.DISSEMINATED, STATUS.RESUBMITTED]
-
-        if route == "submission" and not has_access:
-            raise PermissionDenied(
-                "You do not have access to this submission comparison page."
-            )
-
-        if route == "search":
-            if has_access or sac_1.submission_status in statuses:
+        if route in ("submission", "search"):
+            # If I am attached to this report, I can see the diff.
+            if is_authenticated and is_on_audit:
+                logger.debug("Authenticated as a user on the audit")
+                pass
+            # If I am a Federal user, I can see the diff
+            elif is_authenticated and is_federal_user:
+                logger.debug("Authenticated as a federal user")
                 pass
             else:
                 raise PermissionDenied(
-                    "You do not have access to this search comparison page."
+                    "You do not have access to this comparison page."
                 )
 
         context = _compare_sac(sac_1)
