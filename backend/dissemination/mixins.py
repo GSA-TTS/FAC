@@ -3,7 +3,7 @@ import logging
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 
-from dissemination.models import General
+from dissemination.models import General, Resubmission
 from users.permissions import can_read_tribal
 from audit.models.constants import RESUBMISSION_STATUS
 
@@ -96,3 +96,44 @@ class FederalAccessRequiredMixin:
         # We still want to deny unauthenticated requests.
         except AttributeError:
             raise PermissionDenied
+
+
+class NotDeprecatedOrFederalAccessRequiredMixin:
+    """
+    Restricts a view based on user permissions and the record status.
+    1. If there's no Resubmission object we assume most_recent, and it's open.
+    2. If it's not deprecated, it's open.
+    3. If it is deprecated, it requires federal access.
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+        try:
+            General.objects.get(report_id=report_id)
+        except General.DoesNotExist:
+            raise Http404()
+
+        resubmission = Resubmission.objects.filter(report_id=report_id).first()
+
+        if not resubmission:
+            return super().dispatch(request, *args, **kwargs)
+
+        if resubmission.status != RESUBMISSION_STATUS.DEPRECATED:
+            return super().dispatch(request, *args, **kwargs)
+
+        # These conditions could be unified, but are left open to make it easier to parse and change should the need arise.
+        if not request.user:
+            logger.debug(f"Denying anonymous user access to {request.path}")
+            raise PermissionDenied
+
+        if not request.user.is_authenticated:
+            logger.debug(f"Denying anonymous user access to {request.path}")
+            raise PermissionDenied
+
+        if can_read_tribal(request.user):
+            return super().dispatch(request, *args, **kwargs)
+
+        logger.debug(
+            f"Denying non-priviledged user {request.user.email} access to {request.path}"
+        )
+        raise PermissionDenied
