@@ -2,6 +2,7 @@ import logging
 
 from audit.models import Audit
 from audit.models.constants import STATUS
+from dissemination.mixins import NotDeprecatedOrFederalAccessRequiredMixin
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -24,7 +25,7 @@ from dissemination.views.utils import include_private_results, to_date
 logger = logging.getLogger(__name__)
 
 
-class AuditSummaryView(View):
+class AuditSummaryView(NotDeprecatedOrFederalAccessRequiredMixin, View):
     def get(self, request, report_id):
         """
         Display information about the given report in the dissemination tables.
