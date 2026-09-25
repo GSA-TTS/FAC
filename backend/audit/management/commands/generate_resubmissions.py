@@ -641,8 +641,20 @@ def generate_resubmissions(
             logger.info(f"Generating resubmission chain for {old_sac.report_id}")
             previous_sac = deepcopy(old_sac)
             APNE(previous_sac, old_sac)
+
             for modifier in reportids_to_modifiers[old_sac.report_id]:
-                new_sac = generate_resubmission(previous_sac, options, [modifier], [])
+                modifiers = [
+                    modifier,
+                    upload_pdfs("o-captain.pdf", "o-captain-2.pdf"),
+                ]
+
+                new_sac = generate_resubmission(
+                    previous_sac,
+                    options,
+                    modifiers,
+                    [],
+                )
+
                 previous_sac = deepcopy(new_sac)
                 APNE(previous_sac, new_sac)
         else:
@@ -695,7 +707,7 @@ def copy_data_over(old_sac, new_sac):
     APNE(old_sac, new_sac)
     sac_fields = SECTION_NAMES.keys()
     for field in sac_fields:
-        if field not in ["single_audit_report"]:
+        if field not in ["single_audit_report", "resubmission_meta"]:
             # Don't clobber what was created when we initialized the audit resubmission.
             if field == "general_information":
                 for k, v in old_sac.general_information.items():
@@ -750,6 +762,32 @@ def generate_resubmission(
     new_sac = old_sac.initiate_resubmission(user=THE_USER_OBJ)
     APNE(old_sac, new_sac)
 
+    profile_resubmission_meta = THE_USER_OBJ.profile.entry_form_data.get(
+        "resubmission_meta", {}
+    )
+
+    new_sac.resubmission_meta.update(
+        {
+            "resubmission_requester": profile_resubmission_meta.get(
+                "resubmission_requester", []
+            ),
+            "material_change_reasons": profile_resubmission_meta.get(
+                "material_change_reasons", []
+            ),
+            "non_material_change_reasons": profile_resubmission_meta.get(
+                "non_material_change_reasons", []
+            ),
+            "sfsac_only_change_reasons": profile_resubmission_meta.get(
+                "sfsac_only_change_reasons", []
+            ),
+            "audit_opinion_changes": profile_resubmission_meta.get(
+                "audit_opinion_changes", ""
+            ),
+        }
+    )
+
+    new_sac.save()
+
     logger.info(f"New SAC: {new_sac.report_id}")
     logger.info(f"Created new SAC with ID: {new_sac.id}")
 
@@ -766,17 +804,25 @@ def generate_resubmission(
     # Invokes one or more modification functions (below)
     for modification in modifiers:
         new_sac = modification(old_sac, new_sac, THE_USER_OBJ)
+
     APNE(old_sac, new_sac)
+
+    # Save modifications before validation.
+    # Resubmission validation reloads the SAC from the database
+    # when comparing it with the previous submission.
+    new_sac.save()
 
     # Make sure we created a valid SAC entry.
     # If not, error out.
-    errors = new_sac.validate_full()
+    errors, warnings = new_sac.validate_full()
     if errors:
         logger.error(
             f"Unable to disseminate report with validation errors: {new_sac.report_id}."
         )
-        logger.info(errors["errors"])
+        logger.info(errors)
     else:
+        if warnings:
+            logger.warning(warnings)
         # If we're here, we make sure the new SAC (which is a resubmission)
         # has all the right data/fields to be used for resubmission testing.
         # Need to be in the disseminated state in order to re-disseminated

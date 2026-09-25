@@ -267,7 +267,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
         return None
 
-    def redisseminate(self):
+    def remove_dissemination(self):
+        """
+        Remove this SAC from all dissemination tables without
+        regenerating the dissemination records.
+        """
         named_models = {
             "AdditionalEins": AdditionalEin,
             "AdditionalUeis": AdditionalUei,
@@ -281,30 +285,38 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             "Passthrough": Passthrough,
             "Resubmission": Resubmission,
         }
+
+        for model in named_models.values():
+            model.objects.filter(report_id=self.report_id).delete()
+
+    def redisseminate(self):
         # BEGIN ATOMIC BLOCK
         with transaction.atomic():
-            # This needs to be in the DISSEMINATED state in order
-            # to be redisseminated. Check that here.
+            # This needs to be in the DISSEMINATED or RESUBMITTED
+            # state in order to be redisseminated.
             if self.submission_status not in [
                 STATUS.DISSEMINATED,
                 STATUS.RESUBMITTED,
             ]:
                 logger.error("Trying to resubmit an audit that is not disseminated.")
                 raise AdministrativeOverrideError
+
             try:
-                # Delete this record from the dissemination tables
-                for model in named_models.values():
-                    rows = model.objects.filter(report_id=self.report_id)
-                    rows.delete()
-                # Disseminate this record once more
+                # Remove the existing dissemination records.
+                self.remove_dissemination()
+
+                # Disseminate this record once more.
                 self.disseminate()
+
             except TransactionManagementError as err:
                 logger.error(f"transaction management error in redissemination: {err}")
                 raise err
             except Exception as err:
                 logger.error(f"errors in redissemination: {err}")
                 return {"errors": [err]}
+
             return True
+
         # END ATOMIC BLOCK
         return False
 
