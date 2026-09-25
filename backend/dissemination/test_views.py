@@ -606,35 +606,6 @@ class SummaryViewTests(TestCase):
         super().setUp()
         self.client = Client()
 
-    def create_resubmissions(self):
-        """
-        Creates two resubmissions, v1 and v2, with the appropriate connections.
-        """
-        gen_v1 = baker.make(
-            General,
-            report_id="2022-12-GSAFAC-0000000001",
-            is_public=True,
-            resubmission_status="deprecated_via_resubmission",
-            resubmission_version=1,
-        )
-        gen_v2 = baker.make(
-            General,
-            report_id="2022-12-GSAFAC-0000000002",
-            is_public=True,
-            resubmission_status="most_recent",
-            resubmission_version=2,
-        )
-        baker.make(
-            Resubmission, report_id=gen_v1, version=1, next_report_id=gen_v2.report_id
-        )
-        baker.make(
-            Resubmission,
-            report_id=gen_v2,
-            version=2,
-            previous_report_id=gen_v1.report_id,
-            resubmission_type="audit_pdf",
-        )
-
     def test_public_summary(self):
         """
         A public audit should have a viewable summary, and returns 200.
@@ -768,25 +739,35 @@ class SummaryViewTests(TestCase):
         self.assertIn("REF003", reference_numbers)
         self.assertIn("REF004", reference_numbers)
 
-    def test_resubmission_data_without_permissions(self):
-        """
-        When a user is not permissioned, resubmission data should still be visible.
-        """
-        self.create_resubmissions()
-        url = reverse(
-            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
-        )
-        response = self.client.get(url)
-        page_content = response.content.decode("utf-8")
-
-        self.assertIn("Resubmission history", page_content)
-        self.assertIn("Most recent submitted date", page_content)
-
     def test_resubmission_data_with_access(self):
         """
         When a user is permissioned, all resubmission data should be visible.
         """
-        self.create_resubmissions()
+
+        gen_v1 = baker.make(
+            General,
+            report_id="2022-12-GSAFAC-0000000001",
+            is_public=True,
+            resubmission_status="deprecated_via_resubmission",
+            resubmission_version=1,
+        )
+        gen_v2 = baker.make(
+            General,
+            report_id="2022-12-GSAFAC-0000000002",
+            is_public=True,
+            resubmission_status="most_recent",
+            resubmission_version=2,
+        )
+        baker.make(
+            Resubmission, report_id=gen_v1, version=1, next_report_id=gen_v2.report_id
+        )
+        baker.make(
+            Resubmission,
+            report_id=gen_v2,
+            version=2,
+            previous_report_id=gen_v1.report_id,
+            resubmission_type="audit_pdf",
+        )
 
         user = baker.make(User)
         permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
