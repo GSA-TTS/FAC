@@ -49,7 +49,9 @@ from dissemination.remove_workbook_artifacts import (
     remove_workbook_artifacts,
 )
 
-from curation.curationlib.suppress_audits import suppress_audit
+from curation.curationlib.flag_disseminated_for_removal import (
+    flag_disseminated_for_removal as flag_disseminated_audit_for_removal,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -290,8 +292,8 @@ def audit_revert_to_in_progress(modeladmin, request, queryset):
         )
 
 
-@admin.action(description="Flag selected report(s) for removal")
-def flag_for_removal(modeladmin, request, queryset):
+@admin.action(description="Flag selected unsubmitted report(s) for removal")
+def flag_unsubmitted_for_removal(modeladmin, request, queryset):
 
     flagged = []
     already_flagged = []
@@ -320,39 +322,37 @@ def flag_for_removal(modeladmin, request, queryset):
         )
 
 
-@admin.action(description="Suppress selected disseminated report(s)")
-def suppress_disseminated_reports(modeladmin, request, queryset):
-    suppressed = []
+@admin.action(description="Flag selected disseminated report(s) for removal")
+def flag_disseminated_for_removal(modeladmin, request, queryset):
+    flagged = []
     errors = []
 
     for sac in queryset:
         try:
-            suppress_audit(
+            flag_disseminated_audit_for_removal(
                 report_id=sac.report_id,
                 email=request.user.email,
             )
-            suppressed.append(sac.report_id)
+            flagged.append(sac.report_id)
 
         except (ValueError, RuntimeError) as exc:
             logger.error(
-                "Failed to administratively suppress report %s: %s",
+                "Unable to flag report %s for removal: %s",
                 sac.report_id,
-                str(exc),
+                exc,
             )
-            errors.append(f"{sac.report_id}: {str(exc)}")
+            errors.append(f"{sac.report_id}: {exc}")
 
-    if suppressed:
-        modeladmin.message_user(
+    if flagged:
+        messages.success(
             request,
-            f"Successfully suppressed report(s) ({', '.join(suppressed)}).",
-            level=messages.SUCCESS,
+            f"Successfully flagged report(s) ({', '.join(flagged)}) for removal.",
         )
 
     if errors:
-        modeladmin.message_user(
+        messages.error(
             request,
-            "Unable to suppress report(s): " + "; ".join(errors),
-            level=messages.ERROR,
+            f"Unable to flag report(s) for removal: {'; '.join(errors)}",
         )
 
 
@@ -506,8 +506,8 @@ class SACAdmin(admin.ModelAdmin):
     )
     actions = [
         revert_to_in_progress,
-        flag_for_removal,
-        suppress_disseminated_reports,
+        flag_unsubmitted_for_removal,
+        flag_disseminated_for_removal,
         delete_flagged_records,
     ]
 

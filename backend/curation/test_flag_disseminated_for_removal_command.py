@@ -43,7 +43,7 @@ SAC = {
 }
 
 
-class SuppressAuditCommandTests(TestCase):
+class FlagDisseminatedForRemovalCommandTests(TestCase):
     def setUp(self):
         self.user = baker.make(
             User,
@@ -60,12 +60,12 @@ class SuppressAuditCommandTests(TestCase):
             },
         )
 
-    def test_command_suppresses_audit(self):
+    def test_command_flags_disseminated_audit_for_removal(self):
         sac = self._make_sac()
         stdout = StringIO()
 
         call_command(
-            "suppress_audit",
+            "flag_disseminated_for_removal",
             sac.report_id,
             email=self.user.email,
             stdout=stdout,
@@ -79,7 +79,7 @@ class SuppressAuditCommandTests(TestCase):
         )
 
         self.assertIn(
-            f"Successfully suppressed audit {sac.report_id}.",
+            f"Successfully flagged audit {sac.report_id} for removal.",
             stdout.getvalue(),
         )
 
@@ -89,7 +89,7 @@ class SuppressAuditCommandTests(TestCase):
             "No SAC found",
         ):
             call_command(
-                "suppress_audit",
+                "flag_disseminated_for_removal",
                 "missing-report-id",
                 email=self.user.email,
             )
@@ -108,7 +108,7 @@ class SuppressAuditCommandTests(TestCase):
             "No FAC staff user found",
         ):
             call_command(
-                "suppress_audit",
+                "flag_disseminated_for_removal",
                 sac.report_id,
                 email=user.email,
             )

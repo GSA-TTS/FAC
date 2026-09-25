@@ -104,9 +104,9 @@ def repair_resubmission_chain(sac, user):
     Remove `sac` from its resubmission chain and reconnect the remaining SACs.
 
     Handles:
-        A -> B -> C   suppress A   => B -> C
-        A -> B -> C   suppress B   => A -> C
-        A -> B -> C   suppress C   => A -> B
+        A -> B -> C   remove A   => B -> C
+        A -> B -> C   remove B   => A -> C
+        A -> B -> C   remove C   => A -> B
     """
     meta = sac.resubmission_meta or {}
 
@@ -130,7 +130,7 @@ def repair_resubmission_chain(sac, user):
             previous.submission_status = STATUS.RESUBMITTED
 
         else:
-            # We're suppressing the final report in the chain.
+            # We're removing the final report from the chain.
             previous_meta.pop("next_row_id", None)
             previous_meta.pop("next_report_id", None)
             previous_meta["resubmission_status"] = RESUBMISSION_STATUS.MOST_RECENT
@@ -148,7 +148,7 @@ def repair_resubmission_chain(sac, user):
             next_meta["previous_row_id"] = previous.id
             next_meta["previous_report_id"] = previous.report_id
         else:
-            # We're suppressing the first report in the chain.
+            # We're removing the first report from the chain.
             next_meta.pop("previous_row_id", None)
             next_meta.pop("previous_report_id", None)
 
@@ -164,9 +164,9 @@ def repair_resubmission_chain(sac, user):
 
 
 @transaction.atomic
-def suppress_audit(report_id, email):
+def flag_disseminated_for_removal(report_id, email):
     """
-    Administratively suppress a disseminated audit.
+    Administratively flag a disseminated audit for removal.
 
     - Removes dissemination rows for the target report.
     - Repairs any resubmission chain containing the report.
@@ -189,11 +189,12 @@ def suppress_audit(report_id, email):
         STATUS.RESUBMITTED,
     ]:
         raise ValueError(
-            f"{report_id} cannot be suppressed from status " f"{sac.submission_status}."
+            f"{report_id} cannot be flagged for removal from status "
+            f"{sac.submission_status}."
         )
 
     logger.info(
-        "Suppressing report %s at request of %s",
+        "Flagging disseminated report %s for removal at request of %s",
         report_id,
         email,
     )
@@ -220,7 +221,7 @@ def suppress_audit(report_id, email):
     _flag_sac_for_administrative_removal(sac, user)
 
     logger.info(
-        "Successfully suppressed report %s at request of %s",
+        "Successfully flagged disseminated report %s for removal at request of %s",
         report_id,
         email,
     )

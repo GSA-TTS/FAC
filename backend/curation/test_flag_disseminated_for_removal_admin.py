@@ -7,7 +7,7 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from django.test import RequestFactory, TestCase
 from model_bakery import baker
 
-from audit.admin import SACAdmin, suppress_disseminated_reports
+from audit.admin import SACAdmin, flag_disseminated_for_removal
 from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS
 
@@ -44,7 +44,7 @@ SAC = {
 }
 
 
-class SuppressAuditAdminTests(TestCase):
+class FlagDisseminatedForRemovalTests(TestCase):
     def setUp(self):
         self.user = baker.make(
             User,
@@ -76,21 +76,24 @@ class SuppressAuditAdminTests(TestCase):
             **data,
         )
 
-    @patch("audit.admin.suppress_audit")
-    def test_admin_action_calls_suppress_audit(self, mock_suppress_audit):
+    @patch("audit.admin.flag_disseminated_audit_for_removal")
+    def test_admin_action_calls_flag_disseminated_for_removal(
+        self,
+        mock_flag_disseminated_for_removal,
+    ):
         sac = self._make_sac()
-        mock_suppress_audit.return_value = sac
+        mock_flag_disseminated_for_removal.return_value = sac
 
         request = self._make_request()
         queryset = SingleAuditChecklist.objects.filter(pk=sac.pk)
 
-        suppress_disseminated_reports(
+        flag_disseminated_for_removal(
             self.modeladmin,
             request,
             queryset,
         )
 
-        mock_suppress_audit.assert_called_once_with(
+        mock_flag_disseminated_for_removal.assert_called_once_with(
             report_id=sac.report_id,
             email=self.user.email,
         )
@@ -98,25 +101,28 @@ class SuppressAuditAdminTests(TestCase):
         messages = [str(message) for message in request._messages]
 
         self.assertIn(
-            f"Successfully suppressed report(s) ({sac.report_id}).",
+            f"Successfully flagged report(s) ({sac.report_id}) for removal.",
             messages,
         )
 
-    @patch("audit.admin.suppress_audit")
-    def test_admin_action_displays_error(self, mock_suppress_audit):
+    @patch("audit.admin.flag_disseminated_audit_for_removal")
+    def test_admin_action_displays_error(
+        self,
+        mock_flag_disseminated_for_removal,
+    ):
         sac = self._make_sac(
             submission_status=STATUS.IN_PROGRESS,
         )
 
-        mock_suppress_audit.side_effect = ValueError(
-            f"{sac.report_id} cannot be suppressed from status "
+        mock_flag_disseminated_for_removal.side_effect = ValueError(
+            f"{sac.report_id} cannot be flagged for removal from status "
             f"{STATUS.IN_PROGRESS}."
         )
 
         request = self._make_request()
         queryset = SingleAuditChecklist.objects.filter(pk=sac.pk)
 
-        suppress_disseminated_reports(
+        flag_disseminated_for_removal(
             self.modeladmin,
             request,
             queryset,
@@ -125,11 +131,14 @@ class SuppressAuditAdminTests(TestCase):
         messages = [str(message) for message in request._messages]
 
         self.assertTrue(
-            any("Unable to suppress report(s)" in message for message in messages)
+            any(
+                "Unable to flag report(s) for removal" in message
+                for message in messages
+            )
         )
 
-    def test_suppress_action_is_registered(self):
+    def test_flag_disseminated_action_is_registered(self):
         self.assertIn(
-            suppress_disseminated_reports,
+            flag_disseminated_for_removal,
             self.modeladmin.actions,
         )

@@ -8,10 +8,10 @@ from model_bakery import baker
 
 from audit.models import SingleAuditChecklist
 from audit.models.constants import RESUBMISSION_STATUS, STATUS
-from curation.curationlib.suppress_audits import (
+from curation.curationlib.flag_disseminated_for_removal import (
     _flag_sac_for_administrative_removal,
+    flag_disseminated_for_removal,
     repair_resubmission_chain,
-    suppress_audit,
 )
 from dissemination.models import AdditionalEin, FederalAward, General
 
@@ -118,7 +118,7 @@ def _make_chain():
     return sac_a, sac_b, sac_c
 
 
-class SuppressAuditTests(TestCase):
+class FlagDisseminatedForRemovalTests(TestCase):
     def setUp(self):
         self.user = baker.make(
             User,
@@ -137,10 +137,10 @@ class SuppressAuditTests(TestCase):
             **sac_data,
         )
 
-    def test_suppress_standalone_audit(self):
+    def test_flag_standalone_audit_for_removal(self):
         sac = self._make_sac()
 
-        suppress_audit(
+        flag_disseminated_for_removal(
             sac.report_id,
             self.user.email,
         )
@@ -169,7 +169,7 @@ class SuppressAuditTests(TestCase):
             ValueError,
             "No FAC staff user found",
         ):
-            suppress_audit(
+            flag_disseminated_for_removal(
                 sac.report_id,
                 user.email,
             )
@@ -179,7 +179,7 @@ class SuppressAuditTests(TestCase):
             ValueError,
             "No SAC found",
         ):
-            suppress_audit(
+            flag_disseminated_for_removal(
                 "missing-report-id",
                 self.user.email,
             )
@@ -191,14 +191,14 @@ class SuppressAuditTests(TestCase):
 
         with self.assertRaisesRegex(
             ValueError,
-            "cannot be suppressed",
+            "cannot be flagged for removal",
         ):
-            suppress_audit(
+            flag_disseminated_for_removal(
                 sac.report_id,
                 self.user.email,
             )
 
-    def test_suppress_audit_removes_dissemination_rows(self):
+    def test_flag_for_removal_removes_dissemination_rows(self):
         sac = self._make_sac()
 
         general = baker.make(
@@ -217,17 +217,17 @@ class SuppressAuditTests(TestCase):
             report_id=general,
         )
 
-        # Confirm the dissemination records exist before suppression.
+        # Confirm the dissemination records exist before removal.
         self.assertTrue(General.objects.filter(report_id=sac.report_id).exists())
         self.assertTrue(AdditionalEin.objects.filter(pk=additional_ein.pk).exists())
         self.assertTrue(FederalAward.objects.filter(pk=federal_award.pk).exists())
 
-        suppress_audit(
+        flag_disseminated_for_removal(
             sac.report_id,
             self.user.email,
         )
 
-        # All dissemination records for the suppressed report are removed.
+        # All dissemination records for the flagged report are removed.
         self.assertFalse(General.objects.filter(report_id=sac.report_id).exists())
         self.assertFalse(AdditionalEin.objects.filter(pk=additional_ein.pk).exists())
         self.assertFalse(FederalAward.objects.filter(pk=federal_award.pk).exists())
@@ -240,7 +240,7 @@ class SuppressAuditTests(TestCase):
             STATUS.FLAGGED_FOR_REMOVAL,
         )
 
-    def test_suppression_rolls_back_if_redissemination_fails(self):
+    def test_flag_for_removal_rolls_back_if_redissemination_fails(self):
         first, middle, last = _make_chain()
 
         general = baker.make(
@@ -259,7 +259,7 @@ class SuppressAuditTests(TestCase):
             return_value={"errors": ["Redissemination failed"]},
         ):
             with self.assertRaises(RuntimeError):
-                suppress_audit(
+                flag_disseminated_for_removal(
                     report_id=middle.report_id,
                     email=self.user.email,
                 )
@@ -283,10 +283,10 @@ class SuppressAuditTests(TestCase):
         "redisseminate",
         return_value=True,
     )
-    def test_suppress_first_report_relinks_chain(self, mock_redisseminate):
+    def test_flag_first_report_for_removal_relinks_chain(self, mock_redisseminate):
         first, middle, last = _make_chain()
 
-        suppress_audit(
+        flag_disseminated_for_removal(
             report_id=first.report_id,
             email=self.user.email,
         )
@@ -328,10 +328,10 @@ class SuppressAuditTests(TestCase):
         "redisseminate",
         return_value=True,
     )
-    def test_suppress_middle_report_relinks_chain(self, mock_redisseminate):
+    def test_flag_middle_report_for_removal_relinks_chain(self, mock_redisseminate):
         first, middle, last = _make_chain()
 
-        suppress_audit(
+        flag_disseminated_for_removal(
             report_id=middle.report_id,
             email=self.user.email,
         )
@@ -373,13 +373,13 @@ class SuppressAuditTests(TestCase):
         "redisseminate",
         return_value=True,
     )
-    def test_suppress_last_report_makes_previous_most_recent(
+    def test_flag_last_report_for_removal_makes_previous_most_recent(
         self,
         mock_redisseminate,
     ):
         first, middle, last = _make_chain()
 
-        suppress_audit(
+        flag_disseminated_for_removal(
             report_id=last.report_id,
             email=self.user.email,
         )
@@ -423,13 +423,13 @@ class SuppressAuditTests(TestCase):
         autospec=True,
         return_value=True,
     )
-    def test_suppressed_report_is_not_redisseminated(
+    def test_flagged_report_is_not_redisseminated(
         self,
         mock_redisseminate,
     ):
         first, middle, last = _make_chain()
 
-        suppress_audit(
+        flag_disseminated_for_removal(
             report_id=middle.report_id,
             email=self.user.email,
         )
