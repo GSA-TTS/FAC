@@ -113,7 +113,7 @@ class ResubmissionActionEditViewTests(TestCase):
             fetch_redirect_response=False,
         )
 
-    def test_material_pdf_requires_audit_opinion_changes(self):
+    def test_material_pdf_audit_opinion_changes_is_optional(self):
         response = self.client.post(
             self.path,
             {
@@ -125,10 +125,20 @@ class ResubmissionActionEditViewTests(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            "Identify the changes in the audit opinion that are the reason for the resubmission.",
-            str(response.context["form"].errors),
+        self.assertRedirects(
+            response,
+            reverse(
+                "audit:SubmissionProgress",
+                kwargs={"report_id": self.sac.report_id},
+            ),
+            fetch_redirect_response=False,
+        )
+
+        self.sac.refresh_from_db()
+
+        self.assertEqual(
+            self.sac.resubmission_meta["audit_opinion_changes"],
+            "",
         )
 
     def test_sfsac_only_clears_audit_opinion_changes(self):

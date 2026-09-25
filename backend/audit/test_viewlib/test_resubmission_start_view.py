@@ -350,7 +350,7 @@ class ResubmissionStartViewTests(TestCase):
             "Corrected non-material PDF information.",
         )
 
-    def test_audit_opinion_changes_required_for_audit_pdf_resubmission(self):
+    def test_audit_opinion_changes_optional_for_audit_pdf_resubmission(self):
         self.client.force_login(user=self.user)
 
         response = self.client.post(
@@ -360,11 +360,21 @@ class ResubmissionStartViewTests(TestCase):
                 "material_change_reasons": self.valid_material_change_reasons,
                 "resubmission_type": self.valid_resubmission_type,
                 "resubmission_requester": self.valid_resubmission_requester,
+                "audit_opinion_changes": "",
             },
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            "Identify the changes in the audit opinion that are the reason for the resubmission.",
-            str(response.context["form"].errors),
+        self.assertRedirects(
+            response,
+            reverse("report_submission:eligibility"),
+            fetch_redirect_response=False,
+        )
+
+        self.user.profile.refresh_from_db()
+
+        self.assertEqual(
+            self.user.profile.entry_form_data["resubmission_meta"][
+                "audit_opinion_changes"
+            ],
+            "",
         )
