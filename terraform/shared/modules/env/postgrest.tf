@@ -24,7 +24,7 @@ resource "cloudfoundry_app" "postgrest" {
   instances    = var.postgrest_instances
   strategy     = "rolling"
   environment = {
-    PGRST_DB_URI : cloudfoundry_service_key.postgrest.credentials.uri
+    PGRST_DB_URI : var.cf_space.name == "production" || var.cf_space.name == "preview" ? cloudfoundry_service_key.postgrest.credentials.replica_uri : cloudfoundry_service_key.postgrest.credentials.uri
     PGRST_DB_SCHEMAS : "api_v1_1_0,api_v1_2_0,api_v1_3_0,api_v1_3_1,admin_api_v1_1_0"
     PGRST_DB_ANON_ROLE : "anon"
     PGRST_JWT_SECRET : var.pgrst_jwt_secret
