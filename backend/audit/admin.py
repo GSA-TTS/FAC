@@ -49,6 +49,10 @@ from dissemination.remove_workbook_artifacts import (
     remove_workbook_artifacts,
 )
 
+from curation.curationlib.flag_disseminated_for_removal import (
+    flag_disseminated_for_removal as flag_disseminated_audit_for_removal,
+)
+
 logger = logging.getLogger(__name__)
 
 # As per ADR #0041, the retention period for flagged reports is 6 months. That is 180 days.
@@ -288,8 +292,8 @@ def audit_revert_to_in_progress(modeladmin, request, queryset):
         )
 
 
-@admin.action(description="Flag selected report(s) for removal")
-def flag_for_removal(modeladmin, request, queryset):
+@admin.action(description="Flag selected unsubmitted report(s) for removal")
+def flag_unsubmitted_for_removal(modeladmin, request, queryset):
 
     flagged = []
     already_flagged = []
@@ -315,6 +319,40 @@ def flag_for_removal(modeladmin, request, queryset):
             request,
             f"Report(s) ({', '.join(already_flagged)}) were already flagged.",
             level=messages.WARNING,
+        )
+
+
+@admin.action(description="Flag selected disseminated report(s) for removal")
+def flag_disseminated_for_removal(modeladmin, request, queryset):
+    flagged = []
+    errors = []
+
+    for sac in queryset:
+        try:
+            flag_disseminated_audit_for_removal(
+                report_id=sac.report_id,
+                email=request.user.email,
+            )
+            flagged.append(sac.report_id)
+
+        except (ValueError, RuntimeError) as exc:
+            logger.error(
+                "Unable to flag report %s for removal: %s",
+                sac.report_id,
+                exc,
+            )
+            errors.append(f"{sac.report_id}: {exc}")
+
+    if flagged:
+        messages.success(
+            request,
+            f"Successfully flagged report(s) ({', '.join(flagged)}) for removal.",
+        )
+
+    if errors:
+        messages.error(
+            request,
+            f"Unable to flag report(s) for removal: {'; '.join(errors)}",
         )
 
 
@@ -466,7 +504,12 @@ class SACAdmin(admin.ModelAdmin):
         "general_information__auditee_uei",
         "report_id",
     )
-    actions = [revert_to_in_progress, flag_for_removal, delete_flagged_records]
+    actions = [
+        revert_to_in_progress,
+        flag_unsubmitted_for_removal,
+        flag_disseminated_for_removal,
+        delete_flagged_records,
+    ]
 
     def get_search_results(self, request, queryset, search_term):
         """Extend default search to include certifying auditee/auditor emails."""
