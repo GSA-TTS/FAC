@@ -333,13 +333,13 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 f"A resubmission already exists for report_id {self.report_id}."
             )
 
-        is_public = self.tribal_data_consent.get(
-            "is_tribal_information_authorized_to_be_public", True
+        entity_type = self.general_information.get(
+            "user_provided_organization_type", "unknown"
         )
 
         # Clone the record, including the top level audit type, all workbook data, and most form data.
         # Excludes the certifications, tribal consent form, and cog/over assignments.
-        # For previously Tribal/Private records, also omit sensitive workbook data.
+        # For previously tribal records, also omit sensitive workbook data.
         # PDF report form data is kept with the SingleAuditReportFile, and is copied elsewhere if necessary.
         include_list = [
             "audit_type",
@@ -352,7 +352,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             "secondary_auditors",
             "resubmission_meta",
         ]
-        if is_public:
+        if entity_type != "tribal":
             include_list.extend(
                 [
                     "corrective_action_plan",
