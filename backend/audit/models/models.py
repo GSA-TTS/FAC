@@ -346,7 +346,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             "general_information",
             "audit_information",
             "federal_awards",
-            "findings_text",
+            "findings_uniform_guidance",
             "additional_ueis",
             "additional_eins",
             "secondary_auditors",
@@ -356,7 +356,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             include_list.extend(
                 [
                     "corrective_action_plan",
-                    "findings_uniform_guidance",
+                    "findings_text",
                     "notes_to_sefa",
                 ]
             )
