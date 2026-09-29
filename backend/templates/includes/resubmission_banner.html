@@ -12,7 +12,7 @@
           {% endif %}
 
           {% comment %} If this was once tribal, let the user know that not all workbooks were copied over. {% endcomment %}
-          {% if user_provided_organization_type == "tribal" %}
+          {% if previous_report.user_provided_organization_type == "tribal" %}
             As a resubmission of a tribal audit, sensitive data was not copied into this submission.
           {% endif %}
 
