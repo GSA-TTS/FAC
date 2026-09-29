@@ -15,7 +15,7 @@ import logging
 import os
 import sys
 from base64 import b64decode
-from datetime import date, datetime, timezone
+from datetime import date
 
 import dj_database_url
 import environs
@@ -166,7 +166,7 @@ TEMPLATES = [
                 "config.context_processors.navigation_content",
                 "config.context_processors.omb_num_exp_date",
                 "config.context_processors.current_environment",
-                "config.context_processors.maintenance_banner",
+                "config.context_processors.active_maintenance_banner",
                 "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
             "builtins": [
@@ -609,26 +609,5 @@ DOLLAR_THRESHOLDS = [
         "end": None,
         "minimum": 1000000,
         "message": "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
-    },
-]
-
-# Times for the maintenance banner to display.
-# Requires a 'start' and an 'end'.
-# 'template_name' is optional, and defines what will display if maintenance mode is enabled during this timeframe. If no name is given, the 503 error page is used.
-# 'message' is optional, and overrides the default banner message.
-# The default message states that maintenance will be ongoing for the duration of the banners uptime. This may be true in an emergency. Otherwise, be sure to set a custom message.
-MAINTENANCE_BANNER_DATES = [
-    {
-        # December 5th noon to December 10th 6 PM, EST, uploading historical audits
-        "start": datetime(2024, 12, 5, 17, tzinfo=timezone.utc),
-        "end": datetime(2024, 12, 10, 23, tzinfo=timezone.utc),
-        "template_name": "maintenance_20241210.html",
-        "message": "FAC.gov will be performing maintenance on Tuesday, December 10, 2024 between 12:00 p.m. and 6:00 p.m ET. During this period, the entire website will be unavailable.",
-    },
-    {
-        # April 15th 6 AM to April 21st 7 PM, EST, upgrading teraform modules
-        "start": datetime(2025, 4, 15, 10, tzinfo=timezone.utc),
-        "end": datetime(2025, 4, 21, 23, tzinfo=timezone.utc),
-        "message": "FAC.gov will be performing maintenance from Monday, April 21, 2025 between 9:00 AM and 6:00 PM ET. During this period, the entire website may be unavailable.",
     },
 ]
