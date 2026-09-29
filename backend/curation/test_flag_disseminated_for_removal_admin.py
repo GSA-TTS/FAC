@@ -1,0 +1,144 @@
+from copy import deepcopy
+from unittest.mock import patch
+
+from django.contrib import admin
+from django.contrib.auth.models import User
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.test import RequestFactory, TestCase
+from model_bakery import baker
+
+from audit.admin import SACAdmin, flag_disseminated_for_removal
+from audit.models import SingleAuditChecklist
+from audit.models.constants import STATUS
+
+SAC = {
+    "report_id": "2022-42-MAGIC-0000000001",
+    "submission_status": STATUS.DISSEMINATED,
+    "transition_name": [
+        "ready_for_certification",
+        "auditor_certified",
+        "auditee_certified",
+        "certified",
+        "submitted",
+        "disseminated",
+    ],
+    "transition_date": [
+        "2023-09-26T00:00:00.000Z",
+        "2023-09-26T10:11:52.000Z",
+        "2023-09-26T13:19:56.000Z",
+        "2023-09-26T00:00:00.000Z",
+        "2023-09-26T00:00:00.000Z",
+        "2024-01-20T01:12:35.065Z",
+    ],
+    "general_information": {
+        "ein": "237399677",
+        "auditee_uei": "GNU9RNVE6J68",
+        "auditee_zip": "15942",
+        "auditor_ein": "251390233",
+        "auditee_city": "MINERAL POINT",
+        "auditee_name": "JACKSON TOWNSHIP VOLUNTEER FIRE COMPANY",
+        "auditee_email": "auditee@example.com",
+        "auditee_state": "PA",
+        "auditee_fiscal_period_end": "2022-12-31",
+    },
+}
+
+
+class FlagDisseminatedForRemovalTests(TestCase):
+    def setUp(self):
+        self.user = baker.make(
+            User,
+            email="admin@example.com",
+            is_staff=True,
+        )
+
+        self.factory = RequestFactory()
+        self.modeladmin = SACAdmin(
+            SingleAuditChecklist,
+            admin.site,
+        )
+
+    def _make_request(self):
+        request = self.factory.post("/admin/audit/singleauditchecklist/")
+        request.user = self.user
+
+        request.session = {}
+        request._messages = FallbackStorage(request)
+
+        return request
+
+    def _make_sac(self, **overrides):
+        data = deepcopy(SAC)
+        data.update(overrides)
+
+        return baker.make(
+            SingleAuditChecklist,
+            **data,
+        )
+
+    @patch("audit.admin.flag_disseminated_audit_for_removal")
+    def test_admin_action_calls_flag_disseminated_for_removal(
+        self,
+        mock_flag_disseminated_for_removal,
+    ):
+        sac = self._make_sac()
+        mock_flag_disseminated_for_removal.return_value = sac
+
+        request = self._make_request()
+        queryset = SingleAuditChecklist.objects.filter(pk=sac.pk)
+
+        flag_disseminated_for_removal(
+            self.modeladmin,
+            request,
+            queryset,
+        )
+
+        mock_flag_disseminated_for_removal.assert_called_once_with(
+            report_id=sac.report_id,
+            email=self.user.email,
+        )
+
+        messages = [str(message) for message in request._messages]
+
+        self.assertIn(
+            f"Successfully flagged report(s) ({sac.report_id}) for removal.",
+            messages,
+        )
+
+    @patch("audit.admin.flag_disseminated_audit_for_removal")
+    def test_admin_action_displays_error(
+        self,
+        mock_flag_disseminated_for_removal,
+    ):
+        sac = self._make_sac(
+            submission_status=STATUS.IN_PROGRESS,
+        )
+
+        mock_flag_disseminated_for_removal.side_effect = ValueError(
+            f"{sac.report_id} cannot be flagged for removal from status "
+            f"{STATUS.IN_PROGRESS}."
+        )
+
+        request = self._make_request()
+        queryset = SingleAuditChecklist.objects.filter(pk=sac.pk)
+
+        flag_disseminated_for_removal(
+            self.modeladmin,
+            request,
+            queryset,
+        )
+
+        messages = [str(message) for message in request._messages]
+
+        self.assertTrue(
+            any(
+                "Unable to flag report(s) for removal" in message
+                for message in messages
+            )
+        )
+
+    def test_flag_disseminated_action_is_registered(self):
+        self.assertIn(
+            flag_disseminated_for_removal,
+            self.modeladmin.actions,
+        )
