@@ -127,7 +127,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             )
             previous_report = SingleAuditChecklist.objects.filter(
                 report_id=previous_report_id
-            ).first()
+            ).first()  # Evals to None if there isn't a previous report
 
             # Determine if the auditee certifier is the same as the current user.
             # If there is no auditee certifier, default to False.
@@ -215,7 +215,9 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "is_tribal_data_consent_complete": is_tribal_data_consent_complete,
                 "previous_report_id": previous_report_id,
                 "next_report_id": next_report_id,
-                "previous_report": previous_report,
+                "previous_report_entity_type": getattr(
+                    previous_report, "user_provided_organization_type", None
+                ),
                 "is_resubmission": bool(sac.resubmission_meta),
                 "is_sfsac_only": (
                     sac.resubmission_meta.get("resubmission_type")
