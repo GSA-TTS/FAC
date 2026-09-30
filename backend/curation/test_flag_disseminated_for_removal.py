@@ -332,6 +332,7 @@ class FlagDisseminatedForRemovalTests(TestCase):
                 report_id=middle.report_id,
             ).exists()
         )
+
     def test_flag_for_removal_cleans_up_remaining_standalone_submission(self):
         first, last = _make_two_sac_chain()
 
@@ -476,7 +477,6 @@ class FlagDisseminatedForRemovalTests(TestCase):
             last.resubmission_meta["previous_report_id"],
             middle.report_id,
         )
-       
 
     @patch.object(
         SingleAuditChecklist,
@@ -620,7 +620,6 @@ class FlagDisseminatedForRemovalTests(TestCase):
                 last.report_id,
             },
         )
-
 
 
 class RepairResubmissionChainTests(TestCase):
@@ -920,4 +919,3 @@ class AdministrativeRemovalTests(TestCase):
             len(sac.transition_name),
             len(sac.transition_date),
         )
-
