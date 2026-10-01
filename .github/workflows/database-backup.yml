@@ -25,7 +25,7 @@ on:
         description: Version for fac backup utility to use (ex. vX.Y.Z)
         required: true
         type: string
-        default: 'v0.1.11'
+        default: 'v0.1.12'
       backup_operation:
         description: Operation for fac-backup-utility
         required: true
@@ -42,7 +42,7 @@ jobs:
     environment: ${{ inputs.environment || 'production' }}
     env:
       SPACE: ${{ inputs.environment || 'production' }}
-      UTIL_VERSION: ${{ inputs.util_version || 'v0.1.11' }}
+      UTIL_VERSION: ${{ inputs.util_version || 'v0.1.12' }}
       BACKUPS_OPERATION: ${{ inputs.backup_operation || 'scheduled_backup' }}
     steps:
       - name: Backup FAC Database and Sync Media
