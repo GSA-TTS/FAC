@@ -153,7 +153,6 @@ function attachEventHandlersSorting() {
  */
 function attachEventHandlersSubmission() {
   search_submit_buttons.forEach((button) => {
-
     // The first search button is always for searching all of fac.gov, we want to ignore that one hence skipping.
     if (button.id  === 'fac-search') return;
 
@@ -171,6 +170,18 @@ function attachEventHandlersSubmission() {
       });
 
       FORM.submit();
+    });
+  });
+
+  // Disable unused form fields so that they don't show up in the URL
+  document.getElementById('search-form').addEventListener('submit', function (e) {
+    const inputs = this.querySelectorAll('input, select, textarea');
+
+    inputs.forEach(input => {
+      // Disable inputs that are empty, or select elements with no value selected
+      if (!input.value.trim()) {
+        input.disabled = true;
+      }
     });
   });
 }

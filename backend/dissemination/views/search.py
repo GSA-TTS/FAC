@@ -42,33 +42,29 @@ class Search(View):
     def _is_beta_search(self, request):
         return request.path == "/dissemination/search/beta/"
 
-    def get(self, request, *args, **kwargs):
-        """
-        When accessing the search page through get, return the blank search page.
-        """
-        form = SearchForm()
-
-        return render(
-            request,
-            "search.html",
-            {
-                "form": form,
-                "form_user_input": {"audit_year": default_checked_audit_years},
-                "state_abbrevs": STATE_ABBREVS,
-                "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
-                "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
-                "can_view_resubmissions": is_federal_user(request.user),
-            },
-        )
 
     @newrelic_timing_metric("search-advanced")
-    def post(self, request, *args, **kwargs):
-        """
-        When accessing the search page through post, run a search and display the results.
-        """
+    def get(self, request, *args, **kwargs):
+        # Not a search, just visiting the page
+        if not request.GET:
+            form = SearchForm()
+
+            return render(
+                request,
+                "search.html",
+                {
+                    "form": form,
+                    "form_user_input": {"audit_year": default_checked_audit_years},
+                    "state_abbrevs": STATE_ABBREVS,
+                    "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                    "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                    "can_view_resubmissions": is_federal_user(request.user),
+                },
+            )
+
+
         time_starting_post = time.time()
 
-        form = SearchForm(request.POST)
         paginator_results = None
         results_count = None
         page = 1
@@ -82,6 +78,7 @@ class Search(View):
         }
 
         # Obtain cleaned form data.
+        form = SearchForm(request.GET)
         form.is_valid()  # Runs default cleaning functions AND "clean_*" functions in forms.py
         form_data = form.cleaned_data
         form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
