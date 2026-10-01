@@ -47,18 +47,18 @@ def check_resubmission_allowed(sac) -> Tuple[bool, str]:
     # Further derived from string variables
     audit_year = end_date.split("-")[0]
 
-    # SAC Status must be DISSEMINATED
-    if submission_status != STATUS.DISSEMINATED:
-        return (
-            False,
-            f"Resubmission is only allowed when the current submission is in '{STATUS.DISSEMINATED}' status. Current status: '{submission_status}'",
-        )
-
     # Resubmission status cannot be DEPRECATED
     if resub_status == RESUBMISSION_STATUS.DEPRECATED:
         return (
             False,
             "This audit has been deprecated and cannot be resubmitted.",
+        )
+
+    # SAC Status must be DISSEMINATED
+    if submission_status != STATUS.DISSEMINATED:
+        return (
+            False,
+            f"Resubmission is only allowed when the current submission is in '{STATUS.DISSEMINATED}' status. Current status: '{submission_status}'",
         )
 
     # Fallback check when version, year, uei is missing or incorrect data
