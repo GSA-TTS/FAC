@@ -34,16 +34,10 @@ https://drive.google.com/drive/folders/1WymwJtdQ287SdgrOx__aEraoVTx7ig9D
 
 These are approximately 2GB. Put it in the `data` folder.
 
-Then, exec into the app container:
-
-```
-docker compose exec -it web /bin/bash
-```
-
 Run the script with no arguments to open the menu. The dumpfile and email are requested only if you choose an action that needs them:
 
 ```
-./util/load_public_dissem_data/manage_local_data.bash
+docker compose run --rm web ./util/load_public_dissem_data/manage_local_data.bash
 ```
 
 You can optionally pass the dumpfile path and staff user email as the first and second arguments to avoid being prompted. A relative dumpfile path is resolved from the directory where you launch the script. Once entered, each value is remembered for later menu actions during that run.
@@ -51,7 +45,7 @@ You can optionally pass the dumpfile path and staff user email as the first and 
 When loading a dump, the script checks its `data` folder for files named `sanitized-YYYYMMDD.dump` and offers the most recently dated file as the prompt default. Press Enter to use it, or enter another path. A dumpfile passed as the first command-line argument is used directly.
 
 ```bash
-./util/load_public_dissem_data/manage_local_data.bash util/load_public_dissem_data/data/sanitized-<DATE>.dump <YOUR_EMAIL>
+docker compose run --rm web ./util/load_public_dissem_data/manage_local_data.bash util/load_public_dissem_data/data/sanitized-<DATE>.dump <YOUR_EMAIL>
 ```
 
 The email can be yours or another staff user's. (Because this is from a prod dump, using your prod email address should "just work.")
