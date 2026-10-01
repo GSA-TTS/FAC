@@ -114,6 +114,21 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             audit = Audit.objects.find_audit_or_none(report_id=report_id)
 
+            previous_report_id = (
+                sac.resubmission_meta.get("previous_report_id", None)
+                if sac.resubmission_meta
+                and "previous_report_id" in sac.resubmission_meta
+                else None
+            )
+            next_report_id = (
+                sac.resubmission_meta.get("next_report_id", None)
+                if sac.resubmission_meta and "next_report_id" in sac.resubmission_meta
+                else None
+            )
+            previous_report = SingleAuditChecklist.objects.filter(
+                report_id=previous_report_id
+            ).first()  # Evals to None if there isn't a previous report
+
             # Determine if the auditee certifier is the same as the current user.
             # If there is no auditee certifier, default to False.
             is_user_auditee_certifier = False
@@ -198,16 +213,10 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "is_user_auditee_certifier": is_user_auditee_certifier,
                 "is_tribal_data_consent_complete": is_tribal_data_consent_complete,
-                "previous_report_id": (
-                    sac.resubmission_meta.get("previous_report_id", None)
-                    if sac.resubmission_meta
-                    and "previous_report_id" in sac.resubmission_meta
-                    else None
-                ),
-                "next_report_id": (
-                    sac.resubmission_meta.get("next_report_id", None)
-                    if sac.resubmission_meta
-                    else None
+                "previous_report_id": previous_report_id,
+                "next_report_id": next_report_id,
+                "previous_report_entity_type": getattr(
+                    previous_report, "user_provided_organization_type", None
                 ),
                 "is_resubmission": bool(sac.resubmission_meta),
                 "is_sfsac_only": (
