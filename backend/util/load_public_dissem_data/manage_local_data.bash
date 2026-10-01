@@ -410,6 +410,7 @@ do
       truncate_all_local_tables
       ;;
     "Run most all back-to-back")
+      # `continue` will make it skip the rest. Used for dumpfile or email exceptions.
       load_sanitized_data_dump || continue
       shrink_to_20k_records
       generate_fake_suppressed_reports
