@@ -33,17 +33,54 @@ else
 fi
 
 ensure_dumpfile () {
-  while [[ ! -f "$DUMPFILE" ]]; do
-    if [[ -n "$DUMPFILE" ]]; then
-      echo "File '$DUMPFILE' does not exist."
-    fi
-    if ! IFS= read -r -p "Path to sanitized dumpfile: " DUMPFILE; then
-      echo "No dumpfile provided."
-      return 1
+  # Checks if the dumpfile was already provided in the script args
+  if [[ -n "$DUMPFILE" && -f "$DUMPFILE" ]]; then
+    echo "Found file '$DUMPFILE'."
+    return 0
+  elif [[ -n "$DUMPFILE" ]]; then
+    echo "File '$DUMPFILE' does not exist."
+    DUMPFILE=""
+  fi
+
+  # Grabs the latest-dated sanitized dumpfile from /data to use as the default
+  local default_dumpfile=""
+  local latest_date=""
+  local candidate candidate_date entered_dumpfile
+
+  for candidate in "$SCRIPT_DIR"/data/sanitized-????????.dump; do
+    [[ -f "$candidate" ]] || continue
+    candidate_date=${candidate##*/sanitized-}
+    candidate_date=${candidate_date%.dump}
+    [[ "$candidate_date" =~ ^[0-9]{8}$ ]] || continue
+
+    if [[ -z "$latest_date" || "$candidate_date" > "$latest_date" ]]; then
+      latest_date=$candidate_date
+      default_dumpfile=$candidate
     fi
   done
 
-  echo "Found file '$DUMPFILE'."
+  # Prompts until given a file that exists
+  while true; do
+    if [[ -n "$default_dumpfile" ]]; then
+      if ! IFS= read -r -p "Path to sanitized dumpfile [$default_dumpfile]: " entered_dumpfile; then
+        echo "No dumpfile provided."
+        return 1
+      fi
+      DUMPFILE=${entered_dumpfile:-$default_dumpfile}
+    elif ! IFS= read -r -p "Path to sanitized dumpfile: " DUMPFILE; then
+      echo "No dumpfile provided."
+      return 1
+    fi
+
+    if [[ -f "$DUMPFILE" ]]; then
+      echo "Found file '$DUMPFILE'."
+      return 0
+    fi
+
+    if [[ -n "$DUMPFILE" ]]; then
+      echo "File '$DUMPFILE' does not exist."
+    fi
+  done
 }
 
 ensure_email () {
