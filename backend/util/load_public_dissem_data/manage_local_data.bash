@@ -18,8 +18,6 @@ args=("$@")
 # args[0] is the first argument, and not the name of the script.
 
 export DUMPFILE=${args[0]}
-export EMAIL=${args[1]}
-
 if [[ -z "${DUMPFILE}" ]]; then
   echo "Please pass a sanitized dumpfile as the first command-line argument."
   echo "Exiting."
@@ -34,14 +32,24 @@ else
   exit
 fi
 
+export EMAIL=${args[1]}
 if [[ -z "${EMAIL}" ]]; then
   echo "Please pass a staff user email as the second arg."
   echo "Exiting."
   exit
 fi
 
-# Source in the target tables
-source "tables.source"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+BACKEND_DIR="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
+
+export TABLES_FILE=$"$SCRIPT_DIR/tables.source"
+if [ -f "$TABLES_FILE" ]; then
+  source "$SCRIPT_DIR/tables.source"
+else
+  echo "File '$TABLES_FILE' does not exist."
+  echo "Exiting."
+  exit
+fi
 
 ############################################################
 # truncate_all_local_tables
@@ -63,7 +71,7 @@ truncate_all_local_tables () {
     TABLENAME=${dump/#$prefix}
     TABLENAME=${TABLENAME/%$suffix}
 
-  # TRUNCATE is not guaranteed to be complete if we call a 
+  # TRUNCATE is not guaranteed to be complete if we call a
   # `pg_restore` immediately after. Wrap it in a transaction.
   # https://petereisentraut.blogspot.com/2010/03/running-sql-scripts-with-psql.html
   PGOPTIONS='--client-min-messages=warning' psql \
@@ -75,7 +83,7 @@ truncate_all_local_tables () {
     -v ON_ERROR_STOP=1 \
     -w \
     -c "BEGIN; TRUNCATE ${TABLENAME} CASCADE; COMMIT;"
-  
+
   if [ $? -ne 0 ]; then
     echo "Truncate failed: ${TABLENAME}"
     echo "Exiting."
@@ -122,7 +130,7 @@ load_sanitized_data_dump () {
     -h ${HOST} \
     -v ON_ERROR_STOP=1 \
     -w < "${TEMPFILE}"
-  
+
   # Then remove the tmpfile
   rm -f "${TEMPFILE}"
 
@@ -147,7 +155,7 @@ shrink_to_20k_records () {
     -p ${PORT} \
     -h ${HOST} \
     -v ON_ERROR_STOP=1 \
-    -w < "shrink_the_tables.sql"
+    -w < "$SCRIPT_DIR/shrink_the_tables.sql"
 
   if [ $? -ne 0 ]; then
     echo "psql failed."
@@ -167,13 +175,13 @@ generate_fake_suppressed_reports () {
     -p ${PORT} \
     -h ${HOST} \
     -v ON_ERROR_STOP=1 \
-    -w < "gen_fake_suppressed_audits.sql"
+    -w < "$SCRIPT_DIR/gen_fake_suppressed_audits.sql"
 
   if [ $? -ne 0 ]; then
     echo "psql failed."
     exit
   fi
-  
+
   echo "Done."
 }
 
@@ -189,13 +197,13 @@ generate_fake_resubmission_dissemination_data () {
     -p ${PORT} \
     -h ${HOST} \
     -v ON_ERROR_STOP=1 \
-    -w < "gen_fake_resub_dissem_data.sql"
+    -w < "$SCRIPT_DIR/gen_fake_resub_dissem_data.sql"
 
   if [ $? -ne 0 ]; then
     echo "psql failed."
     exit
   fi
-  
+
   echo "Done."
 }
 
@@ -204,8 +212,8 @@ generate_fake_resubmission_dissemination_data () {
 ############################################################
 generate_resubmissions () {
   echo "generate_resubmissions"
-  pushd ../.. 
-  python manage.py generate_resubmissions --email ${EMAIL}
+  pushd ../..
+  (cd "$BACKEND_DIR" && python manage.py generate_resubmissions --email "$EMAIL")
   popd
 }
 
@@ -215,7 +223,7 @@ generate_resubmissions () {
 generate_materialized_view () {
   echo "generate_materialized_view"
   pushd ../..
-  python manage.py materialized_views --create
+  (cd "$BACKEND_DIR" && python manage.py materialized_views --create)
   popd
 }
 
@@ -240,7 +248,7 @@ truncate_dissemination_tables () {
     TABLENAME=${TABLENAME/%$suffix}
 
   re="dissemination_"
-  if [[ "${TABLENAME}" =~ $re ]]; 
+  if [[ "${TABLENAME}" =~ $re ]];
   then
     echo "Truncating ${TABLENAME}"
     PGOPTIONS='--client-min-messages=warning' psql \
@@ -252,7 +260,7 @@ truncate_dissemination_tables () {
       -v ON_ERROR_STOP=1 \
       -w \
       -c "BEGIN; TRUNCATE ${TABLENAME} CASCADE; COMMIT;"
-    
+
     if [ $? -ne 0 ]; then
       echo "Truncate failed: ${TABLENAME}"
       echo "Exiting."
@@ -267,8 +275,7 @@ truncate_dissemination_tables () {
 ############################################################
 redisseminate_all_sac_records () {
   echo "redisseminate_all_sac_records"
-  pushd ../..
-  python manage.py delete_and_regenerate_dissemination_from_intake
+  (cd "$BACKEND_DIR" && python manage.py delete_and_regenerate_dissemination_from_intake)
   popd
 }
 
