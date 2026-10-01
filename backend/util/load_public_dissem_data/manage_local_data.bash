@@ -17,27 +17,8 @@ DATE=$(date '+%Y%m%d')
 args=("$@")
 # args[0] is the first argument, and not the name of the script.
 
-export DUMPFILE=${args[0]}
-if [[ -z "${DUMPFILE}" ]]; then
-  echo "Please pass a sanitized dumpfile as the first command-line argument."
-  echo "Exiting."
-  exit
-fi
-
-if [ -f "$DUMPFILE" ]; then
-  echo "Found file '$DUMPFILE'."
-else
-  echo "File '$DUMPFILE' does not exist."
-  echo "Exiting."
-  exit
-fi
-
-export EMAIL=${args[1]}
-if [[ -z "${EMAIL}" ]]; then
-  echo "Please pass a staff user email as the second arg."
-  echo "Exiting."
-  exit
-fi
+export DUMPFILE="${args[0]:-}"
+export EMAIL="${args[1]:-}"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_DIR="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
@@ -50,6 +31,29 @@ else
   echo "Exiting."
   exit
 fi
+
+ensure_dumpfile () {
+  while [[ ! -f "$DUMPFILE" ]]; do
+    if [[ -n "$DUMPFILE" ]]; then
+      echo "File '$DUMPFILE' does not exist."
+    fi
+    if ! IFS= read -r -p "Path to sanitized dumpfile: " DUMPFILE; then
+      echo "No dumpfile provided."
+      return 1
+    fi
+  done
+
+  echo "Found file '$DUMPFILE'."
+}
+
+ensure_email () {
+  while [[ -z "$EMAIL" ]]; do
+    if ! IFS= read -r -p "Staff user email: " EMAIL; then
+      echo "No staff user email provided."
+      return 1
+    fi
+  done
+}
 
 ############################################################
 # truncate_all_local_tables
@@ -99,6 +103,10 @@ truncate_all_local_tables () {
 ############################################################
 load_sanitized_data_dump () {
   echo "test_sanitized_production_dump"
+
+  if ! ensure_dumpfile; then
+    return 1
+  fi
 
   # We must truncate everything before loading.
   truncate_all_local_tables
@@ -211,10 +219,12 @@ generate_fake_resubmission_dissemination_data () {
 # generate_resubmissions
 ############################################################
 generate_resubmissions () {
+  if ! ensure_email; then
+    return 1
+  fi
+
   echo "generate_resubmissions"
-  pushd ../..
   (cd "$BACKEND_DIR" && python manage.py generate_resubmissions --email "$EMAIL")
-  popd
 }
 
 ############################################################
@@ -222,9 +232,7 @@ generate_resubmissions () {
 ############################################################
 generate_materialized_view () {
   echo "generate_materialized_view"
-  pushd ../..
   (cd "$BACKEND_DIR" && python manage.py materialized_views --create)
-  popd
 }
 
 ############################################################
@@ -276,7 +284,6 @@ truncate_dissemination_tables () {
 redisseminate_all_sac_records () {
   echo "redisseminate_all_sac_records"
   (cd "$BACKEND_DIR" && python manage.py delete_and_regenerate_dissemination_from_intake)
-  popd
 }
 
 
@@ -366,11 +373,11 @@ do
       truncate_all_local_tables
       ;;
     "Run most all back-to-back")
-      load_sanitized_data_dump
+      load_sanitized_data_dump || continue
       shrink_to_20k_records
       generate_fake_suppressed_reports
       generate_fake_resubmission_dissemination_data
-      generate_resubmissions
+      generate_resubmissions || continue
       truncate_dissemination_tables
       redisseminate_all_sac_records
       generate_materialized_view
