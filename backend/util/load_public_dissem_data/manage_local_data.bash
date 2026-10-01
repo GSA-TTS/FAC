@@ -361,7 +361,7 @@ snapshot_current_db () {
 ############################################################
 # DAS MENU
 ############################################################
-PS3='Please enter your choice: '
+PS3='Please enter your choice (hit enter to view options): '
 options=(\
   "Load sanitized data dump" \
   "Shrink the dump to 20K records" \
