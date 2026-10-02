@@ -28,4 +28,3 @@ INSERT INTO support_administrative_key_uuids
         '2024-07-10'
     )
     ;
-
