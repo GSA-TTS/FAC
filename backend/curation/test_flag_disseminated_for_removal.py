@@ -13,7 +13,7 @@ from curation.curationlib.flag_disseminated_for_removal import (
     flag_disseminated_for_removal,
     repair_resubmission_chain,
 )
-from dissemination.models import AdditionalEin, FederalAward, General
+from dissemination.models import AdditionalEin, FederalAward, General, Resubmission
 
 SAC: Dict[str, Any] = {
     "report_id": "2022-42-MAGIC-0000000001",
@@ -116,6 +116,56 @@ def _make_chain():
     )
 
     return sac_a, sac_b, sac_c
+
+
+def _make_two_sac_chain():
+    """
+    Create:
+
+        A1 -> B2
+    """
+    sac_a_data = {
+        **deepcopy(SAC),
+        "report_id": "2022-42-MAGIC-0000000011",
+        "submission_status": STATUS.RESUBMITTED,
+    }
+
+    sac_b_data = {
+        **deepcopy(SAC),
+        "report_id": "2022-42-MAGIC-0000000012",
+        "submission_status": STATUS.DISSEMINATED,
+    }
+
+    sac_a = baker.make(
+        SingleAuditChecklist,
+        **sac_a_data,
+    )
+
+    sac_b = baker.make(
+        SingleAuditChecklist,
+        **sac_b_data,
+    )
+
+    sac_a.resubmission_meta = {
+        "version": 1,
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
+        "next_report_id": sac_b.report_id,
+        "next_row_id": sac_b.id,
+    }
+
+    sac_b.resubmission_meta = {
+        "version": 2,
+        "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
+        "previous_report_id": sac_a.report_id,
+        "previous_row_id": sac_a.id,
+    }
+
+    SingleAuditChecklist.objects.bulk_update(
+        [sac_a, sac_b],
+        ["resubmission_meta"],
+    )
+
+    return sac_a, sac_b
 
 
 class FlagDisseminatedForRemovalTests(TestCase):
@@ -237,6 +287,111 @@ class FlagDisseminatedForRemovalTests(TestCase):
 
         self.assertEqual(
             sac.submission_status,
+            STATUS.FLAGGED_FOR_REMOVAL,
+        )
+
+    def test_flag_for_removal_cleans_up_resubmission_data(self):
+        first, middle, last = _make_chain()
+
+        general = baker.make(
+            General,
+            report_id=middle.report_id,
+            is_public=True,
+        )
+
+        baker.make(
+            Resubmission,
+            report_id=general,
+            version=2,
+            status=RESUBMISSION_STATUS.DEPRECATED,
+            previous_report_id=first.report_id,
+            next_report_id=last.report_id,
+        )
+
+        self.assertTrue(middle.resubmission_meta)
+        self.assertTrue(
+            Resubmission.objects.filter(
+                report_id=middle.report_id,
+            ).exists()
+        )
+
+        flag_disseminated_for_removal(
+            middle.report_id,
+            self.user.email,
+        )
+
+        middle.refresh_from_db()
+
+        self.assertEqual(
+            middle.resubmission_meta,
+            {},
+        )
+
+        self.assertFalse(
+            Resubmission.objects.filter(
+                report_id=middle.report_id,
+            ).exists()
+        )
+
+    def test_flag_for_removal_cleans_up_remaining_standalone_submission(self):
+        first, last = _make_two_sac_chain()
+
+        flag_disseminated_for_removal(
+            first.report_id,
+            self.user.email,
+        )
+
+        first.refresh_from_db()
+        last.refresh_from_db()
+
+        # The flagged submission is no longer part of a chain.
+        self.assertEqual(
+            first.resubmission_meta,
+            {},
+        )
+
+        # The only remaining submission is also no longer part of a chain,
+        # so it should look like a normal standalone submission.
+        self.assertEqual(
+            last.resubmission_meta,
+            {},
+        )
+
+        self.assertEqual(
+            last.submission_status,
+            STATUS.DISSEMINATED,
+        )
+
+    def test_flag_last_report_cleans_up_remaining_standalone_submission(self):
+        first, last = _make_two_sac_chain()
+
+        flag_disseminated_for_removal(
+            last.report_id,
+            self.user.email,
+        )
+
+        first.refresh_from_db()
+        last.refresh_from_db()
+
+        # The flagged submission is no longer part of a chain.
+        self.assertEqual(
+            last.resubmission_meta,
+            {},
+        )
+
+        # The only remaining submission is also no longer part of a chain.
+        self.assertEqual(
+            first.resubmission_meta,
+            {},
+        )
+
+        self.assertEqual(
+            first.submission_status,
+            STATUS.DISSEMINATED,
+        )
+
+        self.assertEqual(
+            last.submission_status,
             STATUS.FLAGGED_FOR_REMOVAL,
         )
 
@@ -367,6 +522,26 @@ class FlagDisseminatedForRemovalTests(TestCase):
             last.resubmission_meta["version"],
             2,
         )
+        # No remaining submission should reference the flagged report.
+        for remaining_sac in [first, last]:
+            meta = remaining_sac.resubmission_meta or {}
+
+            self.assertNotEqual(
+                meta.get("previous_report_id"),
+                middle.report_id,
+            )
+            self.assertNotEqual(
+                meta.get("next_report_id"),
+                middle.report_id,
+            )
+            self.assertNotEqual(
+                meta.get("previous_row_id"),
+                middle.id,
+            )
+            self.assertNotEqual(
+                meta.get("next_row_id"),
+                middle.id,
+            )
 
     @patch.object(
         SingleAuditChecklist,
