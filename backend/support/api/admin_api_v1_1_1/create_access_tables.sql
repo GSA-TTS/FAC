@@ -18,13 +18,13 @@ CREATE TABLE support_administrative_key_uuids
         added DATE
     );
 
--- INSERT INTO support_administrative_key_uuids
---     (email, uuid, permissions, added)
---     VALUES
---     (
---         'fac-gov-test-users+api-tester-admin@gsa.gov',
---         'dd60c3f9-053d-4d82-a309-c89da53559f4',
---         'CREATE,READ,DELETE',
---         '2024-07-10'
---     )
---     ;
+INSERT INTO support_administrative_key_uuids
+    (email, uuid, permissions, added)
+    VALUES
+    (
+        'fac-gov-test-users+api-tester-admin@gsa.gov',
+        'dd60c3f9-053d-4d82-a309-c89da53559f4',
+        'CREATE,READ,DELETE',
+        '2024-07-10'
+    )
+    ;

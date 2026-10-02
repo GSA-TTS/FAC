@@ -7,10 +7,8 @@ import jwt
 import os
 import requests
 import uuid
-import unittest
 
 
-@unittest.skip("for posterity")
 class TestAdminAPI(TestCase):
     # We can force a UUID locally that would not work when using api.data.gov,
     # because api.data.gov sets/overwrites this.
