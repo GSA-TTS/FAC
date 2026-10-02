@@ -133,7 +133,13 @@ def repair_resubmission_chain(sac, user):
             # We're removing the final report from the chain.
             previous_meta.pop("next_row_id", None)
             previous_meta.pop("next_report_id", None)
-            previous_meta["resubmission_status"] = RESUBMISSION_STATUS.MOST_RECENT
+
+            if _get_previous_sac(previous) is None:
+                # The chain has collapsed to a single submission.
+                previous_meta = {}
+            else:
+                previous_meta["resubmission_status"] = RESUBMISSION_STATUS.MOST_RECENT
+
             previous.submission_status = STATUS.DISSEMINATED
 
         previous.resubmission_meta = previous_meta
@@ -154,11 +160,21 @@ def repair_resubmission_chain(sac, user):
 
         next_sac.resubmission_meta = next_meta
 
-        renumbered = _renumber_following_sacs(next_sac, user)
+        # If there is no previous SAC and no SAC after next_sac,
+        # removing the target collapses the chain to a single submission.
+        # Clear its resubmission metadata so it behaves like a normal
+        # standalone submission.
+        if previous is None and _get_next_sac(next_sac) is None:
+            next_sac.resubmission_meta = {}
+            next_sac.submission_status = STATUS.DISSEMINATED
+            _administrative_save(next_sac, user)
+            affected.append(next_sac)
+        else:
+            renumbered = _renumber_following_sacs(next_sac, user)
 
-        for renumbered_sac in renumbered:
-            if renumbered_sac not in affected:
-                affected.append(renumbered_sac)
+            for renumbered_sac in renumbered:
+                if renumbered_sac not in affected:
+                    affected.append(renumbered_sac)
 
     return affected
 
@@ -203,6 +219,11 @@ def flag_disseminated_for_removal(report_id, email):
 
     # Remove the target from public dissemination.
     sac.remove_dissemination()
+
+    # The flagged submission is no longer part of the resubmission chain.
+    # Clear its resubmission metadata so it looks like a submission that
+    # was never involved in a resubmission.
+    sac.resubmission_meta = {}
 
     # The remaining chain has changed, so regenerate its public
     # resubmission information.
