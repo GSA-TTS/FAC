@@ -170,5 +170,5 @@ class Search(View):
             base_url = request.path
             query_string = urlencode(clean_params)
             return f"{base_url}?{query_string}" if query_string else base_url
-
-        return None
+        else:
+            return None
