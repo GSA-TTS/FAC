@@ -8,7 +8,7 @@ django-dbbackup==4.2.1
 django-filter==24.3
 django-fsm==3.0.0
 django-storages[boto3]==1.14.2
-django==5.2.16
+django==5.2.17
 djangorestframework==3.18.1
 django-viewflow==2.2.8
 environs[django]==11.0.0
@@ -27,13 +27,13 @@ psycogreen==1.0.2
 psycopg2-binary==2.9.10
 pycryptodomex==3.21.0
 pydash==8.0.3
-pyjwt==2.13.0
-pypdf==6.18.0
+pyjwt==2.15.1
+pypdf==6.19.0
 python-dateutil==2.9.0.post0
 python-json-logger==2.0.7
 requests==2.34.2
 types-python-dateutil==2.9.0.20240821
-urllib3==2.7.0
+urllib3==2.8.0
 wheel==0.46.3
 
 # Overrides
