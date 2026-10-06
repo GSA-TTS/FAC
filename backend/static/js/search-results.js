@@ -172,18 +172,6 @@ function attachEventHandlersSubmission() {
       FORM.submit();
     });
   });
-
-  // Disable unused form fields so that they don't show up in the URL
-  document.getElementById('search-form').addEventListener('submit', function (e) {
-    const inputs = this.querySelectorAll('input, select, textarea');
-
-    inputs.forEach(input => {
-      // Disable inputs that are empty, or select elements with no value selected
-      if (!input.value.trim()) {
-        input.disabled = true;
-      }
-    });
-  });
 }
 
 function init() {
