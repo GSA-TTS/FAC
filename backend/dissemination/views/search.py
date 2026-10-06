@@ -2,8 +2,9 @@ from datetime import date
 import logging
 import math
 import time
+from urllib.parse import urlencode
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
@@ -42,7 +43,6 @@ class Search(View):
     def _is_beta_search(self, request):
         return request.path == "/dissemination/search/beta/"
 
-
     @newrelic_timing_metric("search-advanced")
     def get(self, request, *args, **kwargs):
         # Not a search, just visiting the page
@@ -62,6 +62,21 @@ class Search(View):
                 },
             )
 
+        clean_params = []
+        total_original_params = 0
+
+        for key, values in request.GET.lists():
+            for value in values:
+                total_original_params += 1
+                if value.strip():
+                    clean_params.append((key, value))
+
+        # If any empty parameters were stripped, redirect to the cleaned URL
+        if len(clean_params) < total_original_params:
+            base_url = request.path
+            query_string = urlencode(clean_params)
+            redirect_url = f"{base_url}?{query_string}" if query_string else base_url
+            return redirect(redirect_url)
 
         time_starting_post = time.time()
 
