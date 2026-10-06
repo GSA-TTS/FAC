@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
+from django.urls import reverse
 
 from config.settings import (
     STATE_ABBREVS,
@@ -64,7 +65,7 @@ class Search(View):
 
         cleaned_query_string = self._clean_query_string(request)
         if cleaned_query_string:
-            return redirect(f"{request.path}?{cleaned_query_string}")
+            return redirect(f"{reverse("dissemination:Search")}?{cleaned_query_string}")
 
         time_starting_post = time.time()
 
