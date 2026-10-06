@@ -62,21 +62,9 @@ class Search(View):
                 },
             )
 
-        clean_params = []
-        total_original_params = 0
-
-        for key, values in request.GET.lists():
-            for value in values:
-                total_original_params += 1
-                if value.strip():
-                    clean_params.append((key, value))
-
-        # If any empty parameters were stripped, redirect to the cleaned URL
-        if len(clean_params) < total_original_params:
-            base_url = request.path
-            query_string = urlencode(clean_params)
-            redirect_url = f"{base_url}?{query_string}" if query_string else base_url
-            return redirect(redirect_url)
+        cleaned_url = self._clean_url(request)
+        if cleaned_url:
+            return redirect(cleaned_url)
 
         time_starting_post = time.time()
 
@@ -164,3 +152,23 @@ class Search(View):
         total_time_s = total_time_ms / 1000
         logger.info(f"Total time between post and render {total_time_ms}ms")
         return render(request, "search.html", context | {"total_time_s": total_time_s})
+
+    def _clean_url(self, request):
+        """
+        If any empty parameters were stripped, redirect to the cleaned URL
+        """
+        clean_params = []
+        total_original_params = 0
+
+        for key, values in request.GET.lists():
+            for value in values:
+                total_original_params += 1
+                if value.strip():
+                    clean_params.append((key, value))
+
+        if len(clean_params) < total_original_params:
+            base_url = request.path
+            query_string = urlencode(clean_params)
+            return f"{base_url}?{query_string}" if query_string else base_url
+
+        return None
