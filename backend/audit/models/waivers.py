@@ -53,6 +53,7 @@ class SacValidationWaiver(models.Model):
         AUDITOR_CERTIFYING_OFFICIAL = "auditor_certifying_official"
         FINDING_REFERENCE_NUMBER = "finding_reference_number"
         PRIOR_REFERENCES = "prior_references"
+        EXPENDITURE_THRESHOLD = "expenditure_threshold"
 
     WAIVER_CHOICES = [
         (
@@ -70,6 +71,10 @@ class SacValidationWaiver(models.Model):
         (
             TYPES.PRIOR_REFERENCES,
             "Report has invalid prior reference numbers",
+        ),
+        (
+            TYPES.EXPENDITURE_THRESHOLD,
+            "Report is under the expenditure threshold for their audit period",
         ),
     ]
     report_id = models.ForeignKey(

@@ -41,7 +41,17 @@ def check_expenditure_threshold_met(
     Check that the total amount expended meets the minimum threshold for its fy_start_date.
     For now, we are counting reimbursements as positive values, hence using abs().
     See ticket #4198 for more info.
+
+    Skippable via administrative waiver.
     """
+    # Importing here avoids a circular import with the SingleAuditChecklist model, since they share the __init__.py
+    from audit.models import SacValidationWaiver
+
+    if SacValidationWaiver.TYPES.EXPENDITURE_THRESHOLD in sac_dict.get(
+        "waiver_types", []
+    ):
+        return []
+
     all_sections = sac_dict["sf_sac_sections"]
     general_information = all_sections.get("general_information", {})
     federal_awards = all_sections.get("federal_awards", {})
