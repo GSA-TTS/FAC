@@ -1,4 +1,5 @@
 from django.urls import path
+from django.urls import re_path
 
 from audit.fixtures.excel import FORM_SECTIONS
 from audit import views
@@ -140,8 +141,9 @@ urlpatterns = [
         views.PredisseminationSummaryReportDownloadView.as_view(),
         name="PredisseminationSummaryReportDownload",
     ),
-    path(
-        "compare/<str:report_id>",
+    # matches path: ./audit/compare/(search|submission)/<report_id>
+    re_path(
+        r"^compare/(?P<route>search|submission)/(?P<report_id>[\w\-]+)$",
         views.CompareSubmissionsView.as_view(),
         name="CompareSubmissions",
     ),
