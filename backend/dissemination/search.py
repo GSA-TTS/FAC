@@ -44,8 +44,6 @@ def only_searching_on_general(params_dict):
         if param == "cog_or_oversight" and value == "either":
             continue
         elif value and param not in GENERAL_PARAMS:
-            logger.info(param)
-            logger.info(value)
             return False
 
     return True
