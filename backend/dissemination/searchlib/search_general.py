@@ -2,6 +2,7 @@ import time
 from math import ceil
 import logging
 from django.db.models import Q
+from django.contrib.postgres.search import SearchQuery
 from dissemination.models import AdditionalEin, AdditionalUei
 
 logger = logging.getLogger(__name__)
@@ -149,53 +150,14 @@ def _get_names_match_query(names_list):
     Given a list of (potential) names, return the query object that searches auditee and firm names.
     """
     if not names_list:
+            return Q()
+
+    raw_query = " ".join(names_list)
+    if not raw_query.strip():
         return Q()
 
-    name_fields = [
-        # "auditee_city",
-        "auditee_contact_name",
-        "auditee_certify_name",
-        "auditee_email",
-        "auditee_name",
-        # "auditee_state",
-        # "auditor_city",
-        "auditor_contact_name",
-        "auditor_certify_name",
-        "auditor_email",
-        "auditor_firm_name",
-        # "auditor_state",
-    ]
-
-    names_match = Q()
-
-    # The search terms are coming in as a string in a list.
-    # E.g. the search text "college berea" returns nothing,
-    # when it should return entries for "Berea College". That is
-    # because it comes in as
-    # ["college berea"]
-    #
-    # This has to be flattened to a list of singleton terms.
-    flattened = []
-    for term in names_list:
-        for sub in term.split():
-            flattened.append(sub)
-
-    # Now, for each field (e.g. "auditee_contact_name")
-    # build up an AND over the terms. We want something where all of the
-    # terms appear.
-    # Then, do an OR over all of the fields. If that combo appears in
-    # any of the fields, we want to return it.
-    for field in name_fields:
-        field_q = Q()
-        for name in flattened:
-            field_q.add(Q(**{f"{field}__icontains": name}), Q.AND)
-        names_match.add(field_q, Q.OR)
-
-    # Now, "college berea" and "university state ohio" return
-    # the appropriate terms. It is also significantly faster than what
-    # we had before.
-
-    return names_match
+    # Search against the indexed database field
+    return Q(search_vector=SearchQuery(raw_query, search_type="websearch"))
 
 
 def _get_fy_end_month_match_query(fy_end_month):
