@@ -17,9 +17,11 @@ logger = logging.getLogger(__name__)
 def check_finding_prior_references(sac_dict, *_args, **_kwargs):
     """
     Check that prior references numbers point to findings that actually exist
-    in a previously submitted report
+    in a previously submitted report.
+
+    Skippable via administrative waiver.
     """
-    # Importing here to avoid circular import
+    # Importing here avoids a circular import with the SingleAuditChecklist model, since they share the __init__.py
     from audit.models import SacValidationWaiver
 
     if SacValidationWaiver.TYPES.PRIOR_REFERENCES in sac_dict.get("waiver_types", []):

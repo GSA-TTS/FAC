@@ -140,7 +140,7 @@ class TestSacValidationWaiverAdmin(TestCase):
         # Check if the expected error message was added
         messages = list(self.request._messages)
         self.assertEqual(len(messages), 1)
-        self.assertIn("Cannot apply waiver to SAC with status", messages[0].message)
+        self.assertIn("Cannot apply waiver type(s)", messages[0].message)
 
     def test_handle_auditor_certification(self):
         """Test the handle_auditor_certification method of the SacValidation"""
