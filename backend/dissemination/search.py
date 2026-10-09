@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 
 GENERAL_PARAMS = [
     "audit_years",
-    "uei_or_ein",
-    "entity_name",
+    "uei_or_eins",
+    "names",
     "start_date",
     "end_date",
     "auditee_state",
@@ -30,7 +30,7 @@ GENERAL_PARAMS = [
     "order_by",
     "order_direction",
     "advanced_search_flag",
-    "beta_search_flag",
+    "entity_type",
     "LIMIT",
 ]
 
