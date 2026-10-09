@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.contrib.postgres.search import SearchVector
 
 import audit.cross_validation
 from audit.cross_validation.naming import SECTION_NAMES
@@ -58,6 +59,7 @@ from dissemination.models import (
     Passthrough,
     SecondaryAuditor,
     Resubmission,
+    Unified,
 )
 from django.utils.timezone import now
 
@@ -173,6 +175,17 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
 
 GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
 
+SEARCH_VECTOR_NAME_FIELDS = [
+    "auditee_contact_name",
+    "auditee_certify_name",
+    "auditee_email",
+    "auditee_name",
+    "auditor_contact_name",
+    "auditor_certify_name",
+    "auditor_email",
+    "auditor_firm_name",
+]
+
 
 class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
     """
@@ -255,6 +268,15 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             intake_to_dissem.save_dissemination_objects()
             if intake_to_dissem.errors:
                 return {"errors": intake_to_dissem.errors}
+
+            General.objects.filter(report_id=self.report_id).update(
+                search_vector=SearchVector(*SEARCH_VECTOR_NAME_FIELDS)
+            )
+
+            Unified.objects.filter(report_id=self.report_id).update(
+                search_vector=SearchVector(*SEARCH_VECTOR_NAME_FIELDS)
+            )
+
         except TransactionManagementError as err:
             # We want to re-raise this to catch at the view level because we
             # think it's due to a race condition where the user's submission
@@ -263,6 +285,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             raise err
         # TODO: figure out what narrower exceptions to catch here
         except Exception as err:
+            logger.info(err)
             return {"errors": [err]}
 
         return None
