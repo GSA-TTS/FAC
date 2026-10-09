@@ -11,7 +11,7 @@ resource "cloudfoundry_service_instance" "elasticache" {
   type         = "managed"
 
   parameters = jsonencode({
-    engine        = "valkey"
-    engineVersion = "8.2"
+    engine         = "valkey"
+    engine_version = "8.2"
   })
 }
