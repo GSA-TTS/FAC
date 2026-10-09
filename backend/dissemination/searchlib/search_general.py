@@ -150,7 +150,7 @@ def _get_names_match_query(names_list):
     Given a list of (potential) names, return the query object that searches auditee and firm names.
     """
     if not names_list:
-            return Q()
+        return Q()
 
     raw_query = " ".join(names_list)
     if not raw_query.strip():
