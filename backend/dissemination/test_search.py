@@ -3,10 +3,7 @@ from django.test.client import RequestFactory
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.search import SearchVector
 
-from audit.models.constants import (
-  RESUBMISSION_STATUS,
-  SEARCH_VECTOR_NAME_FIELDS,
-)
+from audit.models.constants import RESUBMISSION_STATUS
 from dissemination.models import (
     Finding,
     General,
