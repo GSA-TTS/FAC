@@ -275,7 +275,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             raise err
         # TODO: figure out what narrower exceptions to catch here
         except Exception as err:
-            logger.info(err)
+            logger.error(err)
             return {"errors": [err]}
 
         return None
