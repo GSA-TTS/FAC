@@ -16,3 +16,4 @@ services:
   - fac-logdrain
   - backups
   - autoscaler
+  - fac-redis
