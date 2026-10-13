@@ -39,6 +39,7 @@ from audit.models.constants import (
     STATUS_CHOICES,
     RESUBMISSION_STATUS,
     VALID_DATA_SOURCES,
+    SEARCH_VECTOR_NAME_FIELDS,
 )
 from audit.models.utils import get_next_sequence_id
 from support.cog_over import compute_cog_over, record_cog_assignment
@@ -174,17 +175,6 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
 
 
 GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
-
-SEARCH_VECTOR_NAME_FIELDS = [
-    "auditee_contact_name",
-    "auditee_certify_name",
-    "auditee_email",
-    "auditee_name",
-    "auditor_contact_name",
-    "auditor_certify_name",
-    "auditor_email",
-    "auditor_firm_name",
-]
 
 
 class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore

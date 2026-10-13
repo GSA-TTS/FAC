@@ -242,3 +242,14 @@ USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
     ("non-profit", _("Non-profit")),
     ("unknown", _("Unknown")),
 )
+
+SEARCH_VECTOR_NAME_FIELDS = [
+    "auditee_contact_name",
+    "auditee_certify_name",
+    "auditee_email",
+    "auditee_name",
+    "auditor_contact_name",
+    "auditor_certify_name",
+    "auditor_email",
+    "auditor_firm_name",
+]
