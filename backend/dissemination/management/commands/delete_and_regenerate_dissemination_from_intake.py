@@ -1,5 +1,9 @@
 import logging
+from datetime import date
+
 from django.core.management.base import BaseCommand
+from django.db import reset_queries
+
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -14,7 +18,7 @@ from dissemination.models import (
 )
 from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS
-from datetime import date
+
 
 logger = logging.getLogger(__name__)
 
@@ -92,5 +96,6 @@ class Command(BaseCommand):
                 for sac in queryset.iterator(chunk_size=CHUNK_SIZE):
                     logger.info(f"Redisseminating {sac.report_id}.")
                     sac.redisseminate()
+                    reset_queries() 
 
         logger.info("Redisseminating complete.")
