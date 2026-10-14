@@ -626,37 +626,50 @@ class IntakeToDissemination(object):
         gen_dict = model_to_dict(gen, exclude=["id"])
         unifieds = []
 
-        for fed in self.loaded_objects["FederalAwards"]:
+        for fed in self.loaded_objects.get("FederalAwards", []):
             fed_dict = model_to_dict(fed, exclude=["id"])
             fins = [
                 fin
-                for fin in self.loaded_objects["Findings"]
+                for fin in self.loaded_objects.get("Findings", [])
                 if fin.award_reference == fed.award_reference
             ]
             pts = [
                 pt
-                for pt in self.loaded_objects["Passthroughs"]
+                for pt in self.loaded_objects.get("Passthroughs", [])
                 if pt.award_reference == fed.award_reference
             ]
 
-
             if not fins and not pts:
-                unifieds.append(self._generate_unified_helper(gen, gen_dict, fed_dict, None, None))
+                unifieds.append(
+                    self._generate_unified_helper(gen, gen_dict, fed_dict, None, None)
+                )
             elif fins and not pts:
                 for fin in fins:
-                    unifieds.append(self._generate_unified_helper(gen, gen_dict, fed_dict, fin, None))
+                    unifieds.append(
+                        self._generate_unified_helper(
+                            gen, gen_dict, fed_dict, fin, None
+                        )
+                    )
             elif pts and not fins:
                 for pt in pts:
-                    unifieds.append(self._generate_unified_helper(gen, gen_dict, fed_dict, None, pt))
+                    unifieds.append(
+                        self._generate_unified_helper(gen, gen_dict, fed_dict, None, pt)
+                    )
             else:
                 for fin in fins:
                     for pt in pts:
-                        unifieds.append(self._generate_unified_helper(gen, gen_dict, fed_dict, fin, pt))
+                        unifieds.append(
+                            self._generate_unified_helper(
+                                gen, gen_dict, fed_dict, fin, pt
+                            )
+                        )
 
         return unifieds
 
     def _generate_unified_helper(self, gen, gen_dict, fed_dict, fin, pt):
-        aln = f"{fed_dict["federal_agency_prefix"]}.{fed_dict["federal_award_extension"]}"
+        aln = (
+            f"{fed_dict["federal_agency_prefix"]}.{fed_dict["federal_award_extension"]}"
+        )
         params = {
             "aln": aln,
             "report": gen,

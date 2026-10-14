@@ -19,7 +19,6 @@ from dissemination.models import (
 from audit.models import SingleAuditChecklist
 from audit.models.constants import STATUS
 
-
 logger = logging.getLogger(__name__)
 
 CHUNK_SIZE = 100
