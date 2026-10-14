@@ -34,20 +34,21 @@ https://drive.google.com/drive/folders/1WymwJtdQ287SdgrOx__aEraoVTx7ig9D
 
 These are approximately 2GB. Put it in the `data` folder.
 
-Then, exec into the app container:
+Run the script with no arguments to open the menu. The dumpfile and email are requested only if you choose an action that needs them:
 
 ```
-docker compose exec -it web /bin/bash
+docker compose run --rm web ./util/load_public_dissem_data/manage_local_data.bash
 ```
 
-`cd` into the load public data folder and run the script:
+You can optionally pass the dumpfile path and staff user email as the first and second arguments to avoid being prompted. A relative dumpfile path is resolved from the directory where you launch the script. Once entered, each value is remembered for later menu actions during that run.
 
-```
-cd util/load_public_dissem_data
-./manage_local_data.bash data/sanitized-<DATE>.dump <YOUR_EMAIL>
+When loading a dump, the script checks its `data` folder for files named `sanitized-YYYYMMDD.dump` and offers the most recently dated file as the prompt default. Press Enter to use it, or enter another path. A dumpfile passed as the first command-line argument is used directly.
+
+```bash
+docker compose run --rm web ./util/load_public_dissem_data/manage_local_data.bash util/load_public_dissem_data/data/sanitized-<DATE>.dump <YOUR_EMAIL>
 ```
 
-The path is to a `sanitized-<DATE>.dump` dumpfile (relative to the `load_public_dissem_data` folder; perhaps in `data`), and you need to provide a staff user email address. It could be yours or someone else's. (Because this is from a prod dump, using your prod email address should "just work.")
+The email can be yours or another staff user's. (Because this is from a prod dump, using your prod email address should "just work.")
 
 E.g.
 
@@ -61,17 +62,17 @@ The menu is roughly in order of use.
 
 ### load_sanitized_data_dump
 
-This truncates all tables and loads the dump passed on the command line.
+This truncates all tables and loads the dumpfile.
 
 ### shrink_to_20k_records
 
-If you want a small set of data to work with, run this. 
+If you want a small set of data to work with, run this.
 
 You do not *have* to run this. The other commands will work with the larger dataset. However, some of them will take longer. For example, it takes longer to redisseminate all, or generate the `MATERIALIZED VIEW` if you have 350K records vs. 20K records.
 
 ### generate_fake_suppressed_reports
 
-This runs SQL that flips ~500 audits randomly from being public to having tribal data attestations that say they are suppressed/is_public=false. 
+This runs SQL that flips ~500 audits randomly from being public to having tribal data attestations that say they are suppressed/is_public=false.
 
 Note that this *only* modifies the `singleauditchecklist`. It is not a management command. Therefore, you would need to redisseminate all of the records to see this in `dissemination_general` and other tables.
 
@@ -89,13 +90,13 @@ If you want to eliminate the dissemination tables, run this command. The `single
 
 ### redisseminate_all_sac_records
 
-This redisseminates all records one-by-one. 
+This redisseminates all records one-by-one.
 
-Note that it does *not* wipe out the disseminated data first. This management command is meant to be safe to use in production, and therefore does records one-by-one. 
+Note that it does *not* wipe out the disseminated data first. This management command is meant to be safe to use in production, and therefore does records one-by-one.
 
 ### truncate_all_local_tables
 
-This wipes all the tables. Used by `load_sanitized_data_dump`. 
+This wipes all the tables. Used by `load_sanitized_data_dump`.
 
 ### Run all
 

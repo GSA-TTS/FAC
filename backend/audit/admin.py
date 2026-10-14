@@ -669,52 +669,58 @@ class SacValidationWaiverAdmin(admin.ModelAdmin):
         return request.user.is_staff
 
     def save_model(self, request, obj, form, change):
+        """
+        Before the final save, invoke any waiver-specific behaviors for each waiver type selected in the Admin panel.
+        """
         try:
             sac = SingleAuditChecklist.objects.get(report_id=obj.report_id_id)
-            if sac.submission_status in [
-                STATUS.READY_FOR_CERTIFICATION,
-                STATUS.AUDITOR_CERTIFIED,
-            ]:
-                logger.info(
-                    f"User {request.user.email} is applying waiver for SAC with status: {sac.submission_status}"
-                )
-                self.handle_auditor_certification(request, obj, sac)
-                self.handle_auditee_certification(request, obj, sac)
+            user_email = request.user.email
+
+            logger.info(
+                f"User {user_email} is applying waiver {obj.waiver_types} for SAC with status: {sac.submission_status}"
+            )
+
+            applied = []
+            rejected = []
+            # Waiver types is an Array in the DB. We expect an admin to apply only one, but they can hypothically choose several.
+            for waiver_type in obj.waiver_types:
+                match waiver_type:
+                    # For certification waivers, we need to invoke the transition on apply.
+                    case SacValidationWaiver.TYPES.AUDITOR_CERTIFYING_OFFICIAL:
+                        if sac.submission_status == STATUS.READY_FOR_CERTIFICATION:
+                            self.handle_auditor_certification(request, obj, sac)
+                            applied.append(waiver_type)
+                        else:
+                            rejected.append(waiver_type)
+                    case SacValidationWaiver.TYPES.AUDITEE_CERTIFYING_OFFICIAL:
+                        if sac.submission_status == STATUS.AUDITOR_CERTIFIED:
+                            self.handle_auditee_certification(request, obj, sac)
+                            applied.append(waiver_type)
+                        else:
+                            rejected.append(waiver_type)
+                    # For cross val waivers, we just need to ensure type before saving.
+                    case SacValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER:
+                        applied.append(waiver_type)
+                    case SacValidationWaiver.TYPES.PRIOR_REFERENCES:
+                        applied.append(waiver_type)
+                    case SacValidationWaiver.TYPES.EXPENDITURE_THRESHOLD:
+                        applied.append(waiver_type)
+                    case _:
+                        rejected.append(waiver_type)
+
+            if applied:
                 super().save_model(request, obj, form, change)
                 logger.info(
-                    f"SAC {sac.report_id} updated successfully with waiver by user: {request.user.email}."
+                    f"SAC {sac.report_id} updated successfully with waiver(s) {applied} by user: {user_email}."
                 )
-            elif (
-                STATUS.IN_PROGRESS
-                and SacValidationWaiver.TYPES.FINDING_REFERENCE_NUMBER
-                in obj.waiver_types
-            ):
-                logger.info(
-                    f"User {request.user.email} is applying waiver for SAC with status: {sac.submission_status}"
-                )
-                super().save_model(request, obj, form, change)
-                logger.info(
-                    f"Duplicate finding reference number waiver applied to SAC {sac.report_id} by user: {request.user.email}."
-                )
-            elif (
-                STATUS.IN_PROGRESS
-                and SacValidationWaiver.TYPES.PRIOR_REFERENCES in obj.waiver_types
-            ):
-                logger.info(
-                    f"User {request.user.email} is applying waiver for SAC with status: {sac.submission_status}"
-                )
-                super().save_model(request, obj, form, change)
-                logger.info(
-                    f"Invalid prior reference waiver applied to SAC {sac.report_id} by user: {request.user.email}."
-                )
-            else:
+            if rejected:
                 messages.set_level(request, messages.WARNING)
                 messages.warning(
                     request,
-                    f"Cannot apply waiver to SAC with status {sac.submission_status}. Expected status to be one of {STATUS.READY_FOR_CERTIFICATION}, {STATUS.AUDITOR_CERTIFIED}, or {STATUS.IN_PROGRESS}.",
+                    f"Cannot apply waiver type(s) {rejected} to SAC with status {sac.submission_status}.",
                 )
                 logger.warning(
-                    f"User {request.user.email} attempted to apply waiver to SAC with invalid status: {sac.submission_status}"
+                    f"User {user_email} attempted to apply waiver {rejected} to SAC with invalid status: {sac.submission_status}"
                 )
 
         except Exception as e:

@@ -17,31 +17,80 @@ DATE=$(date '+%Y%m%d')
 args=("$@")
 # args[0] is the first argument, and not the name of the script.
 
-export DUMPFILE=${args[0]}
-export EMAIL=${args[1]}
+export DUMPFILE="${args[0]:-}"
+export EMAIL="${args[1]:-}"
 
-if [[ -z "${DUMPFILE}" ]]; then
-  echo "Please pass a sanitized dumpfile as the first command-line argument."
-  echo "Exiting."
-  exit
-fi
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+BACKEND_DIR="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
 
-if [ -f "$DUMPFILE" ]; then
-  echo "Found file '$DUMPFILE'."
+export TABLES_FILE=$"$SCRIPT_DIR/tables.source"
+if [ -f "$TABLES_FILE" ]; then
+  source "$SCRIPT_DIR/tables.source"
 else
-  echo "File '$DUMPFILE' does not exist."
+  echo "File '$TABLES_FILE' does not exist."
   echo "Exiting."
   exit
 fi
 
-if [[ -z "${EMAIL}" ]]; then
-  echo "Please pass a staff user email as the second arg."
-  echo "Exiting."
-  exit
-fi
+ensure_dumpfile () {
+  # Checks if the dumpfile was already provided in the script args
+  if [[ -n "$DUMPFILE" && -f "$DUMPFILE" ]]; then
+    echo "Found file '$DUMPFILE'."
+    return 0
+  elif [[ -n "$DUMPFILE" ]]; then
+    echo "File '$DUMPFILE' does not exist."
+    DUMPFILE=""
+  fi
 
-# Source in the target tables
-source "tables.source"
+  # Grabs the latest-dated sanitized dumpfile from /data to use as the default
+  local default_dumpfile=""
+  local latest_date=""
+  local candidate candidate_date entered_dumpfile
+
+  for candidate in "$SCRIPT_DIR"/data/sanitized-????????.dump; do
+    [[ -f "$candidate" ]] || continue
+    candidate_date=${candidate##*/sanitized-}
+    candidate_date=${candidate_date%.dump}
+    [[ "$candidate_date" =~ ^[0-9]{8}$ ]] || continue
+
+    if [[ -z "$latest_date" || "$candidate_date" > "$latest_date" ]]; then
+      latest_date=$candidate_date
+      default_dumpfile=$candidate
+    fi
+  done
+
+  # Prompts until given a file that exists
+  while true; do
+    if [[ -n "$default_dumpfile" ]]; then
+      if ! IFS= read -r -p "Path to sanitized dumpfile [$default_dumpfile]: " entered_dumpfile; then
+        echo "No dumpfile provided."
+        return 1
+      fi
+      DUMPFILE=${entered_dumpfile:-$default_dumpfile}
+    elif ! IFS= read -r -p "Path to sanitized dumpfile: " DUMPFILE; then
+      echo "No dumpfile provided."
+      return 1
+    fi
+
+    if [[ -f "$DUMPFILE" ]]; then
+      echo "Found file '$DUMPFILE'."
+      return 0
+    fi
+
+    if [[ -n "$DUMPFILE" ]]; then
+      echo "File '$DUMPFILE' does not exist."
+    fi
+  done
+}
+
+ensure_email () {
+  while [[ -z "$EMAIL" ]]; do
+    if ! IFS= read -r -p "Staff user email: " EMAIL; then
+      echo "No staff user email provided."
+      return 1
+    fi
+  done
+}
 
 ############################################################
 # truncate_all_local_tables
@@ -63,7 +112,7 @@ truncate_all_local_tables () {
     TABLENAME=${dump/#$prefix}
     TABLENAME=${TABLENAME/%$suffix}
 
-  # TRUNCATE is not guaranteed to be complete if we call a 
+  # TRUNCATE is not guaranteed to be complete if we call a
   # `pg_restore` immediately after. Wrap it in a transaction.
   # https://petereisentraut.blogspot.com/2010/03/running-sql-scripts-with-psql.html
   PGOPTIONS='--client-min-messages=warning' psql \
@@ -75,7 +124,7 @@ truncate_all_local_tables () {
     -v ON_ERROR_STOP=1 \
     -w \
     -c "BEGIN; TRUNCATE ${TABLENAME} CASCADE; COMMIT;"
-  
+
   if [ $? -ne 0 ]; then
     echo "Truncate failed: ${TABLENAME}"
     echo "Exiting."
@@ -91,6 +140,10 @@ truncate_all_local_tables () {
 ############################################################
 load_sanitized_data_dump () {
   echo "test_sanitized_production_dump"
+
+  if ! ensure_dumpfile; then
+    return 1
+  fi
 
   # We must truncate everything before loading.
   truncate_all_local_tables
@@ -122,7 +175,7 @@ load_sanitized_data_dump () {
     -h ${HOST} \
     -v ON_ERROR_STOP=1 \
     -w < "${TEMPFILE}"
-  
+
   # Then remove the tmpfile
   rm -f "${TEMPFILE}"
 
@@ -147,7 +200,7 @@ shrink_to_20k_records () {
     -p ${PORT} \
     -h ${HOST} \
     -v ON_ERROR_STOP=1 \
-    -w < "shrink_the_tables.sql"
+    -w < "$SCRIPT_DIR/shrink_the_tables.sql"
 
   if [ $? -ne 0 ]; then
     echo "psql failed."
@@ -167,13 +220,13 @@ generate_fake_suppressed_reports () {
     -p ${PORT} \
     -h ${HOST} \
     -v ON_ERROR_STOP=1 \
-    -w < "gen_fake_suppressed_audits.sql"
+    -w < "$SCRIPT_DIR/gen_fake_suppressed_audits.sql"
 
   if [ $? -ne 0 ]; then
     echo "psql failed."
     exit
   fi
-  
+
   echo "Done."
 }
 
@@ -189,13 +242,13 @@ generate_fake_resubmission_dissemination_data () {
     -p ${PORT} \
     -h ${HOST} \
     -v ON_ERROR_STOP=1 \
-    -w < "gen_fake_resub_dissem_data.sql"
+    -w < "$SCRIPT_DIR/gen_fake_resub_dissem_data.sql"
 
   if [ $? -ne 0 ]; then
     echo "psql failed."
     exit
   fi
-  
+
   echo "Done."
 }
 
@@ -203,10 +256,12 @@ generate_fake_resubmission_dissemination_data () {
 # generate_resubmissions
 ############################################################
 generate_resubmissions () {
+  if ! ensure_email; then
+    return 1
+  fi
+
   echo "generate_resubmissions"
-  pushd ../.. 
-  python manage.py generate_resubmissions --email ${EMAIL}
-  popd
+  (cd "$BACKEND_DIR" && python manage.py generate_resubmissions --email "$EMAIL")
 }
 
 ############################################################
@@ -214,9 +269,7 @@ generate_resubmissions () {
 ############################################################
 generate_materialized_view () {
   echo "generate_materialized_view"
-  pushd ../..
-  python manage.py materialized_views --create
-  popd
+  (cd "$BACKEND_DIR" && python manage.py materialized_views --create)
 }
 
 ############################################################
@@ -240,7 +293,7 @@ truncate_dissemination_tables () {
     TABLENAME=${TABLENAME/%$suffix}
 
   re="dissemination_"
-  if [[ "${TABLENAME}" =~ $re ]]; 
+  if [[ "${TABLENAME}" =~ $re ]];
   then
     echo "Truncating ${TABLENAME}"
     PGOPTIONS='--client-min-messages=warning' psql \
@@ -252,7 +305,7 @@ truncate_dissemination_tables () {
       -v ON_ERROR_STOP=1 \
       -w \
       -c "BEGIN; TRUNCATE ${TABLENAME} CASCADE; COMMIT;"
-    
+
     if [ $? -ne 0 ]; then
       echo "Truncate failed: ${TABLENAME}"
       echo "Exiting."
@@ -267,9 +320,7 @@ truncate_dissemination_tables () {
 ############################################################
 redisseminate_all_sac_records () {
   echo "redisseminate_all_sac_records"
-  pushd ../..
-  python manage.py delete_and_regenerate_dissemination_from_intake
-  popd
+  (cd "$BACKEND_DIR" && python manage.py delete_and_regenerate_dissemination_from_intake)
 }
 
 
@@ -310,7 +361,7 @@ snapshot_current_db () {
 ############################################################
 # DAS MENU
 ############################################################
-PS3='Please enter your choice: '
+PS3='Please enter your choice (supply no # to view options): '
 options=(\
   "Load sanitized data dump" \
   "Shrink the dump to 20K records" \
@@ -359,11 +410,12 @@ do
       truncate_all_local_tables
       ;;
     "Run most all back-to-back")
-      load_sanitized_data_dump
+      # `continue` will make it skip the rest. Used for dumpfile or email exceptions.
+      load_sanitized_data_dump || continue
       shrink_to_20k_records
       generate_fake_suppressed_reports
       generate_fake_resubmission_dissemination_data
-      generate_resubmissions
+      generate_resubmissions || continue
       truncate_dissemination_tables
       redisseminate_all_sac_records
       generate_materialized_view

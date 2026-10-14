@@ -1,6 +1,6 @@
 from django.test import TestCase
 from model_bakery import baker
-from audit.models import Audit
+from audit.models import Audit, SacValidationWaiver
 
 from .errors import err_total_amount_expended
 from .check_expenditure_threshold_met import check_expenditure_threshold_met
@@ -276,3 +276,37 @@ class CheckExpenditureThresholdMetTests(TestCase):
         )
 
         self.assertEqual(validation_result, [])
+
+    def test_amount_expended_below_threshold_waiver(self):
+        """
+        An amount below the threshold should pass when an expenditure
+        threshold waiver is present, and fail without it.
+        """
+        auditee_fiscal_period_start = self.thresholds[1]["start"].isoformat()
+        total = self.thresholds[1]["minimum"] - 1
+
+        audit = baker.make(
+            Audit,
+            audit={
+                "general_information": {
+                    "auditee_fiscal_period_start": auditee_fiscal_period_start,
+                },
+                "federal_awards": {"awards": self._make_federal_awards([total])},
+            },
+            version=0,
+        )
+
+        shape = audit_validation_shape(audit)
+
+        # Fail without waiver
+        self.assertEqual(
+            check_expenditure_threshold_met(shape, thresholds=self.thresholds),
+            [{"error": err_total_amount_expended(total)}],
+        )
+
+        # Pass with waiver. We add the waiver directly rather than through the DB, as shaped SAC generation is tested elsewhere.
+        shape["waiver_types"] = [SacValidationWaiver.TYPES.EXPENDITURE_THRESHOLD]
+        self.assertEqual(
+            check_expenditure_threshold_met(shape, thresholds=self.thresholds),
+            [],
+        )
