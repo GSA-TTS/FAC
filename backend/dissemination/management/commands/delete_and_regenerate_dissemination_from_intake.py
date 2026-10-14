@@ -95,7 +95,7 @@ class Command(BaseCommand):
 
                 for sac in queryset.iterator(chunk_size=CHUNK_SIZE):
                     logger.info(f"Redisseminating {sac.report_id}.")
-                    sac.redisseminate()
-                    reset_queries() 
+                    # sac.redisseminate()
+                    reset_queries()
 
         logger.info("Redisseminating complete.")
