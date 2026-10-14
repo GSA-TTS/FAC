@@ -21,7 +21,7 @@ from audit.models.constants import STATUS
 
 logger = logging.getLogger(__name__)
 
-CHUNK_SIZE = 100
+CHUNK_SIZE = 500
 
 
 class Command(BaseCommand):
