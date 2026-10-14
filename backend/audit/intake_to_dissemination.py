@@ -68,8 +68,6 @@ class IntakeToDissemination(object):
                 logger.warning(error)
                 self.errors.append(error)
 
-        self.load_unified()
-
         return self.loaded_objects
 
     def get_dissemination_objects(self):
@@ -85,6 +83,16 @@ class IntakeToDissemination(object):
                 error = f"An error occurred during bulk creation for {key}: {e}"
                 logger.warning(error)
                 self.errors.append(error)
+
+        batch = []
+        for unified in self.generate_unified():
+            batch.append(unified)
+            if len(batch) == 500:
+                Unified.objects.bulk_create(batch, batch_size=500)
+                batch = []
+
+        if batch:
+            Unified.objects.bulk_create(batch, batch_size=500)
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -604,10 +612,15 @@ class IntakeToDissemination(object):
         return [resubmission]
 
     def load_unified(self):
+        return list(self.generate_unified())
+
+    def generate_unified(self):
         gen = self.loaded_objects["Generals"][0]
+        gen_dict = model_to_dict(gen) # Avoids duplicating work in
         unifieds = []
 
         for fed in self.loaded_objects["FederalAwards"]:
+            fed_dict = model_to_dict(fed)
             fins = [
                 fin
                 for fin in self.loaded_objects["Findings"]
@@ -619,30 +632,29 @@ class IntakeToDissemination(object):
                 if pt.award_reference == fed.award_reference
             ]
 
+
             if not fins and not pts:
-                unifieds.append(self._load_unified_helper(gen, fed, None, None))
+                unifieds.append(self._generate_unified_helper(gen, gen_dict, fed_dict, None, None))
             elif fins and not pts:
                 for fin in fins:
-                    unifieds.append(self._load_unified_helper(gen, fed, fin, None))
+                    unifieds.append(self._generate_unified_helper(gen, gen_dict, fed_dict, fin, None))
             elif pts and not fins:
                 for pt in pts:
-                    unifieds.append(self._load_unified_helper(gen, fed, None, pt))
+                    unifieds.append(self._generate_unified_helper(gen, gen_dict, fed_dict, None, pt))
             else:
                 for fin in fins:
                     for pt in pts:
-                        unifieds.append(self._load_unified_helper(gen, fed, fin, pt))
-
-        self.loaded_objects["Unifieds"] = unifieds
+                        unifieds.append(self._generate_unified_helper(gen, gen_dict, fed_dict, fin, pt))
 
         return unifieds
 
-    def _load_unified_helper(self, gen, fed, fin, pt):
-        aln = f"{fed.federal_agency_prefix}.{fed.federal_award_extension}"
+    def _generate_unified_helper(self, gen, gen_dict, fed_dict, fin, pt):
+        aln = f"{fed_dict["federal_agency_prefix"]}.{fed_dict["federal_award_extension"]}"
         params = {
             "aln": aln,
             "report": gen,
-            **model_to_dict(gen),
-            **model_to_dict(fed),
+            **gen_dict,
+            **fed_dict,
             **(model_to_dict(fin) if fin else {}),
             **(model_to_dict(pt) if pt else {}),
         }
