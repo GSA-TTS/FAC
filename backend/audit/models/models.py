@@ -297,6 +297,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             "General": General,
             "Passthrough": Passthrough,
             "Resubmission": Resubmission,
+            "Unified": Unified,
         }
 
         for model in named_models.values():
