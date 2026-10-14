@@ -92,6 +92,13 @@ class IntakeToDissemination(object):
                 batch = []
 
         if batch:
+            bad = [
+                (index, obj.pk, obj._state.adding, obj.aln, obj.report_id_id)
+                for index, obj in enumerate(batch)
+                if obj.pk is not None
+            ]
+            if bad:
+                raise ValueError(f"Unified batch already has primary keys: {bad[:10]}")
             Unified.objects.bulk_create(batch, batch_size=500)
 
     def load_finding_texts(self):
@@ -616,11 +623,11 @@ class IntakeToDissemination(object):
 
     def generate_unified(self):
         gen = self.loaded_objects["Generals"][0]
-        gen_dict = model_to_dict(gen) # Avoids duplicating work in
+        gen_dict = model_to_dict(gen, exclude=["id"])
         unifieds = []
 
         for fed in self.loaded_objects["FederalAwards"]:
-            fed_dict = model_to_dict(fed)
+            fed_dict = model_to_dict(fed, exclude=["id"])
             fins = [
                 fin
                 for fin in self.loaded_objects["Findings"]
@@ -655,8 +662,8 @@ class IntakeToDissemination(object):
             "report": gen,
             **gen_dict,
             **fed_dict,
-            **(model_to_dict(fin) if fin else {}),
-            **(model_to_dict(pt) if pt else {}),
+            **(model_to_dict(fin, exclude=["id"]) if fin else {}),
+            **(model_to_dict(pt, exclude=["id"]) if pt else {}),
         }
 
         return Unified(**params)
