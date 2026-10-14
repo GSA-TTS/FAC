@@ -22,7 +22,7 @@ from audit.models.constants import STATUS
 
 logger = logging.getLogger(__name__)
 
-CHUNK_SIZE = 500
+CHUNK_SIZE = 100
 
 
 class Command(BaseCommand):
@@ -95,7 +95,7 @@ class Command(BaseCommand):
 
                 for sac in queryset.iterator(chunk_size=CHUNK_SIZE):
                     logger.info(f"Redisseminating {sac.report_id}.")
-                    # sac.redisseminate()
+                    sac.redisseminate()
                     reset_queries()
 
         logger.info("Redisseminating complete.")
