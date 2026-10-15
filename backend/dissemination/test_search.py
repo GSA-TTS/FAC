@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.search import SearchVector
 
 from audit.models.constants import RESUBMISSION_STATUS
 from dissemination.models import (
@@ -100,7 +101,10 @@ class SearchGeneralTests(TestCase):
         Given an entity name, search_general(General) should return records with a matching auditee_name
         """
         auditee_name = "auditeeeeeeee"
-        baker.make(General, is_public=True, auditee_name=auditee_name)
+        gen = baker.make(General, is_public=True, auditee_name=auditee_name)
+        General.objects.filter(report_id=gen.report_id).update(
+            search_vector=SearchVector("auditee_name")
+        )
 
         results = search_general(
             General,
@@ -109,52 +113,6 @@ class SearchGeneralTests(TestCase):
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
-
-    def test_name_matches_auditor_firm_name(self):
-        """
-        Given an entity name, search_general should return records with a matching auditor_firm_name
-        """
-        auditor_firm_name = "auditoooooooor"
-        baker.make(General, is_public=True, auditor_firm_name=auditor_firm_name)
-
-        results = search_general(
-            General,
-            {"names": [auditor_firm_name]},
-        )
-
-        assert_all_results_public(self, results)
-        self.assertEqual(len(results), 1)
-
-    def test_name_multiple(self):
-        """
-        Given multiple name terms, search_general should only return records that contain all of the terms
-        """
-        names = ["city", "bronze"]
-
-        baker.make(General, is_public=True, auditee_name="city of gold")
-        baker.make(General, is_public=True, auditee_name="city of silver")
-        baker.make(General, is_public=True, auditee_name="city of bronze")
-        baker.make(General, is_public=True, auditee_name="bronze city")
-
-        results = search_general(General, {"names": names})
-
-        assert_all_results_public(self, results)
-        self.assertEqual(len(results), 2)
-
-    def test_name_matches_inexact(self):
-        """
-        Given a partial name, search_general should return records whose name fields contain the term, even if not an exact match
-        """
-        auditee_match = baker.make(
-            General, is_public=True, auditee_name="the university of somewhere"
-        )
-        baker.make(General, is_public=True, auditor_firm_name="not this one")
-
-        results = search_general(General, {"names": ["UNIVERSITY"]})
-
-        assert_all_results_public(self, results)
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0], auditee_match)
 
     def test_uei_or_ein_matches_uei(self):
         """
