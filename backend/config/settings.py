@@ -251,6 +251,13 @@ if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTI
     # security middleware: https://whitenoise.readthedocs.io/en/stable/django.html#enable-whitenoise
     MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
+    CACHES = {
+        "default": {
+            "BACKEND": "django_valkey.cache.ValkeyCache",
+            "LOCATION": "valkey://127.0.0.1:6379"
+        }
+    }
+
     # Local environment and Testing environment (CI/CD/GitHub Actions)
 
     if ENVIRONMENT == "LOCAL":

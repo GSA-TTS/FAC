@@ -5,7 +5,7 @@ data "cloudfoundry_service_plan" "elasticache" {
 
 resource "cloudfoundry_service_instance" "elasticache" {
   count        = var.cf_space.name == "dev" ? 1 : 0
-  name         = "${var.cf_org_name}-redis"
+  name         = "fac-redis"
   space        = var.cf_space.id
   service_plan = data.cloudfoundry_service_plan.elasticache.id
   type         = "managed"
