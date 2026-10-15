@@ -140,7 +140,16 @@ services:
         condition: service_healthy
       web:
         condition: service_healthy
+
+  valkey:
+    image: valkey/valkey:8.1-alpine
+    ports:
+     - "6379:6379"
+    volumes:
+      - valkey:/data
+
 volumes:
   postgres-data:
   postgres-data2:
   rustfs:
+  valkey:
