@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
 
 from audit.models.constants import RESUBMISSION_STATUS_CHOICES
 from .constants import REPORT_ID_FK_HELP_TEXT
@@ -6,15 +8,8 @@ from dissemination.models import docs
 
 
 class General(models.Model):
-    # Relational fields
-    # null = True for these so we can load in phases, may want to tighten validation later
-    # 20240125 - These are indices that would be used in our ALN search/annotation.
-    # class Meta:
-    #     indexes = [
-    #         models.Index(fields=["report_id",]),
-    #         models.Index(fields=["fac_accepted_date",]),
-
-    #     ]
+    # The column that holds the indexed search tokens
+    search_vector = SearchVectorField(null=True, blank=True)
 
     report_id = models.TextField(
         "Report ID",
@@ -259,6 +254,9 @@ class General(models.Model):
 
     class Meta:
         unique_together = (("report_id",),)
+        indexes = [
+            GinIndex(fields=["search_vector"], name="search_vector_general_gin_idx"),
+        ]
 
     def __str__(self):
         return (
