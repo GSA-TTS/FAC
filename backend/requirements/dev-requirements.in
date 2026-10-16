@@ -22,5 +22,10 @@ types-pytz==2024.2.0.20241003
 types-requests==2.32.0.20241016
 whitenoise==6.7.0
 
-# via pip-tools
+# Overrides
+
+multidict==6.9.1
+# via aiohttp
+
 pip==26.2.1
+# via pip-tools
