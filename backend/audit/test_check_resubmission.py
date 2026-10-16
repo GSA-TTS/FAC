@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.utils import timezone
 
 from datetime import datetime, timezone as dt_timezone
-from model_bakery import baker
 
 from audit.models import SingleAuditChecklist, SubmissionEvent
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
@@ -10,7 +9,6 @@ from audit.check_resubmission_allowed import (
     check_resubmission_allowed,
     get_last_transition_date,
 )
-from dissemination.models import General
 
 
 def create_sac(
@@ -41,14 +39,6 @@ def create_sac(
         submission_status=status,
         general_information=general_information,
         transition_name=[status],
-    )
-
-    # The SAC's corresponding General entry also created
-    baker.make(
-        General,
-        report_id=sac.report_id,
-        auditee_uei=general_information["auditee_uei"],
-        audit_year=general_information["auditee_fiscal_period_end"].split("-")[0],
     )
 
     if meta is not None:
@@ -218,3 +208,88 @@ class TestCheckResubmissionAllowed(TestCase):
         allowed, msg = check_resubmission_allowed(sac)
         self.assertFalse(allowed)
         self.assertIn("Resubmission is only allowed", msg)
+
+    def test_legacy_allowed_without_general_record(self):
+        sac = create_sac(
+            meta=None,
+            status=STATUS.DISSEMINATED,
+            general_information={
+                "auditee_uei": "TESTUEI123",
+                "auditee_fiscal_period_end": "2023-06-30",
+            },
+        )
+
+        allowed, message = check_resubmission_allowed(sac)
+
+        self.assertTrue(allowed)
+        self.assertIn("eligible", message.lower())
+
+    def test_legacy_different_audit_years(self):
+        create_sac(
+            meta=None,
+            status=STATUS.DISSEMINATED,
+            general_information={
+                "auditee_uei": "TESTUEI123",
+                "auditee_fiscal_period_end": "2022-12-31",
+            },
+        )
+
+        sac = create_sac(
+            meta=None,
+            status=STATUS.DISSEMINATED,
+            general_information={
+                "auditee_uei": "TESTUEI123",
+                "auditee_fiscal_period_end": "2023-06-30",
+            },
+        )
+
+        allowed, message = check_resubmission_allowed(sac)
+
+        self.assertTrue(allowed)
+        self.assertIn("legacy", message.lower())
+
+    def test_legacy_different_ueis(self):
+        create_sac(
+            meta=None,
+            status=STATUS.DISSEMINATED,
+            general_information={
+                "auditee_uei": "TESTUEI111",
+                "auditee_fiscal_period_end": "2023-06-30",
+            },
+        )
+
+        sac = create_sac(
+            meta=None,
+            status=STATUS.DISSEMINATED,
+            general_information={
+                "auditee_uei": "TESTUEI222",
+                "auditee_fiscal_period_end": "2023-12-31",
+            },
+        )
+
+        allowed, message = check_resubmission_allowed(sac)
+
+        self.assertTrue(allowed)
+        self.assertIn("legacy", message.lower())
+
+    def test_legacy_no_matching_siblings(self):
+        sac = create_sac(
+            meta=None,
+            status=STATUS.DISSEMINATED,
+            general_information={
+                "auditee_uei": "TESTUEI123",
+                "auditee_fiscal_period_end": "2023-06-30",
+            },
+        )
+
+        # Change the in-memory SAC without saving.
+        # The database will no longer match the supplied UEI.
+        sac.general_information = {
+            "auditee_uei": "DIFFERENTUEI",
+            "auditee_fiscal_period_end": "2023-06-30",
+        }
+
+        allowed, message = check_resubmission_allowed(sac)
+
+        self.assertFalse(allowed)
+        self.assertIn("no matching legacy audits", message.lower())
