@@ -4,7 +4,6 @@ from datetime import datetime, timezone as dt_timezone
 from django.utils import timezone
 
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
-from dissemination.models import General
 
 
 def get_last_transition_date(sac):
@@ -17,9 +16,47 @@ def get_last_transition_date(sac):
     return datetime.min.replace(tzinfo=dt_timezone.utc)
 
 
-def check_resubmission_allowed(sac) -> Tuple[bool, str]:
+def check_legacy_resubmission_allowed(sac, auditee_uei, audit_year):
     from audit.models import SingleAuditChecklist
 
+    siblings = SingleAuditChecklist.objects.filter(
+        general_information__auditee_uei=auditee_uei,
+        general_information__auditee_fiscal_period_end__startswith=audit_year,
+        resubmission_meta__isnull=True,
+    )
+
+    if not siblings.exists():
+        return False, "No matching legacy audits found for this UEI and audit year."
+
+    if siblings.count() == 1:
+        return True, "Legacy audit is eligible for first resubmission."
+
+    sorted_siblings = sorted(
+        siblings,
+        key=lambda s: (get_last_transition_date(s), s.id),
+    )
+    most_recent = sorted_siblings[-1]
+
+    if sac.id != most_recent.id:
+        return False, (
+            f"Multiple legacy audits found for this UEI and audit year. "
+            f"Only the most recent ({most_recent.report_id}) may initiate resubmission."
+        )
+
+    dates = [get_last_transition_date(s) for s in siblings]
+    if len(dates) > 1 and max(dates) - min(dates) < timezone.timedelta(seconds=10):
+        return False, (
+            "Multiple legacy audits with close timestamps were found for the same UEI and year. "
+            "This may indicate incorrect UEI use across unrelated entities. Please contact support."
+        )
+
+    return (
+        True,
+        "Most recent legacy audit is eligible. Others will be linked automatically.",
+    )
+
+
+def check_resubmission_allowed(sac) -> Tuple[bool, str]:
     """
     Given a SingleAuditChecklist, determine if resubmitting the record should be allowed.
     Return a Tuple(boolean, string), where the boolean determines if resubmission is allowed
@@ -62,56 +99,18 @@ def check_resubmission_allowed(sac) -> Tuple[bool, str]:
         )
 
     # Fallback check when version, year, uei is missing or incorrect data
-    if not all([auditee_uei, end_date, audit_year, sac.id]) or version is None:
+    if not all([auditee_uei, audit_year, sac.id]) or version is None:
         return (
             False,
             "Audit record is incomplete and cannot be evaluated for resubmission.",
         )
 
     # MOST_RECENT + version > 1 can be resubmitted
-    if resub_status in [RESUBMISSION_STATUS.MOST_RECENT]:
-        if version >= 1:
-            return True, "Audit is eligible for resubmission."
+    if resub_status == RESUBMISSION_STATUS.MOST_RECENT and version >= 1:
+        return True, "Audit is eligible for resubmission."
 
     # Legacy audit (meta = None) At this point, we assume data has been curated: valid submission_status, uei, year.
     if sac.resubmission_meta is None:
-        # Faster to find these in General and use the report_ids to search SAC
-        gen_siblings = General.objects.filter(
-            auditee_uei=auditee_uei,
-            audit_year=audit_year,
-        )
-        report_ids = list(gen_siblings.values_list("report_id", flat=True))
-        siblings = SingleAuditChecklist.objects.filter(
-            report_id__in=report_ids,
-            resubmission_meta__isnull=True,
-        )
-
-        if siblings.count() == 1:
-            return True, "Legacy audit is eligible for first resubmission."
-
-        sorted_siblings = sorted(
-            siblings,
-            key=lambda s: (get_last_transition_date(s), s.id),
-        )
-        most_recent = sorted_siblings[-1]
-
-        if sac.id != most_recent.id:
-            return False, (
-                f"Multiple legacy audits found for this UEI and audit year. "
-                f"Only the most recent ({most_recent.report_id}) may initiate resubmission."
-            )
-
-        # Check timestamp clustering
-        dates = [get_last_transition_date(s) for s in siblings]
-        if len(dates) > 1 and max(dates) - min(dates) < timezone.timedelta(seconds=10):
-            return False, (
-                "Multiple legacy audits with close timestamps were found for the same UEI and year. "
-                "This may indicate incorrect UEI use across unrelated entities. Please contact support."
-            )
-
-        return (
-            True,
-            "Most recent legacy audit is eligible. Others will be linked automatically.",
-        )
+        return check_legacy_resubmission_allowed(sac, auditee_uei, audit_year)
 
     return False, "Audit does not meet the criteria for resubmission."

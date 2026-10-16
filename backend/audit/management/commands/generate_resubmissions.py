@@ -5,6 +5,7 @@ from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access
 from django.core.management.base import BaseCommand
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
 from audit.cross_validation.naming import SECTION_NAMES
+from botocore.exceptions import ClientError
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from dissemination.models import (
@@ -20,6 +21,7 @@ from dissemination.models import (
     SecondaryAuditor,
     Resubmission,
 )
+from users.models import UserProfile
 from datetime import datetime
 import pytz
 import os
@@ -78,14 +80,12 @@ REPORTIDS_TO_MODIFIERS = lambda: {
         modify_auditor_address,
         modify_additional_eins_workbook,
     ],
-    # modify_pdf simulates a new PDF submission.
-    # The report on the left has its SAR pointer modified so that it instead
-    # points to the report for the entity on the right. That way,
-    # it looks like a completely different PDF is attached to (say) 19157.
+    # Upload different PDFs and modify the auditor address.
     "2023-06-GSAFAC-0000005147": [
-        modify_pdf_point_at_this_instead("2023-06-GSAFAC-0000002901")
+        upload_pdfs("o-captain.pdf", "o-captain-2.pdf"),
+        modify_auditor_address,
     ],
-    "2023-06-GSAFAC-0000001699": [modify_total_amount_expended],
+    "2023-06-GSAFAC-0000001699": [modify_auditor_address],
     # Do all the things
     "2022-12-GSAFAC-0000007921": [
         modify_auditor_address,
@@ -392,9 +392,18 @@ def get_placeholder_auditor_certification():
 def modify_total_amount_expended(old_sac, new_sac, user_obj):
     logger.info("MODIFIER: modify_total_amount_expended")
     APNE(old_sac, new_sac)
+
+    awards = new_sac.federal_awards["FederalAwards"]
+
     current_amount = old_sac.federal_awards["FederalAwards"]["total_amount_expended"]
     new_amount = current_amount - 100000
-    new_sac.federal_awards["FederalAwards"]["total_amount_expended"] = new_amount
+
+    awards["total_amount_expended"] = new_amount
+
+    first_award = awards["federal_awards"][0]["program"]
+    first_award["amount_expended"] -= 100000
+    first_award["federal_program_total"] -= 100000
+
     return new_sac
 
 
@@ -417,7 +426,7 @@ def modify_auditor_address(old_sac, new_sac, user_obj):
     """
     logger.info("MODIFIER: modify_address")
     APNE(old_sac, new_sac)
-    new_sac.general_information["auditor_address_line_1"] = "123 Across the street"
+    new_sac.general_information["auditor_address_line_1"] = "456 Test Avenue"
     new_sac.general_information["auditor_zip"] = "17921"
     new_sac.general_information["auditor_city"] = "Centralia"
     new_sac.general_information["auditor_state"] = "PA"
@@ -467,11 +476,7 @@ def modify_pdf_point_at_this_instead(old_report_id):
     """
 
     def _do_modify(old_sac, new_sac, user_obj):
-        logger.info("MODIFIER: modify_pdf")
         APNE(old_sac, new_sac)
-        logger.info(
-            f"old_report_id: {old_report_id} new_report_id: {new_sac.report_id}"
-        )
         old_sac = SingleAuditChecklist.objects.get(report_id=old_report_id)
 
         # Now we have a new SAC, and it points to a report.
@@ -482,9 +487,7 @@ def modify_pdf_point_at_this_instead(old_report_id):
 
         # First, delete the SAR(s) we created as a default part of this test data generator.
         recently_created_sars = SingleAuditReportFile.objects.filter(sac=new_sac)
-        logger.info(f"Found new SARS: {len(recently_created_sars)}")
         recently_created_sars.delete()
-        logger.info(f"After delete: {len(recently_created_sars)}")
 
         # Then, copy the SAR associated with the old SAC.
         old_sar = (
@@ -492,7 +495,6 @@ def modify_pdf_point_at_this_instead(old_report_id):
             .order_by("date_created")
             .first()
         )
-        logger.info(f"SAR we are copying ID: {old_sar.id}")
         old_filename = f"{old_sar.filename}"
 
         # Null out the PK, and it will create a new one that is a copy.
@@ -502,14 +504,12 @@ def modify_pdf_point_at_this_instead(old_report_id):
         # Now, point the SAC id of the new SAR at the new SAC id.
         new_sar.sac_id = new_sac.id
         # Save it as a new row
-        logger.info(f"Trying to update filename to {old_filename}")
         new_sar.save(
             administrative_override=True,
             filename_override=old_filename,
             event_user=user_obj,
             event_type="bogus-event-generate-test-pdf",
         )
-        logger.info(f"Saved as id {new_sar.id}")
         return new_sac
 
     return _do_modify
@@ -601,13 +601,35 @@ def append_transition_names(sac: SingleAuditChecklist):
 
 def delete_prior_resubs(sacs):
     """
-    Delete any prior resubmissions, so we regenerate this data clean each time
+    Delete previous generated resubmissions and their
+    dissemination records before regenerating test data.
     """
     for sac in sacs:
         resubs = SingleAuditChecklist.objects.filter(
             resubmission_meta__previous_report_id=sac.report_id
         )
+
         recursively_delete_resubs_for_sac(sac, resubs)
+
+        deleted_count, _ = Resubmission.objects.filter(
+            previous_report_id=sac.report_id
+        ).delete()
+
+        logger.info(
+            "Deleted %s old dissemination resubmission records for %s",
+            deleted_count,
+            sac.report_id,
+        )
+
+
+def reset_original_resubmission_state(sacs):
+    """Reset original reports after deleting generated resubmissions."""
+    for sac in sacs:
+        SingleAuditChecklist.objects.filter(pk=sac.pk).update(
+            resubmission_meta=None,
+        )
+        sac.refresh_from_db()
+        logger.info("Reset resubmission metadata for %s", sac.report_id)
 
 
 def recursively_delete_resubs_for_sac(sac, resubs):
@@ -625,6 +647,7 @@ def recursively_delete_resubs_for_sac(sac, resubs):
         recursively_delete_resubs_for_sac(resub, re_resubs)
 
         logger.info(f"Deleting {resub.report_id}, a resub of {sac.report_id}")
+        Resubmission.objects.filter(previous_report_id=resub.report_id).delete()
         resub.delete()
 
 
@@ -655,6 +678,12 @@ def generate_resubmissions(
                     [],
                 )
 
+                if new_sac is None:
+                    logger.warning(
+                        "Skipping remaining resubmission generation "
+                        "because the previous resubmission failed."
+                    )
+                    break
                 previous_sac = deepcopy(new_sac)
                 APNE(previous_sac, new_sac)
         else:
@@ -668,18 +697,81 @@ def generate_resubmissions(
 
 
 def create_resubmitted_pdf(sac, new_sac):
-    # Get the PDF report associated with this SAC, and
-    # create a "resubmitted" PDF
+    """Copy the original audit PDF into the new resubmission's storage path."""
     sac_sar = SingleAuditReportFile.objects.filter(sac=sac).first()
-    sac_sar.filename = f"singleauditreport/{new_sac.report_id}.pdf"
-    new_sac_sar = SingleAuditReportFile.objects.create(
-        file=sac_sar.file,
-        sac=new_sac,
-        audit=sac_sar.audit,  # We're not bothering to make a new audit
-        user=sac_sar.user,
-        component_page_numbers=sac_sar.component_page_numbers,
+
+    if sac_sar is None:
+        raise ValueError(f"No PDF record found for {sac.report_id}")
+
+    new_filename = f"{new_sac.report_id}.pdf"
+    new_file_path = f"singleauditreport/{new_filename}"
+
+    client = boto3.client(
+        "s3",
+        aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
+        endpoint_url=settings.AWS_S3_ENDPOINT_URL,
     )
-    logger.info(f"Created new SAR with ID: {new_sac_sar.id}")
+
+    bucket = settings.AWS_PRIVATE_STORAGE_BUCKET_NAME
+    source_key = sac_sar.file.name
+
+    try:
+        client.copy_object(
+            Bucket=bucket,
+            CopySource={"Bucket": bucket, "Key": source_key},
+            Key=new_file_path,
+        )
+        logger.info(
+            "Copied PDF from %s to %s",
+            source_key,
+            new_file_path,
+        )
+
+    except ClientError as error:
+        error_code = error.response.get("Error", {}).get("Code")
+
+        if error_code not in ("NoSuchKey", "404", "NotFound"):
+            raise
+
+        logger.warning(
+            "Original PDF missing from RustFS: %s. "
+            "Uploading a fixture PDF for local testing.",
+            source_key,
+        )
+
+        fixture_path = "audit/fixtures/o-captain.pdf"
+
+        with open(fixture_path, "rb") as fixture:
+            client.upload_fileobj(
+                fixture,
+                bucket,
+                source_key,
+            )
+
+        client.copy_object(
+            Bucket=bucket,
+            CopySource={"Bucket": bucket, "Key": source_key},
+            Key=new_file_path,
+        )
+
+        logger.info(
+            "Uploaded fallback PDF and copied it to %s",
+            new_file_path,
+        )
+
+    new_sac_sar = SingleAuditReportFile.objects.create(
+        file=new_file_path,
+        filename=new_filename,
+        sac=new_sac,
+        audit=sac_sar.audit,
+        user=sac_sar.user,
+        component_page_numbers=deepcopy(sac_sar.component_page_numbers),
+    )
+
+    logger.info("Created new SAR with ID: %s", new_sac_sar.id)
+
+    return new_sac_sar
 
 
 # {"ein": "222474723", "audit_type": "single-audit", "auditee_uei": "HXC9E9MTFLB6", "auditee_zip": "06851", "auditor_ein": "060530830", "auditor_zip": "06473", "auditee_city": "Norwalk", "auditee_name": "Miss Laura M. Raymond Homes, Inc.", "auditor_city": "North Haven", "is_usa_based": true, "auditee_email": "scox@ehmchm.org", "auditee_phone": "2032304809", "auditee_state": "CT", "auditor_email": "mloso@sewardmonde.com", "auditor_phone": "2032489341", "auditor_state": "CT", "auditor_country": "USA", "auditor_firm_name": "Seward and Monde, CPAs", "audit_period_covered": "annual", "auditee_contact_name": "Sabine Cox", "auditor_contact_name": "Michele Loso Boisvert", "auditee_contact_title": "Accounting Director", "auditor_contact_title": "Partner", "multiple_eins_covered": false, "multiple_ueis_covered": false, "auditee_address_line_1": "290 Main Avenue", "auditor_address_line_1": "296 State Street", "met_spending_threshold": true, "secondary_auditors_exist": false, "audit_period_other_months": "", "auditee_fiscal_period_end": "2023-06-30", "ein_not_an_ssn_attestation": true, "auditee_fiscal_period_start": "2022-07-01", "auditor_international_address": "", "user_provided_organization_type": "non-profit", "auditor_ein_not_an_ssn_attestation": true}
@@ -750,7 +842,7 @@ def copy_data_over(old_sac, new_sac):
 
 def generate_resubmission(
     old_sac: SingleAuditChecklist, options, modifiers, post_modifiers
-):  #
+):
     """
     Generates a single resubmission
     """
@@ -759,12 +851,33 @@ def generate_resubmission(
 
     # Start by taking a record and duplicating it, save for
     # some of the state around the transitions.
+    profile, _ = UserProfile.objects.get_or_create(
+        user=THE_USER_OBJ,
+    )
+
+    profile.entry_form_data = {
+        **(profile.entry_form_data or {}),
+        "user_provided_organization_type": old_sac.general_information.get(
+            "user_provided_organization_type", "state"
+        ),
+        "met_spending_threshold": True,
+        "is_usa_based": True,
+    }
+
+    profile.save(update_fields=["entry_form_data"])
     new_sac = old_sac.initiate_resubmission(user=THE_USER_OBJ)
+    old_sac.refresh_from_db()
+
     APNE(old_sac, new_sac)
 
-    profile_resubmission_meta = THE_USER_OBJ.profile.entry_form_data.get(
-        "resubmission_meta", {}
-    )
+    profile_resubmission_meta = profile.entry_form_data.get("resubmission_meta", {}) | {
+        "resubmission_type": "audit_pdf",
+        "resubmission_requester": ["auditee"],
+        "material_change_reasons": ["other"],
+        "non_material_change_reasons": [],
+        "sfsac_only_change_reasons": [],
+        "audit_opinion_changes": "Test material change for generated resubmission data.",
+    }
 
     new_sac.resubmission_meta.update(
         {
@@ -783,13 +896,13 @@ def generate_resubmission(
             "audit_opinion_changes": profile_resubmission_meta.get(
                 "audit_opinion_changes", ""
             ),
+            "resubmission_type": profile_resubmission_meta.get(
+                "resubmission_type", "audit_pdf"
+            ),
         }
     )
 
     new_sac.save()
-
-    logger.info(f"New SAC: {new_sac.report_id}")
-    logger.info(f"Created new SAC with ID: {new_sac.id}")
 
     # Copy a PDF and create a new SAR record for it.
     create_resubmitted_pdf(old_sac, new_sac)
@@ -799,6 +912,9 @@ def generate_resubmission(
     # This is not how we would normally do it, but we get a lot of errors otherwise.
     copy_data_over(old_sac, new_sac)
     APNE(old_sac, new_sac)
+    new_sac.general_information["user_provided_organization_type"] = (
+        profile.entry_form_data.get("user_provided_organization_type", "state")
+    )
 
     # Perform modifications on the new resubmission
     # Invokes one or more modification functions (below)
@@ -819,7 +935,7 @@ def generate_resubmission(
         logger.error(
             f"Unable to disseminate report with validation errors: {new_sac.report_id}."
         )
-        logger.info(errors)
+        logger.error(errors)
     else:
         if warnings:
             logger.warning(warnings)
@@ -871,13 +987,15 @@ class Command(BaseCommand):
                 f"Expected {len(reportids_to_modifiers.keys())} SACs, found {len(sacs_for_resubs)}. Make sure to truncate and load tables via menu.bash first."
             )
             logger.error(f"Found: {[getattr(o, 'report_id') for o in sacs_for_resubs]}")
-            diff = set([getattr(o, "report_id") for o in sacs_for_resubs]) - set(
-                reportids_to_modifiers.keys()
-            )
+            diff = set(reportids_to_modifiers.keys()) - {
+                sac.report_id for sac in sacs_for_resubs
+            }
             logger.error(f"Missing: {diff}")
             sys.exit(1)
 
         delete_prior_resubs(sacs_for_resubs)
+        reset_original_resubmission_state(sacs_for_resubs)
+
         generate_resubmissions(
             sacs_for_resubs, reportids_to_modifiers, post_submission_modifiers, options
         )
