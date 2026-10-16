@@ -8,7 +8,7 @@ django-dbbackup==4.2.1
 django-filter==24.3
 django-fsm==3.0.0
 django-storages[boto3]==1.14.2
-django==5.2.17
+django==6.1.2
 djangorestframework==3.18.1
 django-viewflow==2.2.8
 environs[django]==11.0.0
@@ -41,7 +41,7 @@ wheel==0.46.3
 cryptography==50.0.0
 pyjwkest==1.4.4
 python-dotenv==1.2.2
-mako==1.3.12
+mako==1.4.2
 # via oic
 
 idna==3.15
