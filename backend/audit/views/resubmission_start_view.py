@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.views.generic import View
 
 from audit.formlib import ResubmissionForm
-from config.settings import ENVIRONMENT
 
 
 class ResubmissionStartView(LoginRequiredMixin, View):
