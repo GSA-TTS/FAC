@@ -159,7 +159,7 @@ def _chain_creates_orphan(chain_rows):
 
     for i, row in enumerate(chain_rows):
         rid = row["report_id"]
-        resubmission_meta = row.get("prior_resubmission_meta")
+        resubmission_meta = row.get("resubmission_meta") or {}
         prev_rid = resubmission_meta.get("previous_report_id")
         next_rid = resubmission_meta.get("next_report_id")
         is_first = i == 0
