@@ -15,10 +15,6 @@ class ResubmissionStartView(LoginRequiredMixin, View):
     template_name = "audit/resubmission_start_form.html"
 
     def get(self, request, *args, **kwargs):
-        # Only run in non-production environments for now.
-        if ENVIRONMENT == "PRODUCTION":
-            return redirect(reverse("config:Home"))
-
         form = ResubmissionForm()
         return render(
             request,
@@ -30,10 +26,6 @@ class ResubmissionStartView(LoginRequiredMixin, View):
         )
 
     def post(self, request):
-        # Only run in non-production environments for now.
-        if ENVIRONMENT == "PRODUCTION":
-            return redirect(reverse("config:Home"))
-
         form = ResubmissionForm(request.POST)
 
         # If the form is not valid, reload to display the errors
