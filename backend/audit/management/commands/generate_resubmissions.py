@@ -878,7 +878,7 @@ def generate_resubmission(
 
     profile_resubmission_meta = profile.entry_form_data.get("resubmission_meta") or {}
 
-    resubmission_meta = {
+    resubmission_meta: dict[str, str | list[str]] = {
         "resubmission_requester": ["auditee"],
         "material_change_reasons": [],
         "non_material_change_reasons": [],
