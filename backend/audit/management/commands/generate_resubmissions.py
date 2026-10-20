@@ -873,13 +873,10 @@ def generate_resubmission(
     APNE(old_sac, new_sac)
 
     is_pdf_resubmission = any(
-        getattr(modifier, "is_pdf_modifier", False)
-        for modifier in modifiers
+        getattr(modifier, "is_pdf_modifier", False) for modifier in modifiers
     )
 
-    profile_resubmission_meta = (
-        profile.entry_form_data.get("resubmission_meta") or {}
-    )
+    profile_resubmission_meta = profile.entry_form_data.get("resubmission_meta") or {}
 
     resubmission_meta = {
         "resubmission_requester": ["auditee"],
@@ -906,9 +903,7 @@ def generate_resubmission(
             }
         )
 
-    new_sac.resubmission_meta.update(
-        profile_resubmission_meta | resubmission_meta
-    )
+    new_sac.resubmission_meta.update(profile_resubmission_meta | resubmission_meta)
 
     new_sac.save()
 
