@@ -250,6 +250,7 @@ def upload_pdfs(orig_pdf, revised_pdf):
 
         return new_sac
 
+    _fun.is_pdf_modifier = True
     return _fun
 
 
@@ -512,6 +513,7 @@ def modify_pdf_point_at_this_instead(old_report_id):
         )
         return new_sac
 
+    _do_modify.is_pdf_modifier = True
     return _do_modify
 
 
@@ -870,36 +872,42 @@ def generate_resubmission(
 
     APNE(old_sac, new_sac)
 
-    profile_resubmission_meta = profile.entry_form_data.get("resubmission_meta", {}) | {
-        "resubmission_type": "audit_pdf",
+    is_pdf_resubmission = any(
+        getattr(modifier, "is_pdf_modifier", False)
+        for modifier in modifiers
+    )
+
+    profile_resubmission_meta = (
+        profile.entry_form_data.get("resubmission_meta") or {}
+    )
+
+    resubmission_meta = {
         "resubmission_requester": ["auditee"],
-        "material_change_reasons": ["other"],
+        "material_change_reasons": [],
         "non_material_change_reasons": [],
         "sfsac_only_change_reasons": [],
-        "audit_opinion_changes": "Test material change for generated resubmission data.",
     }
 
+    if is_pdf_resubmission:
+        resubmission_meta.update(
+            {
+                "resubmission_type": "audit_pdf",
+                "material_change_reasons": ["other"],
+                "audit_opinion_changes": (
+                    "Test material change for generated resubmission data."
+                ),
+            }
+        )
+    else:
+        resubmission_meta.update(
+            {
+                "resubmission_type": "sfsac_only",
+                "sfsac_only_change_reasons": ["other"],
+            }
+        )
+
     new_sac.resubmission_meta.update(
-        {
-            "resubmission_requester": profile_resubmission_meta.get(
-                "resubmission_requester", []
-            ),
-            "material_change_reasons": profile_resubmission_meta.get(
-                "material_change_reasons", []
-            ),
-            "non_material_change_reasons": profile_resubmission_meta.get(
-                "non_material_change_reasons", []
-            ),
-            "sfsac_only_change_reasons": profile_resubmission_meta.get(
-                "sfsac_only_change_reasons", []
-            ),
-            "audit_opinion_changes": profile_resubmission_meta.get(
-                "audit_opinion_changes", ""
-            ),
-            "resubmission_type": profile_resubmission_meta.get(
-                "resubmission_type", "audit_pdf"
-            ),
-        }
+        profile_resubmission_meta | resubmission_meta
     )
 
     new_sac.save()
