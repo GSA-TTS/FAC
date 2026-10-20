@@ -77,6 +77,29 @@ def generate_submission_chains_by_report_ids(sacs, report_ids):
     return [sacs]
 
 
+def filter_and_sort_chains(chains):
+    """
+    1. Filters out chains with only one lonely SAC.
+    2. Sorts all chains by AY. Chances are, this command is being run by the AY. In which case, this sort is a no-op.
+    But, it helps us see any obviously wrong submissions and it is useful when many years are run at once.
+    3. Sorts submissions in each chain by submission date.
+    4. Add a "skipped" tag to chains in which any of the submissions have equivalent submission dates.
+    This is somewhat common in Census records, since their ETL converted datestamps to timestamps.
+    """
+    chains = [chain for chain in chains if len(chain) > 1]
+
+    sorted_chains = sorted(chains, key=lambda chain: get_audit_year(chain[0]))
+    sorted_chains = [sorted(chain, key=order_reports_key) for chain in sorted_chains]
+
+    for chain in sorted_chains:
+        keys = [order_reports_key(r) for r in chain]
+        skipped = len(set(keys)) != len(keys)
+        for r in chain:
+            r.skipped = skipped
+
+    return sorted_chains
+
+
 def generate_submission_chains_by_equivalence(sacs, noisy=False):
     """
     Group submissions into resubmission chains using exact field equivalence.
@@ -136,15 +159,12 @@ def generate_submission_chains_by_equivalence(sacs, noisy=False):
             partial_index[partial] = canonical_key
         chains[canonical_key].append(r)
 
-    # Discard chains with one lonely SAC.
-    chains = [chain for chain in chains.values() if len(chain) > 1]
+    return filter_and_sort_chains(chains.values())
 
-    # Sort all chains by AY. Chances are, this command is being run by the AY. In which case, this sort is a no-op.
-    # But, it helps us see any obviously wrong submissions and it is useful when many years are run at once.
-    # Then, sort each chain by submission date so the oldest comes first.
-    sorted_chains = sorted(chains, key=lambda chain: get_audit_year(chain[0]))
-    sorted_chains = [sorted(chain, key=order_reports_key) for chain in sorted_chains]
-    return sorted_chains
+
+def is_skipped_chain(chain):
+    """True if any report in the chain has the 'skipped' flag."""
+    return any(getattr(r, "skipped", False) for r in chain)
 
 
 def generate_submission_chains_by_distance(sacs, noisy=False):
