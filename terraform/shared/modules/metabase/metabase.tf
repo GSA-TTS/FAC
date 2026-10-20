@@ -62,6 +62,8 @@ resource "cloudfoundry_app" "app" {
   environment = merge({
     REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
     SSL_CERT_FILE      = "/etc/ssl/certs/ca-certificates.crt"
+    MAX_SESSION_AGE = 1440 # expire session after 24 hours
+    MB_SESSION_COOKIES = true
   }, var.environment_variables)
 
   depends_on = [module.database]
