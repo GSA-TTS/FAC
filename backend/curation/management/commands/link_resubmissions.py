@@ -14,6 +14,7 @@ from audit.models.constants import STATUS
 from curation.curationlib.generate_resubmission_chains import (
     get_and_generate_submission_chains_by_equivalence,
     get_and_generate_submission_chain_by_report_ids,
+    is_skipped_chain,
 )
 from curation.curationlib.util import (
     exit_if_not_staff_user,
@@ -250,7 +251,11 @@ class Command(BaseCommand):
             logger.info("Exiting.")
             sys.exit()
         else:
-            annotate_linked_reports(options, sorted_chains)
+            unskipped_chains = [c for c in sorted_chains if not is_skipped_chain(c)]
+            logger.info(
+                f"Skipping {len(sorted_chains) - len(unskipped_chains)} chains with identical acceptance dates."
+            )
+            annotate_linked_reports(options, unskipped_chains)
 
         if annotate_old:
             annotate_old(options)
