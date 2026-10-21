@@ -477,6 +477,7 @@ def modify_pdf_point_at_this_instead(old_report_id):
     """
 
     def _do_modify(old_sac, new_sac, user_obj):
+        logger.info("MODIFIER: modify_pdf")
         APNE(old_sac, new_sac)
         old_sac = SingleAuditChecklist.objects.get(report_id=old_report_id)
 
