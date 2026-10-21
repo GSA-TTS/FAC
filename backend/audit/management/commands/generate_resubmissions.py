@@ -85,7 +85,7 @@ REPORTIDS_TO_MODIFIERS = lambda: {
         upload_pdfs("o-captain.pdf", "o-captain-2.pdf"),
         modify_auditor_address,
     ],
-    "2023-06-GSAFAC-0000001699": [modify_auditor_address],
+    "2023-06-GSAFAC-0000001699": [modify_total_amount_expended],
     # Do all the things
     "2022-12-GSAFAC-0000007921": [
         modify_auditor_address,
