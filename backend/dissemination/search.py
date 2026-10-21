@@ -108,6 +108,7 @@ def search(request, params):
 
     return results
 
+
 def _create_cache_key(params):
     """
     creates a key used to get/set our cached results
@@ -120,12 +121,13 @@ def _create_cache_key(params):
         cache_prefix = "unified:"
 
     params_string = json.dumps(params)
-    hex_dig = hashlib.md5(params_string.encode('utf-8')).hexdigest()
+    hex_dig = hashlib.md5(params_string.encode("utf-8")).hexdigest()
     cache_key = cache_prefix + "" + hex_dig
 
     logger.info(f"cache key / params ----> {cache_key} >><< {params_string}")
 
     return cache_key
+
 
 def _set_general_defaults(params):
     # Set some defaults.
