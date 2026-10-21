@@ -292,6 +292,16 @@ if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTI
     DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
     DBBACKUP_STORAGE_OPTIONS = {"location": BASE_DIR / "backup"}
 
+    # cache server
+    CACHES = {
+        "default": {
+            "BACKEND": "django_valkey.cache.ValkeyCache",
+            "LOCATION": "valkey://valkey:6379",
+            "KEY_PREFIX": "facapp",  # Prefix all keys to avoid collisions
+            "TIMEOUT": 300,  # Default timeout: 5 minutes
+        }
+    }
+
 else:
     # One of the Cloud.gov environments
     STORAGES = {
@@ -431,6 +441,35 @@ else:
     # Will not be enabled in cloud environments
     DISABLE_AUTH = False
 
+    # cache server settings
+
+    # CACHE_USERNAME = get_cache_username_from_vcap_services(vcap)
+    # CACHE_PASSWORD = get_cache_password_from_vcap_services(vcap)
+    # CACHE_HOSTNAME = get_cache_hostname_from_vcap_services(vcap)
+    # CACHE_PORT     = get_cache_port_____from_vcap_services(vcap)
+
+    # if ENVIRONMENT == "PRODUCTION":
+    #     CACHE_DB = "0",
+
+    # if ENVIRONMENT == "PREVIEW":
+    #     CACHE_DB = "2",
+
+    # if ENVIRONMENT == "STAGING":
+    #     CACHE_DB = "4",
+
+    # if ENVIRONMENT == "DEVELOPMENT":
+    #     CACHE_DB = "6",
+
+    # CACHE_LOCATION = f"valkey://{CACHE_USERNAME}:{CACHE_PASSWORD}@{CACHE_HOSTNAME}:{CACHE_PORT}/{CACHE_DB}"
+
+    # CACHES = {
+    #     "default": {
+    #         "BACKEND": "django_valkey.cache.ValkeyCache",
+    #         "LOCATION": CACHE_LOCATION,
+    #         "KEY_PREFIX": "facapp",  # Prefix all keys to avoid collisions
+    #         "TIMEOUT": 300,          # Default timeout: 5 minutes
+    #     }
+    # }
 
 ADMIN_URL = "admin/"
 

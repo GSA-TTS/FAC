@@ -5,6 +5,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from unittest.mock import patch
+from django.core.cache import cache
 
 from audit.models import (
     ExcelFile,
@@ -177,12 +178,22 @@ class SearchViewTests(TestCase):
     def _search_url(self):
         return reverse("dissemination:Search")
 
+    def _clear_cache(self):
+        # temporarily clearing cache
+        try:
+            cache.clear()
+        except Exception as e:
+            # fail silently
+            print(f"cache connection failed to clear: {e}")
+
     def test_allows_anonymous(self):
         response = self.anon_client.get(self._search_url())
+        self._clear_cache()
         self.assertEqual(response.status_code, 200)
 
     def test_search(self):
         response = self.anon_client.post(self._search_url(), {})
+        self._clear_cache()
         self.assertContains(
             response, "is updated in real time and can be used to confirm"
         )
@@ -239,6 +250,8 @@ class SearchViewTests(TestCase):
         public, private, deprecated = self._make_reports()
         response = self.anon_client.post(self._search_url(), {})
 
+        self._clear_cache()
+
         # Should include 10 results (public + private), excluding deprecated
         self.assertContains(response, "<strong>10</strong>")
 
@@ -257,6 +270,8 @@ class SearchViewTests(TestCase):
         public, private, deprecated = self._make_reports()
         response = self.auth_client.post(self._search_url(), {})
 
+        self._clear_cache()
+
         self.assertContains(response, "<strong>10</strong>")
 
         for g in public:
@@ -272,6 +287,8 @@ class SearchViewTests(TestCase):
         """
         public, private, deprecated = self._make_reports()
         response = self.perm_client.post(self._search_url(), {})
+
+        self._clear_cache()
 
         self.assertContains(response, "<strong>12</strong>")
 

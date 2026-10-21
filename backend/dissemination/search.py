@@ -1,6 +1,8 @@
 import json
 import logging
 import time
+import hashlib
+from django.core.cache import cache
 from .searchlib.search_constants import OrderBy, Direction, DAS_LIMIT
 from .searchlib.search_general import report_timing, search_general
 from .searchlib.search_alns import search_alns
@@ -60,31 +62,70 @@ def search(request, params):
     # Time the whole thing.
     t0 = time.time()
 
-    if only_searching_on_general(params):
-        # Don't bother querying the huge tables if General can be used instead
-        logger.info("search Searching `General`")
-        results = search_general(General, params)
-    else:
-        logger.info("search Searching `Unified`")
-        results = search_general(Unified, params)
-        results = search_alns(results, params)
-        results = search_cog_or_oversight(results, params)
-        results = search_federal_program_name(results, params)
-        results = search_findings(results, params)
-        results = search_direct_funding(results, params)
-        results = search_major_program(results, params)
-        results = search_passthrough_name(results, params)
-        results = search_type_requirement(results, params)
+    cache_key = _create_cache_key(params)
 
-    results = search_resubmissions(request, results, params)
-    results = _sort_results(results, params)
-    results = _make_distinct(results, params)
+    # reading from cache
+    try:
+        results = cache.get(cache_key)
+    except Exception as e:
+        # fail silently
+        logger.error(f"cache connection failed during read: {e}")
+
+    # should we retry a request if cached results are blank or empty ??!!
+
+    if results is None:
+        logger.info("--->> NOT USING CACHE <<---")
+
+        if only_searching_on_general(params):
+            # Don't bother querying the huge tables if General can be used instead
+            logger.info("search Searching `General`")
+            results = search_general(General, params)
+        else:
+            logger.info("search Searching `Unified`")
+            results = search_general(Unified, params)
+            results = search_alns(results, params)
+            results = search_cog_or_oversight(results, params)
+            results = search_federal_program_name(results, params)
+            results = search_findings(results, params)
+            results = search_direct_funding(results, params)
+            results = search_major_program(results, params)
+            results = search_passthrough_name(results, params)
+            results = search_type_requirement(results, params)
+
+        results = search_resubmissions(request, results, params)
+        results = _sort_results(results, params)
+        results = _make_distinct(results, params)
+
+        # writing to cache
+        try:
+            cache.set(cache_key, results, timeout=300)
+        except Exception as e:
+            # fail silently
+            logger.error(f"cache connection failed during write: {e}")
 
     t1 = time.time()
     report_timing("search", params, t0, t1)
 
     return results
 
+def _create_cache_key(params):
+    """
+    creates a key used to get/set our cached results
+    we hash our params to get a unique key
+    """
+
+    if only_searching_on_general(params):
+        cache_prefix = "general:"
+    else:
+        cache_prefix = "unified:"
+
+    params_string = json.dumps(params)
+    hex_dig = hashlib.md5(params_string.encode('utf-8')).hexdigest()
+    cache_key = cache_prefix + "" + hex_dig
+
+    logger.info(f"cache key / params ----> {cache_key} >><< {params_string}")
+
+    return cache_key
 
 def _set_general_defaults(params):
     # Set some defaults.

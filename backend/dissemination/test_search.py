@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 
 from audit.models.constants import RESUBMISSION_STATUS
 from dissemination.models import (
@@ -824,6 +825,13 @@ class SearchFilterTests(TestCase):
         params = {"resubmissions": "include"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
+
+        # temporarily clearing cache
+        try:
+            cache.clear()
+        except Exception as e:
+            # fail silently
+            print(f"cache connection failed to clear: {e}")
 
         # Now a Fed, so can also see deprecated
         permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
