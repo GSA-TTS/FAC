@@ -479,6 +479,11 @@ def modify_pdf_point_at_this_instead(old_report_id):
     def _do_modify(old_sac, new_sac, user_obj):
         logger.info("MODIFIER: modify_pdf")
         APNE(old_sac, new_sac)
+
+        logger.info(
+            f"old_report_id: {old_report_id} new_report_id: {new_sac.report_id}"
+        )
+
         old_sac = SingleAuditChecklist.objects.get(report_id=old_report_id)
 
         # Now we have a new SAC, and it points to a report.
@@ -489,7 +494,9 @@ def modify_pdf_point_at_this_instead(old_report_id):
 
         # First, delete the SAR(s) we created as a default part of this test data generator.
         recently_created_sars = SingleAuditReportFile.objects.filter(sac=new_sac)
+        logger.info(f"Found new SARS: {len(recently_created_sars)}")
         recently_created_sars.delete()
+        logger.info(f"After delete: {len(recently_created_sars)}")
 
         # Then, copy the SAR associated with the old SAC.
         old_sar = (
@@ -497,6 +504,7 @@ def modify_pdf_point_at_this_instead(old_report_id):
             .order_by("date_created")
             .first()
         )
+        logger.info(f"SAR we are copying ID: {old_sar.id}")
         old_filename = f"{old_sar.filename}"
 
         # Null out the PK, and it will create a new one that is a copy.
@@ -506,12 +514,14 @@ def modify_pdf_point_at_this_instead(old_report_id):
         # Now, point the SAC id of the new SAR at the new SAC id.
         new_sar.sac_id = new_sac.id
         # Save it as a new row
+        logger.info(f"Trying to update filename to {old_filename}")
         new_sar.save(
             administrative_override=True,
             filename_override=old_filename,
             event_user=user_obj,
             event_type="bogus-event-generate-test-pdf",
         )
+        logger.info(f"Saved as id {new_sar.id}")
         return new_sac
 
     _do_modify.is_pdf_modifier = True
