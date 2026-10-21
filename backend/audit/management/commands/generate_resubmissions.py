@@ -57,7 +57,7 @@ REPORTIDS_TO_MODIFIERS = lambda: {
     ],
     "2023-06-GSAFAC-0000002166": [
         modify_auditee_ein,
-        # The second file contains an image; the second does not
+        # The first file contains an image; the second does not
         upload_pdfs("federalist.pdf", "federalist-2.pdf"),
     ],
     # Modifying the workbook requires there to be additional EINs
