@@ -668,7 +668,7 @@ class IntakeToDissemination(object):
 
     def _generate_unified_helper(self, gen, gen_dict, fed_dict, fin, pt):
         aln = (
-            f"{fed_dict["federal_agency_prefix"]}.{fed_dict["federal_award_extension"]}"
+            f"{fed_dict['federal_agency_prefix']}.{fed_dict['federal_award_extension']}"
         )
         params = {
             "aln": aln,
