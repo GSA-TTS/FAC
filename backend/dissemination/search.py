@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-import hashlib
+import xxhash
 from django.core.cache import cache
 from .searchlib.search_constants import OrderBy, Direction, DAS_LIMIT
 from .searchlib.search_general import report_timing, search_general
@@ -63,18 +63,20 @@ def search(request, params):
     t0 = time.time()
 
     cache_key = _create_cache_key(params)
+    results = None
 
     # reading from cache
     try:
+        logger.info(f"CACHE: reading cache result for cache_key: [{cache_key}]")
         results = cache.get(cache_key)
     except Exception as e:
         # fail silently
-        logger.error(f"cache connection failed during read: {e}")
+        logger.error(f"CACHE: cache connection failed during read: {e}")
 
     # should we retry a request if cached results are blank or empty ??!!
 
     if results is None:
-        logger.info("--->> NOT USING CACHE <<---")
+        logger.info(f"CACHE: cache_key: [{cache_key}] result not found. querying DB...")
 
         if only_searching_on_general(params):
             # Don't bother querying the huge tables if General can be used instead
@@ -98,10 +100,13 @@ def search(request, params):
 
         # writing to cache
         try:
-            cache.set(cache_key, results, timeout=300)
+            logger.info(
+                f"CACHE: writing search results to cache for cache_key: [{cache_key}]"
+            )
+            cache.set(cache_key, results)
         except Exception as e:
             # fail silently
-            logger.error(f"cache connection failed during write: {e}")
+            logger.error(f"CACHE: cache connection failed during write: {e}")
 
     t1 = time.time()
     report_timing("search", params, t0, t1)
@@ -111,21 +116,20 @@ def search(request, params):
 
 def _create_cache_key(params):
     """
-    creates a key used to get/set our cached results
-    we hash our params to get a unique key
+    create a key used to get/set our cached results by:
+    - hashing the params to create a unique identifier
+    - prefixing that hash to identify which search table is used
     """
-
     if only_searching_on_general(params):
-        cache_prefix = "general:"
+        prefix_tag = "general:"
     else:
-        cache_prefix = "unified:"
+        prefix_tag = "unified:"
 
     params_string = json.dumps(params)
-    hex_dig = hashlib.md5(params_string.encode("utf-8")).hexdigest()
-    cache_key = cache_prefix + "" + hex_dig
+    hex_dig = xxhash.xxh64_hexdigest(params_string.encode("utf-8"))
+    cache_key = prefix_tag + "" + hex_dig
 
-    logger.info(f"cache key / params ----> {cache_key} >><< {params_string}")
-
+    logger.info(f"CACHE: [cache_key] - [params] <-> [{cache_key}] - [{params_string}]")
     return cache_key
 
 
