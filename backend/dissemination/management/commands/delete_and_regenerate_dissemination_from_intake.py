@@ -81,8 +81,6 @@ class Command(BaseCommand):
                 logger.info("Redisseminating all records.")
                 years = range(2015, date.today().year + 1)
 
-            redisseminated = {}
-
             for year in years:
                 logger.info(f"Working year {year}")
 
@@ -94,6 +92,5 @@ class Command(BaseCommand):
                 for sac in queryset.iterator(chunk_size=CHUNK_SIZE):
                     logger.info(f"Redisseminating {sac.report_id}.")
                     sac.redisseminate()
-                    redisseminated[sac.report_id] = True
 
         logger.info("Redisseminating complete.")
