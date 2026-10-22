@@ -619,9 +619,9 @@ levenshtein==0.27.1 \
     --hash=sha256:ff5afb78719659d353055863c7cb31599fbea6865c0890b2d840ee40214b3ddb \
     --hash=sha256:ffdd9056c7afb29aea00b85acdb93a3524e43852b934ebb9126c901506d7a1ed
     # via -r requirements/requirements.in
-mako==1.3.12 \
-    --hash=sha256:8f61569480282dbf557145ce441e4ba888be453c30989f879f0d652e39f53ea9 \
-    --hash=sha256:9f778e93289bd410bb35daadeb4fc66d95a746f0b75777b942088b7fd7af550a
+mako==1.4.2 \
+    --hash=sha256:7227a060ee3af55a493af61d73d6beef13044b81dba9586736c13945f09464ce \
+    --hash=sha256:e70a2a4308952b33a21208bfd6725da79fae5a8c224578f8cfdeb60e5ace03df
     # via
     #   -r requirements/requirements.in
     #   oic
