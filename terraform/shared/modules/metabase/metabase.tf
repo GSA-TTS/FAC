@@ -19,7 +19,7 @@ data "cloudfoundry_space" "app_space" {
 }
 
 data "docker_registry_image" "metabase" {
-  name = "ghcr.io/gsa-tts/fac/metabase:latest"
+  name = "ghcr.io/gsa-tts/fac/metabase:v0.64.3"
 }
 
 resource "cloudfoundry_route" "app_route" {
