@@ -1,6 +1,8 @@
 import json
 import logging
 import time
+import xxhash
+from django.core.cache import cache
 from .searchlib.search_constants import OrderBy, Direction, DAS_LIMIT
 from .searchlib.search_general import report_timing, search_general
 from .searchlib.search_alns import search_alns
@@ -60,30 +62,75 @@ def search(request, params):
     # Time the whole thing.
     t0 = time.time()
 
-    if only_searching_on_general(params):
-        # Don't bother querying the huge tables if General can be used instead
-        logger.info("search Searching `General`")
-        results = search_general(General, params)
-    else:
-        logger.info("search Searching `Unified`")
-        results = search_general(Unified, params)
-        results = search_alns(results, params)
-        results = search_cog_or_oversight(results, params)
-        results = search_federal_program_name(results, params)
-        results = search_findings(results, params)
-        results = search_direct_funding(results, params)
-        results = search_major_program(results, params)
-        results = search_passthrough_name(results, params)
-        results = search_type_requirement(results, params)
+    cache_key = _create_cache_key(params)
+    results = None
 
-    results = search_resubmissions(request, results, params)
-    results = _sort_results(results, params)
-    results = _make_distinct(results, params)
+    # reading from cache
+    try:
+        logger.info(f"CACHE: reading cache result for cache_key: [{cache_key}]")
+        results = cache.get(cache_key)
+    except Exception as e:
+        # fail silently
+        logger.error(f"CACHE: cache connection failed during read: {e}")
+
+    # should we retry a request if cached results are blank or empty ??!!
+
+    if results is None:
+        logger.info(f"CACHE: cache_key: [{cache_key}] result not found. querying DB...")
+
+        if only_searching_on_general(params):
+            # Don't bother querying the huge tables if General can be used instead
+            logger.info("search Searching `General`")
+            results = search_general(General, params)
+        else:
+            logger.info("search Searching `Unified`")
+            results = search_general(Unified, params)
+            results = search_alns(results, params)
+            results = search_cog_or_oversight(results, params)
+            results = search_federal_program_name(results, params)
+            results = search_findings(results, params)
+            results = search_direct_funding(results, params)
+            results = search_major_program(results, params)
+            results = search_passthrough_name(results, params)
+            results = search_type_requirement(results, params)
+
+        results = search_resubmissions(request, results, params)
+        results = _sort_results(results, params)
+        results = _make_distinct(results, params)
+
+        # writing to cache
+        try:
+            logger.info(
+                f"CACHE: writing search results to cache for cache_key: [{cache_key}]"
+            )
+            cache.set(cache_key, results)
+        except Exception as e:
+            # fail silently
+            logger.error(f"CACHE: cache connection failed during write: {e}")
 
     t1 = time.time()
     report_timing("search", params, t0, t1)
 
     return results
+
+
+def _create_cache_key(params):
+    """
+    create a key used to get/set our cached results by:
+    - hashing the params to create a unique identifier
+    - prefixing that hash to identify which search table is used
+    """
+    if only_searching_on_general(params):
+        prefix_tag = "general:"
+    else:
+        prefix_tag = "unified:"
+
+    params_string = json.dumps(params)
+    hex_dig = xxhash.xxh64_hexdigest(params_string.encode("utf-8"))
+    cache_key = prefix_tag + "" + hex_dig
+
+    logger.info(f"CACHE: [cache_key] - [params] <-> [{cache_key}] - [{params_string}]")
+    return cache_key
 
 
 def _set_general_defaults(params):
