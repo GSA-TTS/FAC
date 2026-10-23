@@ -31,6 +31,23 @@ env = environs.Env()
 
 ENVIRONMENT = env.str("ENV", "UNDEFINED").upper()
 
+
+# Ensure your sessions are actually pointed to the cache
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+# Sessions can be saved to the cache and the database
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache_db"
+
+# Force sessions to save to the database (this is the django default)
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+# stores session data directly inside a cryptographically signed cookie
+# SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+
+# stores session files on the server disk
+# SESSION_ENGINE = "django.contrib.sessions.backends.signed_file"
+
+
 key_service = AppEnv().get_service(name="fac-key-service")
 if key_service and key_service.credentials:
     secret = key_service.credentials.get
@@ -472,7 +489,6 @@ else:
     # }
 
 ADMIN_URL = "admin/"
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
