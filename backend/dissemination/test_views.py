@@ -187,13 +187,11 @@ class SearchViewTests(TestCase):
             print(f"cache connection failed to clear: {e}")
 
     def test_allows_anonymous(self):
-        self._clear_cache()
         response = self.anon_client.get(self._search_url())
         self._clear_cache()
         self.assertEqual(response.status_code, 200)
 
     def test_search(self):
-        self._clear_cache()
         response = self.anon_client.post(self._search_url(), {})
         self._clear_cache()
         self.assertContains(
@@ -249,8 +247,6 @@ class SearchViewTests(TestCase):
         """
         Anonymous users should see public + private reports, but NOT audits deprecated via resubmission.
         """
-        self._clear_cache()
-
         public, private, deprecated = self._make_reports()
         response = self.anon_client.post(self._search_url(), {})
 
@@ -271,8 +267,6 @@ class SearchViewTests(TestCase):
         Authenticated but non-permissioned users should see public + private reports,
         but NOT audits deprecated via resubmission.
         """
-        self._clear_cache()
-
         public, private, deprecated = self._make_reports()
         response = self.auth_client.post(self._search_url(), {})
 
@@ -291,8 +285,6 @@ class SearchViewTests(TestCase):
         """
         Permissioned users should see all reports.
         """
-        self._clear_cache()
-
         public, private, deprecated = self._make_reports()
         response = self.perm_client.post(self._search_url(), {})
 

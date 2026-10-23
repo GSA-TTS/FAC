@@ -8,7 +8,7 @@ django-dbbackup==4.2.1
 django-filter==24.3
 django-fsm==3.0.0
 django-storages[boto3]==1.14.2
-django-valkey==0.4.1
+django-valkey[zstd]==0.4.1
 django-viewflow==2.2.8
 django==5.2.17
 djangorestframework==3.18.1
