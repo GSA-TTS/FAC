@@ -24,7 +24,20 @@ resource "cloudfoundry_app" "postgrest" {
   instances    = var.postgrest_instances
   strategy     = "rolling"
   environment = {
-    PGRST_DB_URI : var.cf_space.name == "production" || var.cf_space.name == "preview" ? cloudfoundry_service_key.postgrest.credentials.replica_uri : cloudfoundry_service_key.postgrest.credentials.uri
+    # Prod and preview: multi-host URI, read replica first, primary second.
+    # `target_session_attrs` lets the PostgREST LISTEN sessions work off the primary DB, since we post to those on app startup.
+    # Format: postgres://user:pass@read_replica.host:port,primary.host:port/dbname?options
+    # I realise this is gross. It's also easy to read, and I'll make it nicer after all the tests.
+    PGRST_DB_URI : var.cf_space.name == "production" || var.cf_space.name == "preview" ? format(
+      "postgres://%s:%s@%s:%s,%s:%s/%s?target_session_attrs=read-only",
+      cloudfoundry_service_key.postgrest.credentials.username,
+      cloudfoundry_service_key.postgrest.credentials.password,
+      cloudfoundry_service_key.postgrest.credentials.replica_host,
+      cloudfoundry_service_key.postgrest.credentials.port,
+      cloudfoundry_service_key.postgrest.credentials.host,
+      cloudfoundry_service_key.postgrest.credentials.port,
+      cloudfoundry_service_key.postgrest.credentials.db_name
+    ) : cloudfoundry_service_key.postgrest.credentials.uri
     PGRST_DB_SCHEMAS : "api_v1_1_0,api_v1_2_0,api_v1_3_0,api_v1_3_1,admin_api_v1_1_0"
     PGRST_DB_ANON_ROLE : "anon"
     PGRST_JWT_SECRET : var.pgrst_jwt_secret
