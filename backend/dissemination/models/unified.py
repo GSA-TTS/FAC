@@ -1,8 +1,9 @@
 import copy
+from typing import List, Tuple, Type
 
 from django.db import models
 from django.db.models.functions import Lower
-from typing import List, Tuple, Type
+from django.contrib.postgres.indexes import GinIndex
 
 from .constants import REPORT_ID_FK_HELP_TEXT
 from dissemination.models import (
@@ -78,6 +79,7 @@ fields_to_import: List[Tuple[Type[models.Model], List[str]]] = [
             "type_audit_code",
             "is_public",
             "data_source",
+            "search_vector",
         ],
     ),
     (
@@ -154,6 +156,7 @@ class Unified(models.Model):
         db_table = "dissemination_unified"
 
         indexes = [
+            GinIndex(fields=["search_vector"], name="search_vector_unified_gin_idx"),
             models.Index(
                 Lower("auditee_certify_name"), name="du_auditee_certify_name_idx"
             ),

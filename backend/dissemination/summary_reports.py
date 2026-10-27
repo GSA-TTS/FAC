@@ -398,11 +398,11 @@ def gather_report_data_dissemination(report_ids, tribal_report_ids, include_priv
     names_not_in_dc = all_names - names_in_dc
     data = initialize_data_structure(names_in_dc.union(names_not_in_dc))
 
-    process_combined_results(
+    process_unified_results(
         report_ids, names_in_dc, data, include_private, tribal_report_ids
     )
 
-    process_non_combined_results(
+    process_non_unified_results(
         report_ids, names_not_in_dc, data, include_private, tribal_report_ids
     )
 
@@ -419,19 +419,19 @@ def initialize_data_structure(names):
     return data
 
 
-def process_combined_results(
+def process_unified_results(
     report_ids, names_in_dc, data, include_private, tribal_report_ids
 ):
-    # Grab all the rows from the combined table into a local structure.
+    # Grab all the rows from the Unified table into a local structure.
     # We'll do this in memory. This table flattens general, federalaward, and findings
     # so we can move much faster on those tables without extra lookups.
-    dc_results = Unified.objects.all().filter(report_id__in=report_ids)
+    du_results = Unified.objects.all().filter(report_id__in=report_ids)
 
     # Different tables want to be visited/filtered differently.
     visited = set()
     # Do all of the names in Unified at the same time.
     # That way, we only go through the results once.
-    for obj in dc_results:
+    for obj in du_results:
         for model_name in names_in_dc:
             field_names = field_name_ordered[model_name]
             report_id = getattr(obj, "report_id")
@@ -465,7 +465,7 @@ def process_combined_results(
             ####
             # FINDING
             elif model_name == "finding" and (
-                award_reference is None or reference_number is None
+                not award_reference or not reference_number
             ):
                 # And we don't include rows in finding where there are none.
                 pass
@@ -489,7 +489,7 @@ def process_combined_results(
                     )
 
 
-def process_non_combined_results(
+def process_non_unified_results(
     report_ids, names_not_in_dc, data, include_private, tribal_report_ids
 ):
     for model_name in names_not_in_dc:

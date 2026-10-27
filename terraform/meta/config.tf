@@ -22,8 +22,7 @@ locals {
     "daryll.pierre@gsa.gov",
     "james.person@gsa.gov",
     "philip.dominguez@gsa.gov",
-    "ranye.mclendon@gsa.gov",
-    "annie.rodriguezdelacruz@gsa.gov"
+    "ranye.mclendon@gsa.gov"
   ]
 
   # All spaces have the same SpaceManagers for now
