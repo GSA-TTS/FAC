@@ -131,13 +131,15 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 report_id=previous_report_id
             ).first()  # Evals to None if there isn't a previous report
 
-            # Determine if the auditee certifier is the same as the current user.
-            # If there is no auditee certifier, default to False.
             is_user_auditee_certifier = has_role(
-                sac, request.user, AccessRole.CERTIFYING_AUDITEE_CONTACT
+                sac,
+                request.user,
+                AccessRole.CERTIFYING_AUDITEE_CONTACT,
             )
             is_user_auditor_certifier = has_role(
-                sac, request.user, AccessRole.CERTIFYING_AUDITOR_CONTACT
+                sac,
+                request.user,
+                AccessRole.CERTIFYING_AUDITOR_CONTACT,
             )
 
             is_tribal_data_consent_complete = True if sac.tribal_data_consent else False
