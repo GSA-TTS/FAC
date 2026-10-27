@@ -1343,7 +1343,7 @@ class TestValidateGeneralInformation(SimpleTestCase):
 
 def test_migrated_records_require_five_character_names(self):
     data = self.valid_general_information.copy()
-    data["auditee_name"] = "John"
+    data["auditee_name"] = "John LLC"
 
     with self.assertRaises(ValidationError):
         validate_general_information_json(data, is_data_migration=True)
