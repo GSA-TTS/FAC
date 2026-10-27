@@ -80,7 +80,7 @@
       },
       "auditee_name": {
          "maxLength": 100,
-         "minLength": 2,
+         "minLength": 5,
          "type": "string"
       },
       "auditee_phone": {
@@ -249,7 +249,7 @@
       },
       "auditor_firm_name": {
          "maxLength": 100,
-         "minLength": 2,
+         "minLength": 5,
          "type": "string"
       },
       "auditor_international_address": {

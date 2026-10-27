@@ -53,6 +53,7 @@ from .validators import (
     validate_audit_information_json,
     validate_tribal_data_consent_json,
     validate_general_information_json,
+    validate_general_information_names,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -970,20 +971,82 @@ class TribalAccessTests(SimpleTestCase):
                 validate_tribal_data_consent_json(case_copy)
 
 
+class GeneralInformationNameTests(SimpleTestCase):
+    def test_valid_organization_names(self):
+        for field in ("auditee_name", "auditor_firm_name"):
+            for name in ("A LLC", "Acme Accounting", "ABC & Co."):
+                with self.subTest(field=field, name=name):
+                    data = {field: name}
+                    self.assertEqual(
+                        validate_general_information_names(data),
+                        data,
+                    )
+
+    def test_organization_names_too_short(self):
+        for field in ("auditee_name", "auditor_firm_name"):
+            with self.subTest(field=field):
+                with self.assertRaisesMessage(
+                    ValidationError,
+                    f"{field} must be at least 5 characters long.",
+                ):
+                    validate_general_information_names({field: "ABC"})
+
+    def test_names_cannot_be_only_numbers_or_symbols(self):
+        for field in (
+            "auditee_name",
+            "auditor_firm_name",
+            "auditee_contact_name",
+            "auditor_contact_name",
+        ):
+            for name in ("123456789", "!!!!!!!", "123-456"):
+                with self.subTest(field=field, name=name):
+                    with self.assertRaises(ValidationError):
+                        validate_general_information_names({field: name})
+
+    def test_names_cannot_contain_ein(self):
+        for field in ("auditee_name", "auditor_firm_name"):
+            with self.subTest(field=field):
+                with self.assertRaisesMessage(
+                    ValidationError,
+                    f"{field} cannot contain an EIN or UEI.",
+                ):
+                    validate_general_information_names({
+                        field: "123456789 Accounting",
+                        "ein": "123456789",
+                    })
+
+    def test_names_cannot_contain_uei(self):
+        for field in ("auditee_name", "auditor_firm_name"):
+            with self.subTest(field=field):
+                with self.assertRaisesMessage(
+                    ValidationError,
+                    f"{field} cannot contain an EIN or UEI.",
+                ):
+                    validate_general_information_names({
+                        field: "ABC123456789 Consulting",
+                        "auditee_uei": "ABC123456789",
+                    })
+
+    def test_valid_contact_names(self):
+        for field in ("auditee_contact_name", "auditor_contact_name"):
+            with self.subTest(field=field):
+                data = {field: "Jo"}
+                self.assertEqual(
+                    validate_general_information_names(data),
+                    data,
+                )
+
+
 class GeneralInformationTests(SimpleTestCase):
     def test_no_error_standard_case(self):
         """No error should be raised when is_gsa_migration is not supplied and no emails contain GSA_MIGRATION"""
-        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-            "GeneralInformationCase"
-        ]
+        gen_info = self.get_general_information()
 
         validate_general_information_json(gen_info)
 
     def test_error_default_is_gsa_migration(self):
         """An error should be raised when is_gsa_migration is False and an email contains GSA_MIGRATION"""
-        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-            "GeneralInformationCase"
-        ]
+        gen_info = self.get_general_information()
         gen_info["auditee_email"] = settings.GSA_MIGRATION
 
         with self.assertRaises(ValidationError):
@@ -991,27 +1054,21 @@ class GeneralInformationTests(SimpleTestCase):
 
     def test_no_error_is_gsa_migration_auditee_email(self):
         """No error should be raised when is_gsa_migration is True and auditee_email contains GSA_MIGRATION"""
-        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-            "GeneralInformationCase"
-        ]
+        gen_info = self.get_general_information()
         gen_info["auditee_email"] = settings.GSA_MIGRATION
 
         validate_general_information_json(gen_info, True)
 
     def test_no_error_is_gsa_migration_auditor_email(self):
         """No error should be raised when is_gsa_migration is True and auditor_email contains GSA_MIGRATION"""
-        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-            "GeneralInformationCase"
-        ]
+        gen_info = self.get_general_information()
         gen_info["auditor_email"] = settings.GSA_MIGRATION
 
         validate_general_information_json(gen_info, True)
 
     def test_error_is_not_gsa_migration_auditee_email(self):
         """An error should be raised when is_gsa_migration is False and auditee_email contains GSA_MIGRATION"""
-        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-            "GeneralInformationCase"
-        ]
+        gen_info = self.get_general_information()
         gen_info["auditee_email"] = settings.GSA_MIGRATION
 
         with self.assertRaises(ValidationError):
@@ -1019,13 +1076,20 @@ class GeneralInformationTests(SimpleTestCase):
 
     def test_error_is_not_gsa_migration_auditor_email(self):
         """An error should be raised when is_gsa_migration is False and auditor_email contains GSA_MIGRATION"""
-        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-            "GeneralInformationCase"
-        ]
+        gen_info = self.get_general_information()
         gen_info["auditor_email"] = settings.GSA_MIGRATION
 
         with self.assertRaises(ValidationError):
             validate_general_information_json(gen_info, False)
+
+    def get_general_information(self):
+        gen_info = json.loads(
+            SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8")
+        )["GeneralInformationCase"]
+
+        gen_info["auditee_name"] = "John LLC"
+
+        return gen_info
 
 
 class TestValidateGeneralInformation(SimpleTestCase):
@@ -1259,7 +1323,7 @@ class TestValidateGeneralInformation(SimpleTestCase):
         with self.assertRaises(ValidationError):
             validate_general_information_schema_rules(self.missing_state_and_zip)
 
-    def tes_validate_general_information_json(self):
+    def test_validate_general_information_json(self):
         """
         Test the validation method with valid general information data.
         """
@@ -1271,3 +1335,17 @@ class TestValidateGeneralInformation(SimpleTestCase):
             self.fail(
                 "validate_general_information_json raised ValidationError unexpectedly!"
             )
+
+
+    def test_migrated_records_require_five_character_names(self):
+        data = self.valid_general_information.copy()
+        data["auditee_name"] = "John"
+
+        with self.assertRaises(ValidationError):
+            validate_general_information_json(data, is_data_migration=True)
+
+        data = self.valid_general_information.copy()
+        data["auditor_firm_name"] = "Acme"
+
+        with self.assertRaises(ValidationError):
+            validate_general_information_json(data, is_data_migration=True)

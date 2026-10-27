@@ -28,7 +28,7 @@
     "max": 320
   },
   "auditee_name": {
-    "min": 2,
+    "min": 5,
     "max": 100
   },
   "auditee_phone": {
@@ -96,7 +96,7 @@
     "max": 320
   },
   "auditor_firm_name": {
-    "min": 2,
+    "min": 5,
     "max": 100
   },
   "auditor_foreign_address": {
