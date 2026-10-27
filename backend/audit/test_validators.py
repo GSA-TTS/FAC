@@ -1010,10 +1010,12 @@ class GeneralInformationNameTests(SimpleTestCase):
                     ValidationError,
                     f"{field} cannot contain an EIN or UEI.",
                 ):
-                    validate_general_information_names({
-                        field: "123456789 Accounting",
-                        "ein": "123456789",
-                    })
+                    validate_general_information_names(
+                        {
+                            field: "123456789 Accounting",
+                            "ein": "123456789",
+                        }
+                    )
 
     def test_names_cannot_contain_uei(self):
         for field in ("auditee_name", "auditor_firm_name"):
@@ -1022,10 +1024,12 @@ class GeneralInformationNameTests(SimpleTestCase):
                     ValidationError,
                     f"{field} cannot contain an EIN or UEI.",
                 ):
-                    validate_general_information_names({
-                        field: "ABC123456789 Consulting",
-                        "auditee_uei": "ABC123456789",
-                    })
+                    validate_general_information_names(
+                        {
+                            field: "ABC123456789 Consulting",
+                            "auditee_uei": "ABC123456789",
+                        }
+                    )
 
     def test_valid_contact_names(self):
         for field in ("auditee_contact_name", "auditor_contact_name"):
@@ -1083,9 +1087,9 @@ class GeneralInformationTests(SimpleTestCase):
             validate_general_information_json(gen_info, False)
 
     def get_general_information(self):
-        gen_info = json.loads(
-            SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8")
-        )["GeneralInformationCase"]
+        gen_info = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+            "GeneralInformationCase"
+        ]
 
         gen_info["auditee_name"] = "John LLC"
 
@@ -1337,15 +1341,15 @@ class TestValidateGeneralInformation(SimpleTestCase):
             )
 
 
-    def test_migrated_records_require_five_character_names(self):
-        data = self.valid_general_information.copy()
-        data["auditee_name"] = "John"
+def test_migrated_records_require_five_character_names(self):
+    data = self.valid_general_information.copy()
+    data["auditee_name"] = "John"
 
-        with self.assertRaises(ValidationError):
-            validate_general_information_json(data, is_data_migration=True)
+    with self.assertRaises(ValidationError):
+        validate_general_information_json(data, is_data_migration=True)
 
-        data = self.valid_general_information.copy()
-        data["auditor_firm_name"] = "Acme"
+    data = self.valid_general_information.copy()
+    data["auditor_firm_name"] = "Acme"
 
-        with self.assertRaises(ValidationError):
-            validate_general_information_json(data, is_data_migration=True)
+    with self.assertRaises(ValidationError):
+        validate_general_information_json(data, is_data_migration=True)

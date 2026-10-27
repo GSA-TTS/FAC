@@ -148,9 +148,7 @@ def validate_general_information_names(general_information):
             continue
 
         if field in ("auditee_name", "auditor_firm_name") and len(name.strip()) < 5:
-            raise ValidationError(
-                f"{field} must be at least 5 characters long."
-            )
+            raise ValidationError(f"{field} must be at least 5 characters long.")
 
         if not any(char.isalpha() for char in name):
             raise ValidationError(
@@ -164,9 +162,7 @@ def validate_general_information_names(general_information):
             general_information.get("auditee_uei"),
         ]:
             if identifier and identifier.upper() in name.upper():
-                raise ValidationError(
-                    f"{field} cannot contain an EIN or UEI."
-                )
+                raise ValidationError(f"{field} cannot contain an EIN or UEI.")
 
     return general_information
 
