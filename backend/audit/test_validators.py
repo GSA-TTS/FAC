@@ -974,22 +974,13 @@ class TribalAccessTests(SimpleTestCase):
 class GeneralInformationNameTests(SimpleTestCase):
     def test_valid_organization_names(self):
         for field in ("auditee_name", "auditor_firm_name"):
-            for name in ("A LLC", "Acme Accounting", "ABC & Co."):
+            for name in ("EY", "IBM", "Aeon", "Kupu", "VIVE", "WNET", "U4I", "A LLC"):
                 with self.subTest(field=field, name=name):
                     data = {field: name}
                     self.assertEqual(
                         validate_general_information_names(data),
                         data,
                     )
-
-    def test_organization_names_too_short(self):
-        for field in ("auditee_name", "auditor_firm_name"):
-            with self.subTest(field=field):
-                with self.assertRaisesMessage(
-                    ValidationError,
-                    f"{field} must be at least 5 characters long.",
-                ):
-                    validate_general_information_names({field: "ABC"})
 
     def test_names_cannot_be_only_numbers_or_symbols(self):
         for field in (
@@ -1340,16 +1331,11 @@ class TestValidateGeneralInformation(SimpleTestCase):
                 "validate_general_information_json raised ValidationError unexpectedly!"
             )
 
+    def test_migrated_records_allow_short_names(self):
+        for field in ("auditee_name", "auditor_firm_name"):
+            for name in ("EY", "IBM"):
+                with self.subTest(field=field, name=name):
+                    data = self.valid_general_information.copy()
+                    data[field] = name
 
-def test_migrated_records_require_five_character_names(self):
-    data = self.valid_general_information.copy()
-    data["auditee_name"] = "John LLC"
-
-    with self.assertRaises(ValidationError):
-        validate_general_information_json(data, is_data_migration=True)
-
-    data = self.valid_general_information.copy()
-    data["auditor_firm_name"] = "Acme"
-
-    with self.assertRaises(ValidationError):
-        validate_general_information_json(data, is_data_migration=True)
+                    validate_general_information_json(data, is_data_migration=True)

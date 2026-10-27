@@ -147,9 +147,6 @@ def validate_general_information_names(general_information):
         if not name:
             continue
 
-        if field in ("auditee_name", "auditor_firm_name") and len(name.strip()) < 5:
-            raise ValidationError(f"{field} must be at least 5 characters long.")
-
         if not any(char.isalpha() for char in name):
             raise ValidationError(
                 f"{field} must contain letters and cannot consist "
