@@ -149,29 +149,42 @@ function attachEventHandlersSorting() {
 
 /**
  * Attach event listeners for form submission.
- * On clicking "Search", disable both search buttons and show the loader instead of the arrow image, then submit.
+ * On a valid submission, disable the search buttons and show the loader instead of the arrow image.
  */
 function attachEventHandlersSubmission() {
-  search_submit_buttons.forEach((button) => {
+  FORM.addEventListener('submit', () => {
+    if (search_arrow) {
+      search_arrow.hidden = true;
+    }
 
-    // The first search button is always for searching all of fac.gov, we want to ignore that one hence skipping.
-    if (button.id  === 'fac-search') return;
-
-    button.addEventListener('click', () => {
-      // The arrow won't be there if results were previously populated
-      if (search_arrow) {
-        search_arrow.hidden = true;
-      }
-
+    if (loader) {
       loader.hidden = false;
+    }
 
-      search_submit_buttons.forEach((btn) => {
-        btn.disabled = true;
-        btn.value = 'Searching...';
-      });
-
-      FORM.submit();
+    search_submit_buttons.forEach((button) => {
+      if (button.id === 'fac-search') return;
+      button.disabled = true;
+      button.value = 'Searching...';
     });
+  });
+}
+
+/**
+ * Restores the submission UI when the back button is used.
+ */
+function resetSubmissionState() {
+  if (loader) {
+    loader.hidden = true;
+  }
+
+  if (search_arrow) {
+    search_arrow.hidden = false;
+  }
+
+  search_submit_buttons.forEach((button) => {
+    if (button.id === 'fac-search') return;
+    button.disabled = false;
+    button.value = 'Search';
   });
 }
 
@@ -183,3 +196,4 @@ function init() {
 }
 
 window.onload = init;
+window.addEventListener('pageshow', resetSubmissionState);
