@@ -24,7 +24,23 @@ resource "cloudfoundry_app" "postgrest" {
   instances    = var.postgrest_instances
   strategy     = "rolling"
   environment = {
-    PGRST_DB_URI : var.cf_space.name == "production" || var.cf_space.name == "preview" ? cloudfoundry_service_key.postgrest.credentials.replica_uri : cloudfoundry_service_key.postgrest.credentials.uri
+    # In Production and Preview we use a multi-host URI to put the read-replica first.
+    # We have the full URI for each DB, but for the reformat we construct it from components.
+    # Format: postgres://user:pass@replica.host:port,primary.host:port/dbname?options
+    PGRST_DB_URI : var.cf_space.name == "production" || var.cf_space.name == "preview" ? format(
+      "postgres://%s:%s@%s:%s,%s:%s/%s?%s",
+      cloudfoundry_service_key.postgrest.credentials.username,
+      cloudfoundry_service_key.postgrest.credentials.password,
+      cloudfoundry_service_key.postgrest.credentials.replica_host,
+      cloudfoundry_service_key.postgrest.credentials.port,
+      cloudfoundry_service_key.postgrest.credentials.host,
+      cloudfoundry_service_key.postgrest.credentials.port,
+      cloudfoundry_service_key.postgrest.credentials.db_name,
+      # `target_session_attrs` is for all requests except for some overrides, like LISTEN
+      # Further params can be added by appending "&param=option"
+      # See https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS
+      "target_session_attrs=read-only"
+    ) : cloudfoundry_service_key.postgrest.credentials.uri
     PGRST_DB_SCHEMAS : "api_v1_1_0,api_v1_2_0,api_v1_3_0,api_v1_3_1,admin_api_v1_1_0"
     PGRST_DB_ANON_ROLE : "anon"
     PGRST_JWT_SECRET : var.pgrst_jwt_secret
