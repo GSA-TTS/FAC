@@ -135,12 +135,12 @@ describe('A11y Testing on search pages', () => {
     cy.visit('/dissemination/search/');
     cy.get('label').contains('All years').click();
 
-    // Intercept the exact POST your form should fire
-    cy.intercept('POST', '/dissemination/search/').as('search');
+    // Intercept the exact GET your form should fire
+    cy.intercept('GET', '/dissemination/search/').as('search');
 
     cy.get('#audit-search-form').submit();
 
-    // Wait until the POST completes (prevents racing the DOM)
+    // Wait until the GET completes (prevents racing the DOM)
     cy.wait('@search').its('response.statusCode').should('eq', 200);
 
     // If there are results, capture the first summary link; otherwise keep null and skip
