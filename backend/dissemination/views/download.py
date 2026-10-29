@@ -215,7 +215,7 @@ class MultipleSummaryReportDownloadView(View):
 
             if len(results) == 0:
                 raise Http404("Cannot generate summary report. No results found.")
-            report_ids = [result.report_id for result in results]
+            report_ids = [result.get("report_id") for result in results]
             filename, workbook_bytes = (
                 generate_summary_report(report_ids, include_private)
                 if not use_audit
@@ -261,7 +261,7 @@ class FindingsSummaryReportDownloadView(FederalAccessRequiredMixin, View):
 
             if len(results) == 0:
                 raise Http404("Cannot generate summary report. No results found.")
-            report_ids = [result.report_id for result in results]
+            report_ids = [result.get("report_id") for result in results]
             filename, workbook_bytes = generate_findings_summary_report(
                 report_ids=report_ids
             )

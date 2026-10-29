@@ -14,8 +14,9 @@ def add_resub_tag_data(rows):
     Only tag if it's deprecated OR if it's the most recent amongst resubmissions
     """
     for row in rows:
-        v = _safe_int(getattr(row, "resubmission_version", 0))
-        resub_status = getattr(row, "resubmission_status", RESUBMISSION_STATUS.UNKNOWN)
+        v = _safe_int(row.get("resubmission_version", 0))
+        resub_status = row.get("resubmission_status", RESUBMISSION_STATUS.UNKNOWN)
+
         tag = None
         color = None
 
@@ -26,5 +27,4 @@ def add_resub_tag_data(rows):
             tag = f"V{v} ({RESUBMISSION_TAGS.MOST_RECENT})"
             color = "bg-green"
 
-        setattr(row, "resubmission_tag", tag)
-        setattr(row, "tag_color", color)
+        row |= {"resubmission_tag": tag, "tag_color": color}

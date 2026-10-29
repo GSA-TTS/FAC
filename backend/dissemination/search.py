@@ -81,10 +81,10 @@ def search(request, params):
         if only_searching_on_general(params):
             # Don't bother querying the huge tables if General can be used instead
             logger.info("search Searching `General`")
-            results = search_general(General, params)
+            results = search_general(General, "general", params)
         else:
             logger.info("search Searching `Unified`")
-            results = search_general(Unified, params)
+            results = search_general(Unified, "unified", params)
             results = search_alns(results, params)
             results = search_cog_or_oversight(results, params)
             results = search_federal_program_name(results, params)

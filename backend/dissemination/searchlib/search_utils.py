@@ -47,7 +47,6 @@ def run_search(request, form_data):
     Given cleaned form data, run the search.
     Returns the results QuerySet.
     """
-
     basic_parameters = {
         "audit_years": form_data["audit_year"],
         "auditee_state": form_data["auditee_state"],
@@ -87,22 +86,20 @@ def run_search(request, form_data):
 def populate_cog_over_name(results):
     agency_names = AGENCY_NAMES
     for result in results:
-        if result.oversight_agency:
-            agency_code = result.oversight_agency
-            agency_name = agency_names.get(
-                result.oversight_agency, result.oversight_agency
-            )
-            result.agency_name = "\n".join(
+        if result.get("oversight_agency"):
+            agency_code = result.get("oversight_agency")
+            agency_name = agency_names.get(agency_code, agency_code)
+            agency_info = "\n".join(
                 textwrap.wrap(agency_code + " - " + agency_name + " (OVER)", width=20)
             )
-        elif result.cognizant_agency:
-            agency_code = result.cognizant_agency
-            agency_name = agency_names.get(
-                result.cognizant_agency, result.cognizant_agency
-            )
-            result.agency_name = "\n".join(
+            result.update(agency_name=agency_info)
+        elif result.get("cognizant_agency"):
+            agency_code = result.get("cognizant_agency")
+            agency_name = agency_names.get(agency_code)
+            agency_info = "\n".join(
                 textwrap.wrap(agency_code + " - " + agency_name + " (COG)", width=20)
             )
+            result.update(agency_name=agency_info)
     return results
 
 

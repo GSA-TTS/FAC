@@ -7,35 +7,108 @@ from dissemination.models import AdditionalEin, AdditionalUei
 logger = logging.getLogger(__name__)
 
 
-def search_general(base_model, params=None):
+def search_general(base_model, model_type, params=None):
     params = params or dict()
     # Time general reduction
     t0 = time.time()
 
     ##############
     # Initialize query.
-    r_base = base_model.objects.all()
+    # r_base = base_model.objects.all()
+
+    # grab only the columns we need as a QuerySet of Dictionaries
+    if model_type == "general":
+        r_base = base_model.objects.values(
+            "id",
+            "report_id",
+            "entity_type",
+            "audit_year",
+            "auditee_certify_name",
+            "auditee_contact_name",
+            "auditee_ein",
+            "auditee_email",
+            "auditee_name",
+            "auditee_uei",
+            "auditee_state",
+            "auditor_certify_name",
+            "auditor_contact_name",
+            "auditor_email",
+            "auditor_firm_name",
+            "resubmission_status",
+            "cognizant_agency",
+            "oversight_agency",
+            "fac_accepted_date",
+            "fy_end_date",
+            "fy_start_date",
+            "is_additional_ueis",
+            "is_public",
+            "resubmission_status",
+            "resubmission_version",
+        )
+    else:
+        r_base = base_model.objects.values(
+            "id",
+            "report_id",
+            "aln",
+            "entity_type",
+            "audit_year",
+            "auditee_certify_name",
+            "auditee_contact_name",
+            "auditee_ein",
+            "auditee_email",
+            "auditee_name",
+            "auditee_uei",
+            "auditee_state",
+            "auditor_certify_name",
+            "auditor_contact_name",
+            "auditor_email",
+            "auditor_firm_name",
+            "resubmission_status",
+            "cognizant_agency",
+            "oversight_agency",
+            "is_material_weakness",
+            "is_modified_opinion",
+            "is_other_findings",
+            "is_other_matters",
+            "is_questioned_costs",
+            "is_repeat_finding",
+            "is_significant_deficiency",
+            "fac_accepted_date",
+            "fy_end_date",
+            "fy_start_date",
+            "type_requirement",
+            "passthrough_name",
+            "is_direct",
+            "is_major",
+            "is_public",
+            "federal_award_extension",
+            "federal_agency_prefix",
+            "federal_program_name",
+            "is_additional_ueis",
+            "resubmission_status",
+            "resubmission_version",
+        )
 
     ##############
     # Audit years
     # query.add(_get_audit_years_match_query(audit_years), Q.AND)
     q_audit_year = _get_audit_years_match_query(params.get("audit_years", None))
-    r_audit_year = base_model.objects.filter(q_audit_year)
+    r_audit_year = r_base.filter(q_audit_year)
 
     ##############
     # State
     q_state = _get_auditee_state_match_query(params.get("auditee_state", None))
-    r_state = base_model.objects.filter(q_state)
+    r_state = r_base.filter(q_state)
 
     ##############
     # Names
     q_names = _get_names_match_query(params.get("names", None))
-    r_names = base_model.objects.filter(q_names)
+    r_names = r_base.filter(q_names)
 
     ##############
     # UEI/EIN
     q_uei = _get_uei_or_eins_match_query(params.get("uei_or_eins", None))
-    r_uei = base_model.objects.filter(q_uei)
+    r_uei = r_base.filter(q_uei)
 
     ##############
     # Start/end dates
@@ -48,36 +121,35 @@ def search_general(base_model, params=None):
         end = params.get("start_date", None)
 
     q_start_date = _get_start_date_match_query(start)
-    r_start_date = base_model.objects.filter(q_start_date)
+    r_start_date = r_base.filter(q_start_date)
     q_end_date = _get_end_date_match_query(end)
-    r_end_date = base_model.objects.filter(q_end_date)
+    r_end_date = r_base.filter(q_end_date)
 
     ##############
     # Fiscal year end month
     q_fy_end_month = _get_fy_end_month_match_query(params.get("fy_end_month", None))
-    r_fy_end_month = base_model.objects.filter(q_fy_end_month)
+    r_fy_end_month = r_base.filter(q_fy_end_month)
 
     ##############
     # Entity type
     q_entity_type = _get_entity_type_match_query(params.get("entity_type", None))
-    r_entity_type = base_model.objects.filter(q_entity_type)
+    r_entity_type = r_base.filter(q_entity_type)
 
     ##############
     # Report ID
     q_report_id = _get_report_id_match_query(params.get("report_id", None))
-    r_report_id = base_model.objects.filter(q_report_id)
+    r_report_id = r_base.filter(q_report_id)
 
     ##############
     # Intersection
     # Intersection on result sets is an &.
     results = (
         r_audit_year
-        & r_start_date
-        & r_end_date
         & r_state
         & r_names
         & r_uei
-        & r_base
+        & r_start_date
+        & r_end_date
         & r_fy_end_month
         & r_entity_type
         & r_report_id
