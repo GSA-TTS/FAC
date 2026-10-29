@@ -147,6 +147,9 @@ def validate_general_information_names(general_information):
         if not name:
             continue
 
+        if len(name.strip()) < 2:
+            raise ValidationError(f"{field} must contain at least 2 characters.")
+
         if not any(char.isalpha() for char in name):
             raise ValidationError(
                 f"{field} must contain letters and cannot consist "

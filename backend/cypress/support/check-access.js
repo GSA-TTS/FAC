@@ -14,16 +14,22 @@ const accessFields = [
   '#auditor_contacts_re_email',
 ];
 
+
 export function addValidInfo(field) {
   const fieldType = field.split('_').pop();
   const email = field.includes('auditee')
     ? Cypress.env('LOGIN_TEST_EMAIL_AUDITEE')
     : Cypress.env('LOGIN_TEST_EMAIL');
 
-  cy.get(field).clear();
-  cy.get(field).type(fieldType === 'email' ? email : 'Percy A. Person');
-  cy.get(field).blur();
+  cy.get(field)
+    .clear()
+    .type(fieldType === 'email' ? email : 'Percy A. Person');
+
+  cy.get(field)
+    .focus()
+    .blur();
 }
+
 
 export function testValidAccess() {
   cy.wrap(accessFields).each((field) => {
