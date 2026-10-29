@@ -10,7 +10,7 @@ services:
   # Metabase app
   #---------------------------------------------
   metabase:
-    image: metabase/metabase:v0.63.16.7
+    image: ghcr.io/gsa-tts/fac/metabase:latest
     container_name: metabase
     hostname: metabase
     volumes:
