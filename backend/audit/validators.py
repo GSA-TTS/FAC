@@ -131,6 +131,39 @@ def validate_uei_nine_digit_sequences(value):
     return value
 
 
+def validate_general_information_names(general_information):
+    """Validate name fields in general information."""
+
+    name_fields = [
+        "auditee_name",
+        "auditor_firm_name",
+        "auditee_contact_name",
+        "auditor_contact_name",
+    ]
+
+    for field in name_fields:
+        name = general_information.get(field, "")
+
+        if not name:
+            continue
+
+        if not any(char.isalpha() for char in name):
+            raise ValidationError(
+                f"{field} must contain letters and cannot consist "
+                "entirely of numbers or symbols."
+            )
+
+        for identifier in [
+            general_information.get("ein"),
+            general_information.get("auditor_ein"),
+            general_information.get("auditee_uei"),
+        ]:
+            if identifier and identifier.upper() in name.upper():
+                raise ValidationError(f"{field} cannot contain an EIN or UEI.")
+
+    return general_information
+
+
 def validate_findings_uniform_guidance_json(value):
     """
     Apply JSON Schema for findings uniform guidance and report errors.
@@ -346,12 +379,12 @@ def validate_general_information_schema_rules(general_information):
 def validate_general_information_json(value, is_data_migration=True):
     """
     Apply JSON Schema and Python checks to a general information record.
-
-    Keyword arguments:
-    is_data_migration -- True if ignoring GSA_MIGRATION emails. (default True)
     """
     validate_use_of_gsa_migration_keyword(value, is_data_migration)
     validate_general_information_schema(value)
+
+    if not is_data_migration:
+        validate_general_information_names(value)
 
     return value
 
@@ -367,6 +400,9 @@ def validate_general_information_complete_json(value, is_data_migration=True):
     validate_use_of_gsa_migration_keyword(value, is_data_migration)
     validate_general_information_schema(value)
     validate_general_information_schema_rules(value)
+
+    if not is_data_migration:
+        validate_general_information_names(value)
 
     return value
 
