@@ -145,6 +145,7 @@ class Search(View):
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
+            "report_ids_display": "\n".join(form_data["report_id"]),
         }
         time_beginning_render = time.time()
         total_time_ms = int(
