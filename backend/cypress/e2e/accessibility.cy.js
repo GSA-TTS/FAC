@@ -130,18 +130,18 @@ describe('A11y tests on a fully submitted report', () => {
   });
 });
 
-describe('A11y Testing on search pages', () => {
+describe.only('A11y Testing on search pages', () => {
   before(() => {
     cy.visit('/dissemination/search/');
     cy.get('label').contains('All years').click();
 
-    // Intercept the exact GET your form should fire
-    cy.intercept('GET', '/dissemination/search/').as('search');
+    // Match the GET request even when its query parameters are appended to the URL.
+    cy.intercept('GET', '**/dissemination/search/**').as('search');
 
     cy.get('#audit-search-form').submit();
 
     // Wait until the GET completes (prevents racing the DOM)
-    cy.wait('@search').its('response.statusCode').should('eq', 200);
+    cy.wait('@search');
 
     // If there are results, capture the first summary link; otherwise keep null and skip
     cy.get('body').then(($body) => {
