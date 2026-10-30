@@ -1,12 +1,9 @@
 from typing import Tuple
 from datetime import datetime, timezone as dt_timezone
-import logging
 
 from django.utils import timezone
 
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
-
-logger = logging.getLogger(__name__)
 
 
 def get_last_transition_date(sac):
