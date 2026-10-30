@@ -1,9 +1,12 @@
 from typing import Tuple
 from datetime import datetime, timezone as dt_timezone
+import logging
 
 from django.utils import timezone
 
 from audit.models.constants import STATUS, RESUBMISSION_STATUS
+
+logger = logging.getLogger(__name__)
 
 
 def get_last_transition_date(sac):
@@ -23,6 +26,7 @@ def check_legacy_resubmission_allowed(sac, auditee_uei, audit_year):
         general_information__auditee_uei=auditee_uei,
         general_information__auditee_fiscal_period_end__startswith=audit_year,
         resubmission_meta__isnull=True,
+        submission_status=STATUS.DISSEMINATED,
     )
 
     if not siblings.exists():
