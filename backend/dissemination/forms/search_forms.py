@@ -1,4 +1,6 @@
+import base64
 from datetime import date
+import zlib
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -105,6 +107,7 @@ class SearchForm(forms.Form):
     )
     passthrough_name = forms.CharField(required=False)
     report_id = forms.CharField(required=False)
+    report_id_z = forms.CharField(required=False)
     start_date = forms.DateField(required=False)
     type_requirement = forms.CharField(required=False)
     uei_or_ein = forms.CharField(required=False)
@@ -119,6 +122,14 @@ class SearchForm(forms.Form):
     page = forms.CharField(required=False)
     order_by = forms.CharField(required=False)
     order_direction = forms.CharField(required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # Replace report_id with decompressed version, when available
+        report_id_z = cleaned_data.get("report_id_z")
+        if report_id_z:
+            cleaned_data["report_id"] = report_id_z
 
     def clean_aln(self):
         """
@@ -209,6 +220,20 @@ class SearchForm(forms.Form):
         """
         text_input = self.cleaned_data["report_id"]
         return clean_text_field(text_input, report_id_delimiters)
+
+    def clean_report_id_z(self):
+        compressed_val = self.cleaned_data["report_id_z"]
+
+        # Decode URL-safe Base64, then decompress
+        try:
+            # Restore Base64 `=` padding that was removed for URL compatibility
+            padded = compressed_val + "=" * (-len(compressed_val) % 4)
+            raw_bytes = base64.urlsafe_b64decode(padded.encode("ascii"))
+            decompressed = zlib.decompress(raw_bytes).decode("utf-8")
+            cleaned = clean_text_field(decompressed, report_id_delimiters)
+            return cleaned
+        except (zlib.error, ValueError):
+            return []
 
     def clean_passthrough_name(self):
         """
