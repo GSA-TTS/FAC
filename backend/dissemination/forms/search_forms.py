@@ -226,14 +226,14 @@ class SearchForm(forms.Form):
 
         # Decode URL-safe Base64, then decompress
         try:
-            # Restore Base64 padding
+            # Restore Base64 `=` padding that was removed for URL compatibility
             padded = compressed_val + "=" * (-len(compressed_val) % 4)
             raw_bytes = base64.urlsafe_b64decode(padded.encode("ascii"))
             decompressed = zlib.decompress(raw_bytes).decode("utf-8")
             cleaned = clean_text_field(decompressed, report_id_delimiters)
             return cleaned
         except (zlib.error, ValueError):
-            return []
+            raise ValidationError("Unable to parse compressed report IDs")
 
     def clean_passthrough_name(self):
         """
