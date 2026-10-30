@@ -166,6 +166,36 @@ class TestCheckResubmissionAllowed(TestCase):
         self.assertTrue(allowed)
         self.assertIn("eligible", message.lower())
 
+    def test_legacy_multiple_records_not_disseminated_ignored(self):
+        """
+        Ensures a newer sibling is ignored if it's not disseminated,
+        allowing the older sibling to be resubmitted
+        """
+        shared_info = {
+            "auditee_uei": "TESTUEI1",
+            "auditee_fiscal_period_end": timezone.now().date().isoformat(),
+        }
+
+        older = create_sac(
+            meta=None,
+            status=STATUS.DISSEMINATED,
+            general_information=shared_info,
+            transition_date=timezone.now() - timezone.timedelta(seconds=20),
+        )
+
+        # Most recent, but not disseminated
+        latest = create_sac(
+            version=0,
+            meta=None,
+            status=STATUS.FLAGGED_FOR_REMOVAL,
+            general_information=shared_info,
+            transition_date=timezone.now(),
+        )
+        latest.save()
+        allowed, message = check_resubmission_allowed(older)
+        self.assertTrue(allowed)
+        self.assertIn("eligible", message.lower())
+
     def test_legacy_suspicious_timestamp_cluster(self):
         ts_base = timezone.now()
 
