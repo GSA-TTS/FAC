@@ -233,7 +233,7 @@ class SearchForm(forms.Form):
             cleaned = clean_text_field(decompressed, report_id_delimiters)
             return cleaned
         except (zlib.error, ValueError):
-            raise ValidationError("Unable to parse compressed report IDs")
+            return []
 
     def clean_passthrough_name(self):
         """
