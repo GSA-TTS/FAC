@@ -1227,7 +1227,7 @@ class PageHandlingTests(TestCase):
         invalid_data = self.valid_post_data.copy()
         invalid_data["page"] = "100"  # Too high
 
-        response = self.client.post(self.search_url, invalid_data)
+        response = self.client.get(self.search_url, invalid_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 1)  # Should reset to 1
 
@@ -1239,7 +1239,7 @@ class PageHandlingTests(TestCase):
         invalid_data = self.valid_post_data.copy()
         invalid_data["page"] = "0"
 
-        response = self.client.post(self.search_url, invalid_data)
+        response = self.client.get(self.search_url, invalid_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 1)  # Should reset to 1
 
@@ -1250,8 +1250,11 @@ class PageHandlingTests(TestCase):
 
         invalid_data = self.valid_post_data.copy()
         invalid_data["page"] = ""
-
-        response = self.client.post(self.search_url, invalid_data)
+        response = self.client.get(
+            self.search_url,
+            invalid_data,
+            follow=True,
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 1)  # Should default to 1
 
@@ -1263,6 +1266,6 @@ class PageHandlingTests(TestCase):
         valid_data = self.valid_post_data.copy()
         valid_data["page"] = "2"  # Valid page
 
-        response = self.client.post(self.search_url, valid_data)
+        response = self.client.get(self.search_url, valid_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 2)  # Should remain 2
