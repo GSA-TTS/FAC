@@ -203,7 +203,7 @@ async function buildCompressedUrl() {
       try {
         // Only compress if the string is reasonably long, otherwise keep it readable
         if (rawReportIds.length > 125) { // > 125 chars = 5+ report_ids
-          const compressed = await compressValues(rawReportIds);
+          const compressed = await compressString(rawReportIds);
           searchParams.set('report_id_z', compressed);
         } else {
           searchParams.set('report_id', rawReportIds);
@@ -219,6 +219,24 @@ async function buildCompressedUrl() {
     const finalUrl = `${actionUrl}?${searchParams.toString()}`;
 
     window.location.href = finalUrl;
+}
+
+/**
+ * Returns a compressed and URL-safe Base64 version of the given string.
+ */
+async function compressString(str) {
+  const stream = new Blob([str])
+    .stream()
+    .pipeThrough(new CompressionStream('deflate'));
+
+  const buffer = await new Response(stream).arrayBuffer();
+  const binary = String.fromCharCode(...new Uint8Array(buffer));
+
+  // URL-safe Base64 conversion
+  return btoa(binary)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 
 /**
@@ -245,21 +263,6 @@ function init() {
   attachEventHandlersReset();
   attachEventHandlersSorting();
   attachEventHandlersSubmission();
-}
-
-async function compressValues(values) {
-  const stream = new Blob([values])
-    .stream()
-    .pipeThrough(new CompressionStream('deflate'));
-
-  const buffer = await new Response(stream).arrayBuffer();
-  const binary = String.fromCharCode(...new Uint8Array(buffer));
-
-  // URL-safe Base64 conversion
-  return btoa(binary)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
 }
 
 window.onload = init;

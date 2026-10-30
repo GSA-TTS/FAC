@@ -63,6 +63,8 @@ class Search(View):
                 },
             )
 
+        # If any empty parameters were stripped, redirect to the cleaned URL to
+        # prevent clutter in the user's address bar
         cleaned_query_string = self._clean_query_string(request)
         if cleaned_query_string:
             return redirect(f"{reverse("dissemination:Search")}?{cleaned_query_string}")
@@ -157,7 +159,7 @@ class Search(View):
 
     def _clean_query_string(self, request):
         """
-        If any empty parameters were stripped, redirect to the cleaned URL
+        Removes empty parameters from the given request URL
         """
         clean_params = []
         has_empty = False
