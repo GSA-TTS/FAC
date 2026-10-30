@@ -174,6 +174,9 @@ class SearchViewTests(TestCase):
         )
         self.perm_client.force_login(self.perm_user)
 
+        self.audit_year = 2023
+        self.search_all_params = {"audit_year": self.audit_year}
+
     def _search_url(self):
         return reverse("dissemination:Search")
 
@@ -182,7 +185,7 @@ class SearchViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_search(self):
-        response = self.anon_client.post(self._search_url(), {})
+        response = self.anon_client.get(self._search_url(), {})
         self.assertContains(
             response, "is updated in real time and can be used to confirm"
         )
@@ -198,9 +201,11 @@ class SearchViewTests(TestCase):
 
         Returns tuple: (public, private, deprecated)
         """
-        public_gens = baker.make(General, is_public=True, audit_year=2023, _quantity=5)
+        public_gens = baker.make(
+            General, is_public=True, audit_year=self.audit_year, _quantity=5
+        )
         private_gens = baker.make(
-            General, is_public=False, audit_year=2023, _quantity=5
+            General, is_public=False, audit_year=self.audit_year, _quantity=5
         )
 
         for g in public_gens:
@@ -213,7 +218,7 @@ class SearchViewTests(TestCase):
         deprecated_public = baker.make(
             General,
             is_public=True,
-            audit_year=2023,
+            audit_year=self.audit_year,
             resubmission_status="deprecated_via_resubmission",
             resubmission_version=1,
         )
@@ -223,7 +228,7 @@ class SearchViewTests(TestCase):
         deprecated_private = baker.make(
             General,
             is_public=False,
-            audit_year=2023,
+            audit_year=self.audit_year,
             resubmission_status="deprecated_via_resubmission",
             resubmission_version=1,
         )
@@ -237,7 +242,7 @@ class SearchViewTests(TestCase):
         Anonymous users should see public + private reports, but NOT audits deprecated via resubmission.
         """
         public, private, deprecated = self._make_reports()
-        response = self.anon_client.post(self._search_url(), {})
+        response = self.anon_client.get(self._search_url(), self.search_all_params)
 
         # Should include 10 results (public + private), excluding deprecated
         self.assertContains(response, "<strong>10</strong>")
@@ -255,7 +260,7 @@ class SearchViewTests(TestCase):
         but NOT audits deprecated via resubmission.
         """
         public, private, deprecated = self._make_reports()
-        response = self.auth_client.post(self._search_url(), {})
+        response = self.auth_client.get(self._search_url(), self.search_all_params)
 
         self.assertContains(response, "<strong>10</strong>")
 
@@ -271,7 +276,7 @@ class SearchViewTests(TestCase):
         Permissioned users should see all reports.
         """
         public, private, deprecated = self._make_reports()
-        response = self.perm_client.post(self._search_url(), {})
+        response = self.perm_client.get(self._search_url(), self.search_all_params)
 
         self.assertContains(response, "<strong>12</strong>")
 
@@ -1253,7 +1258,7 @@ class PageHandlingTests(TestCase):
         response = self.client.get(
             self.search_url,
             invalid_data,
-            follow=True,
+            follow=True,  # The endpoint cleans empty params and redirects
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page"], 1)  # Should default to 1
