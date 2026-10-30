@@ -31,6 +31,7 @@ from dissemination.test_utils import bake_unified
 from model_bakery import baker
 
 from datetime import timedelta
+from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
 User = get_user_model()
@@ -286,6 +287,24 @@ class SearchViewTests(TestCase):
             self.assertContains(response, g.report_id)
         for g in deprecated:
             self.assertContains(response, g.report_id)
+
+    def test_clean_parameters_and_redirect(self):
+        """
+        Ensures that parameters with empty values are removed from the query
+        string and the request is redirected
+        """
+        response = self.perm_client.get(
+            self._search_url(),
+            {
+                "foo": "",
+                "audit_year": "2023",
+            },
+        )
+        parsed_query = parse_qs(urlparse(response.url).query)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(parsed_query["audit_year"], ["2023"])
+        self.assertNotIn("foo", parsed_query)
 
 
 class PublicDataDownloadViewTests(TestCase):
