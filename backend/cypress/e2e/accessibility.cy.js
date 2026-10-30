@@ -130,12 +130,11 @@ describe('A11y tests on a fully submitted report', () => {
   });
 });
 
-describe.only('A11y Testing on search pages', () => {
+describe('A11y Testing on search pages', () => {
   before(() => {
     cy.visit('/dissemination/search/');
     cy.get('label').contains('All years').click();
 
-    // Match the GET request even when its query parameters are appended to the URL.
     cy.intercept('GET', '**/dissemination/search/**').as('search');
 
     cy.get('#audit-search-form').submit();
