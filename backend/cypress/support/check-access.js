@@ -21,13 +21,11 @@ export function addValidInfo(field) {
     ? Cypress.env('LOGIN_TEST_EMAIL_AUDITEE')
     : Cypress.env('LOGIN_TEST_EMAIL');
 
-  cy.get(field)
-    .clear()
-    .type(fieldType === 'email' ? email : 'Percy A. Person');
+  cy.get(field).clear();
+  cy.get(field).type(fieldType === 'email' ? email : 'Percy A. Person');
 
-  cy.get(field)
-    .focus()
-    .blur();
+  cy.get(field).focus();
+  cy.get(field).blur();
 }
 
 
