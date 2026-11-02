@@ -400,8 +400,7 @@ def validate_general_information_complete_json(value, is_data_migration=True):
     Keyword arguments:
     is_data_migration -- True if ignoring GSA_MIGRATION emails. (default True)
     """
-    validate_use_of_gsa_migration_keyword(value, is_data_migration)
-    validate_general_information_schema(value)
+    validate_general_information_json(value, is_data_migration)
     validate_general_information_schema_rules(value)
 
     return value
