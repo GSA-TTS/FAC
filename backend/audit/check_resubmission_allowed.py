@@ -23,6 +23,7 @@ def check_legacy_resubmission_allowed(sac, auditee_uei, audit_year):
         general_information__auditee_uei=auditee_uei,
         general_information__auditee_fiscal_period_end__startswith=audit_year,
         resubmission_meta__isnull=True,
+        submission_status=STATUS.DISSEMINATED,
     )
 
     if not siblings.exists():
