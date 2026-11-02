@@ -15,7 +15,7 @@ resource "cloudfoundry_service_instance" "app_autoscaler" {
     scaling_rules = [
       {
         metric_type          = "memoryused"
-        threshold            = 3000 # 3GBs , scale down at 75% usage for instances with 4GB of memory
+        threshold            = 3000 # 3GBs , scale up at 75% usage for instances with 4GB of memory
         operator             = ">="
         adjustment           = "+1"
         breach_duration_secs = 60
