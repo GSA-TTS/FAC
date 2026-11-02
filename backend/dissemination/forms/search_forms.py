@@ -222,6 +222,10 @@ class SearchForm(forms.Form):
         return clean_text_field(text_input, report_id_delimiters)
 
     def clean_report_id_z(self):
+        """
+        Clean up the compressed report IDs field. Base64 decode, uncompress,
+        then to normal report_id cleaning.
+        """
         compressed_val = self.cleaned_data["report_id_z"]
 
         # Decode URL-safe Base64, then decompress
