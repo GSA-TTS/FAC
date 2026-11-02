@@ -217,7 +217,7 @@ def add_custom_field_to_log(sender, instance, created, **kwargs):
 
 
 @admin.register(MaintenanceBanner)
-class MaintenanceBannerAdmin(admin.ModelAdmin):
+class MaintenanceBannerAdmin(SupportAdmin):
     list_display = (
         "message",
         "is_active",
@@ -236,3 +236,6 @@ class MaintenanceBannerAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_staff

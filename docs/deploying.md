@@ -86,12 +86,16 @@ cf push -f manifests/manifest-dev.yml
 1.  Create a [new release](https://github.com/GSA-TTS/FAC/releases/new).
     *   Create a new tag in the form `v1.[YYYYMMDD]` with the current date, such as `v1.20230329`, and use that as the tag for the release.
     *   **_Remember to set the target to `prod`_**.
-3.  Wait for the checks to pass.
-4.  If checks fail, or if reviewers request changes, something has gone awry. Investigation and/or starting over from a branch and making a PR against `main` may be required.
-5.  Verify that the deploy steps all passed.
-6.  After deployment, the changes should be on https://app.fac.gov/.
-7.  If anything was merged directly into the `prod` branch, such as a hotfix, merge `prod` back into `main`.
-8.  Login via CF and tail the logs during a deployment (before it gets to deploy application stage)
+    *   We tend to do a "Generate Release Notes" and then manually delete the auto-generated PR notes.
+    *   "Publish Release"
+2.  Navigate to the associated Github Action and review the Terraform plan.
+3.  An admin must approve the Terraform plan before the final deploy. This is done from "Review deployments" on the overall Action.
+4.  Verify that the deploy steps all passed without error.
+5.  After deployment, any app changes should be on https://app.fac.gov/.
+6.  If anything was merged directly into the `prod` branch, such as a hotfix, merge `prod` back into `main`.
+
+Optional:
+Login via CF and tail the logs during a deployment (before it gets to deploy application stage, so you can watch it). This is most valuable when changes to the application startup are made.
 ```bash
 cf login -a api.fr.cloud.gov --sso
 Select an org:
@@ -100,8 +104,6 @@ Select a space:
 5. production
 cf logs gsa-fac
 ```
-9.  Post the most recent dbbackup and mediabackup file names in https://github.com/GSA-TTS/FAC/issues/2221
-    - *NOTE* the following is not necessary as of this time. django-dbbackup is not backing up the media due to the file sizes being too large, and we will be using another method for getting the media backed up (TBD)
 
 To see more about branching and the deployment steps, see the [Branching](branching.md) page.
 

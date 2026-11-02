@@ -144,7 +144,13 @@ def _load_csv(csv_path):
         )
         sys.exit(-1)
 
-    return rows
+    # Skipped rows were not linked, so we cannot undo them.
+    total_rowcount = len(rows)
+    filtered_rows = [r for r in rows if (r.get("skipped")) != "Y"]
+    if len(filtered_rows) != total_rowcount:
+        logger.info(f"Omitting {total_rowcount - len(filtered_rows)} skipped rows.")
+
+    return filtered_rows
 
 
 def _chain_creates_orphan(chain_rows):
@@ -153,7 +159,7 @@ def _chain_creates_orphan(chain_rows):
 
     for i, row in enumerate(chain_rows):
         rid = row["report_id"]
-        resubmission_meta = row["resubmission_meta"]
+        resubmission_meta = row.get("resubmission_meta") or {}
         prev_rid = resubmission_meta.get("previous_report_id")
         next_rid = resubmission_meta.get("next_report_id")
         is_first = i == 0

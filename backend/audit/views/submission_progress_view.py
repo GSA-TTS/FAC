@@ -12,9 +12,11 @@ from audit.cross_validation import (
 from audit.cross_validation.audit_validation_shape import audit_validation_shape
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
+    has_role,
 )
-from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access, Audit
+from audit.models import SingleAuditChecklist, SingleAuditReportFile, Audit
 from audit.models.constants import STATUS, RESUBMISSION_TYPE
+from audit.models.access_roles import AccessRole
 
 logger = logging.getLogger(__name__)
 
@@ -129,16 +131,16 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 report_id=previous_report_id
             ).first()  # Evals to None if there isn't a previous report
 
-            # Determine if the auditee certifier is the same as the current user.
-            # If there is no auditee certifier, default to False.
-            is_user_auditee_certifier = False
-            sac_auditee_results = Access.objects.filter(
-                sac_id=sac.id, role="certifying_auditee_contact"
-            ).values()  # ValuesQuerySet (array of dicts)
-            if sac_auditee_results.exists():
-                is_user_auditee_certifier = (
-                    sac_auditee_results[0].get("user_id") == request.user.id
-                )
+            is_user_auditee_certifier = has_role(
+                sac,
+                request.user,
+                AccessRole.CERTIFYING_AUDITEE_CONTACT,
+            )
+            is_user_auditor_certifier = has_role(
+                sac,
+                request.user,
+                AccessRole.CERTIFYING_AUDITOR_CONTACT,
+            )
 
             is_tribal_data_consent_complete = True if sac.tribal_data_consent else False
 
@@ -212,6 +214,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "submission_status": sac.get_friendly_status(),
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "is_user_auditee_certifier": is_user_auditee_certifier,
+                "is_user_auditor_certifier": is_user_auditor_certifier,
                 "is_tribal_data_consent_complete": is_tribal_data_consent_complete,
                 "previous_report_id": previous_report_id,
                 "next_report_id": next_report_id,

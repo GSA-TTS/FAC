@@ -46,13 +46,17 @@ class ResubmissionStartViewTests(TestCase):
             SingleAuditChecklist,
             report_id=self.valid_sibling_report_id,
             submission_status=STATUS.DISSEMINATED,
-            general_information=self.general_information,
+            general_information={
+                **self.general_information,
+                "auditee_uei": "different_auditee_uei",
+            },
         )
+
         self.sibling_general = baker.make(
             General,
             report_id=self.valid_sibling_report_id,
             audit_year="2022",
-            auditee_uei="auditee_uei",
+            auditee_uei="different_auditee_uei",
         )
 
         self.user = baker.make(User)

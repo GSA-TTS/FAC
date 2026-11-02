@@ -52,6 +52,7 @@ def export_chains_as_csv(chains, AY=None, report_ids=None, noisy=False):
                 "auditee_state",
                 "prior_submission_status",
                 "prior_resubmission_meta",
+                "skipped",
             ]
         )
         for ndx, chain in enumerate(chains):
@@ -76,6 +77,7 @@ def export_chains_as_csv(chains, AY=None, report_ids=None, noisy=False):
                                 if r.resubmission_meta is not None
                                 else ""
                             ),
+                            ("Y" if getattr(r, "skipped", False) else "N"),
                         ]
                     )
     return filename
@@ -116,8 +118,11 @@ def export_chains_as_markdown(chains, AY=None, report_ids=None):
 
         for ndx, chain in enumerate(chains):
             if len(chain) > 1:
+                skipped = any(getattr(r, "skipped", False) for r in chain)
                 md.write(
-                    f"#### UEI {chain[0].general_information['auditee_uei']}" + NEWLINE
+                    f"#### UEI {chain[0].general_information['auditee_uei']}"
+                    + (" - SKIPPED" if skipped else "")
+                    + NEWLINE
                 )
                 for ndx, _ in enumerate(chain):
                     if ndx in [0, 1]:
