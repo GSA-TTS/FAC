@@ -646,13 +646,13 @@ CACHES = {
         "BACKEND": "django_valkey.cache.ValkeyCache",
         "LOCATION": "valkey://valkey:6379",
         "KEY_PREFIX": "facapp_v1",  # Prefix all keys to avoid collisions
-        "TIMEOUT": 300,             # Default timeout: 5 minutes,
-        'OPTIONS': {
+        "TIMEOUT": 300,  # Default timeout: 5 minutes,
+        "OPTIONS": {
             "COMPRESSOR": "django_valkey.compressors.zstd.ZStdCompressor",
             "CLIENT_CLASS": "django_valkey.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,  # gracefully return None on cache failures instead of crashing
-                                        # hopefully this stops valkey from crashing the web worker thread!!!!
-        }
+            # hopefully this stops valkey from crashing the web worker thread!!!!
+        },
     }
 }
 
