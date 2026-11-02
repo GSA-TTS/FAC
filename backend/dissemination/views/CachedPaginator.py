@@ -17,9 +17,11 @@ class CachedPaginator(Paginator):
 
         # try to hit the cache
         try:
+            logger.info(f"CACHE: pulling from cache for: {self.cache_key}")
             cached_object_list = cache.get(self.cache_key)
             if cached_object_list is None:
                 # cache miss: fetch from db and convert QuerySet to a standard list to evaluate it
+                logger.info(f"CACHE: cache miss - adding to cache for: {self.cache_key}")
                 actual_page = super().page(number)
                 cached_object_list = list(actual_page.object_list)
 
@@ -28,7 +30,7 @@ class CachedPaginator(Paginator):
         except Exception as e:
             # fail silently
             logger.error(
-                f"CACHE: cache connection failed for 'results' during read/write: {e}"
+                f"CACHE: cache connection failed for the 'cached page list' during read/write: {e}"
             )
             # we'll to add feature flags to workaround a misbehaving cache server
 

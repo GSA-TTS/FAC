@@ -115,8 +115,10 @@ class Search(View):
 
         # reading results_count from cache
         try:
+            logger.info(f"CACHE: pulling from cache for: {count_cache_key}")
             results_count = cache.get(count_cache_key)
             if results_count is None:
+                logger.info(f"CACHE: cache miss - adding to cache for: {count_cache_key}")
                 results_count = results.count()
                 cache.set(count_cache_key, results_count)
         except Exception as e:
