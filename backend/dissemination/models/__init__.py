@@ -1,7 +1,6 @@
 from .additionalein import AdditionalEin
 from .additionaluei import AdditionalUei
 from .captext import CapText
-from .combined import DisseminationCombined
 from .federalaward import FederalAward
 from .finding import Finding
 from .findingtext import FindingText
@@ -26,7 +25,6 @@ _dissemination_models = [
     AdditionalEin,
     AdditionalUei,
     CapText,
-    DisseminationCombined,
     FederalAward,
     Finding,
     FindingText,

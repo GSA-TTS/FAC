@@ -55,7 +55,7 @@
                                     Your certifying auditor must attest and sign the single audit package before submission. In order to unlock this step, you must complete and upload all required workbooks from the previous steps, as well as the single audit report PDF.
                                 </p>
                             </div>
-                        {% elif certification.auditor_enabled %}
+                        {% elif certification.auditor_enabled and is_user_auditor_certifier is True %}
                             {% include "./icon-list-icon.html" with completed=certification.auditor_certified %}
                             <div>
                                 <p class="text-bold margin-0">
@@ -88,7 +88,7 @@
                                     Your certifying auditee must attest and sign the single audit package before submission. In order to unlock this step, you must complete and upload all required workbooks from the previous steps, as well as the single audit report PDF.
                                 </p>
                             </div>
-                        {% elif certification.auditee_enabled %}
+                        {% elif certification.auditee_enabled and is_user_auditee_certifier is True %}
                             {% include "./icon-list-icon.html" with completed=certification.auditee_certified %}
                             <div>
                                 <p class="text-bold margin-0">
