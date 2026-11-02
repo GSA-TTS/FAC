@@ -174,6 +174,7 @@ class SearchViewTests(TestCase):
             permission=permission,
         )
         self.perm_client.force_login(self.perm_user)
+        self._clear_cache()
 
     def _search_url(self):
         return reverse("dissemination:Search")
@@ -188,12 +189,10 @@ class SearchViewTests(TestCase):
 
     def test_allows_anonymous(self):
         response = self.anon_client.get(self._search_url())
-        self._clear_cache()
         self.assertEqual(response.status_code, 200)
 
     def test_search(self):
         response = self.anon_client.post(self._search_url(), {})
-        self._clear_cache()
         self.assertContains(
             response, "is updated in real time and can be used to confirm"
         )
@@ -250,8 +249,6 @@ class SearchViewTests(TestCase):
         public, private, deprecated = self._make_reports()
         response = self.anon_client.post(self._search_url(), {})
 
-        self._clear_cache()
-
         # Should include 10 results (public + private), excluding deprecated
         self.assertContains(response, "<strong>10</strong>")
 
@@ -270,8 +267,6 @@ class SearchViewTests(TestCase):
         public, private, deprecated = self._make_reports()
         response = self.auth_client.post(self._search_url(), {})
 
-        self._clear_cache()
-
         self.assertContains(response, "<strong>10</strong>")
 
         for g in public:
@@ -287,8 +282,6 @@ class SearchViewTests(TestCase):
         """
         public, private, deprecated = self._make_reports()
         response = self.perm_client.post(self._search_url(), {})
-
-        self._clear_cache()
 
         self.assertContains(response, "<strong>12</strong>")
 
@@ -1233,6 +1226,15 @@ class PageHandlingTests(TestCase):
             "order_direction": "asc",
             "page": "1",
         }
+        self._clear_cache()
+
+    def _clear_cache(self):
+        # temporarily clearing cache
+        try:
+            cache.clear()
+        except Exception as e:
+            # fail silently
+            print(f"cache connection failed to clear: {e}")
 
     @patch("dissemination.views.search.run_search")
     def test_search_post_page_too_high(self, mock_run_search):

@@ -14,7 +14,6 @@ def search_general(base_model, model_type, params=None):
 
     ##############
     # Initialize query.
-    # r_base = base_model.objects.all()
 
     # grab only the columns we need as a QuerySet of Dictionaries
     if model_type == "general":

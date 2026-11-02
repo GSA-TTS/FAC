@@ -1,3 +1,7 @@
+import json
+import xxhash
+import copy
+
 import logging
 import textwrap
 
@@ -80,6 +84,36 @@ def run_search(request, form_data):
     _add_search_params_to_newrelic(search_parameters)
 
     return search_sac(request, search_parameters)
+
+
+def create_cache_keys(form_data):
+    """
+    create a key used to get/set our cached results by:
+    - create pure search string w/out 'limit' and 'page'
+      - we hash it to get a unique id for that search
+      - we use that hash in our cache keys
+    - prefix that hash to identify a page_key and count_key
+    """
+
+    form_data_copy = copy.deepcopy(form_data)
+    page_number = form_data_copy.pop("page", 1)
+    limit_number = form_data_copy.pop("limit", 30)
+
+    # form_data_search represents a pure search form w/out 'limit' and 'page'
+    form_data_search = json.dumps(form_data_copy)
+
+    hex_digest = xxhash.xxh64_hexdigest(form_data_search.encode("utf-8"))
+
+    search_hash = f"search:{hex_digest}"
+    count_key = f"count:{search_hash}"
+
+    page_prefix_tag = f"page:{page_number}:limit:{limit_number}"
+    page_key = f"{page_prefix_tag}:{search_hash}"
+
+    logger.info(
+        f"CACHE: cache_keys --> page_key: [{page_key}], count_key: [{count_key}]"
+    )
+    return page_key, count_key
 
 
 # TODO: Update Post SOC Launch -> This can go

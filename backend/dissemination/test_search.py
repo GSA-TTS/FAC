@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from unittest import skip
 
 from audit.models.constants import RESUBMISSION_STATUS
 from dissemination.models import (
@@ -560,6 +559,7 @@ class SearchFilterTests(TestCase):
         self.request = RequestFactory().get("/")
         self.request.user = self.user
         super().setUp()
+        clear_cache()
 
     def test_search_federal_program_name(self):
         """
@@ -615,7 +615,6 @@ class SearchFilterTests(TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].get("federal_program_name"), "Yub Nub")
 
-    # @skip("skipping for now - assert fails on very last search !!")
     def test_search_cog_or_oversight(self):
         """
         When making a search on major program, search_cog_or_oversight should
@@ -667,11 +666,8 @@ class SearchFilterTests(TestCase):
         params = {"agency_name": 24, "cog_or_oversight": "oversight"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].get("report_id"), general_cog.report_id)
+        self.assertEqual(results[0].get("report_id"), general_over.report_id)
         clear_cache()
-
-        print(f"results --- {results}")
-        print(f"general_cog.report_id --- {general_cog.report_id}")
 
     def test_search_findings(self):
         """
