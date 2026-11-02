@@ -404,9 +404,6 @@ def validate_general_information_complete_json(value, is_data_migration=True):
     validate_general_information_schema(value)
     validate_general_information_schema_rules(value)
 
-    if not is_data_migration:
-        validate_general_information_names(value)
-
     return value
 
 

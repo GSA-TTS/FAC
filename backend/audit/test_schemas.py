@@ -51,8 +51,6 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         "GeneralInformationCase"
     ]
 
-    SIMPLE_CASE["auditee_name"] = "John"
-
     def test_simple_pass(self):
         """
         The simple case should be valid
