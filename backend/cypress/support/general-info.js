@@ -16,15 +16,10 @@ export function testValidGeneralInfo(isResubmission=false) {
 		cy.get('label[for=audit-period-annual]').click();
 
 		// Auditee information
-		cy.get('#auditee_name').type('Audit McAuditee')
+		// Auditee name, address, city, state, and zip are populated by SAM
 		cy.get('#ein').type('546000173');
 		cy.get('label[for=ein_not_an_ssn_attestation]').click();
 		cy.get('label[for=multiple-eins-yes]').click();
-		cy.get('#auditee_address_line_1').type('1111 E Broad ST');
-		cy.get('#auditee_city').type('Richmond');
-		cy.get('#auditee_state').type('VA{enter}');
-		cy.get('#auditee_zip').clear();
-		cy.get('#auditee_zip').type('23219');
 
 		// Auditee UEI is pre-filled and uneditable.
 		// cy.get('#auditee_uei').type('CMBSGK6P7BE1');

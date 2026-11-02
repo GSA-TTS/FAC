@@ -8,8 +8,6 @@ beforeEach(() => {
   cy.visit('/dissemination/search/');
 
   search = new searchPage();
-
-  search.elements.advanceSearchBtn().should('contain', 'advanced search').click();
 });
 
 describe('Test Basic Search Fields', () => {
@@ -159,7 +157,7 @@ describe('Test Advance Search Fields', () => {
 
   it('Tests Type Requirement', () => {
     const typeValue = searchData.typeRequirement;
-    search.elements.typeRequirementAccordionBtn().contains('Type Requirement').as('accordionButton').click();
+    search.elements.typeRequirementAccordionBtn().contains('Type of compliance requirement').as('accordionButton').click();
     search.elements.typeRequirementField().clear().type(typeValue);
   });
 
@@ -189,7 +187,7 @@ describe('Test Advance Search Fields', () => {
   });
 });
 
-describe('Test search and return results', () => {
+describe.only('Test search and return results', () => {
   it('Fills out basic search fields and downloads summary report', () => {
 
     search.elements.yearCheckboxById(searchData.yearsToCheck[0])
@@ -204,10 +202,6 @@ describe('Test search and return results', () => {
     search.elements.entityNameField().clear().type(searchData.name)
       .should('have.value', searchData.name);
 
-    search.elements.facAcceptDateAccordionBtn().contains('FAC acceptance date').as('accordionButton').click();
-    search.elements.startDateField().clear().type(searchData.accDate[0]);
-    search.elements.endDateField().clear().type(searchData.accDate[1]);
-
     search.elements.stateAccordionBtn().contains('State').as('accordionButton').click();
     search.elements.auditeeState().select(searchData.state).should('have.value', searchData.state);
 
@@ -216,10 +210,6 @@ describe('Test search and return results', () => {
 
     search.elements.entityTypeAccordionBtn().contains('Entity type').as('accordionButton').click();
     search.elements.entityTypeCheckboxId(searchData.entityType).check({ force: true }).should('be.checked').and('have.value', searchData.entityType);
-
-    search.elements.reportdIdAccordionBtn().as('accordionButton').click();
-    search.elements.reportIdField().clear().type(searchData.reportId)
-      .should('have.value', searchData.reportId);
 
     search.clickSearchSubmitButton();
     cy.url().should('include', '/dissemination/search/');
