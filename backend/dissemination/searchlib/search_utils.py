@@ -21,8 +21,8 @@ def _add_search_params_to_newrelic(search_parameters):
     ]
 
     multis = [
-        "uei_or_eins",
-        "names",
+        "ueis_and_eins",
+        "entity_names",
     ]
 
     singles.append("cog_or_oversight")
@@ -49,15 +49,15 @@ def run_search(request, form_data):
     """
 
     basic_parameters = {
-        "audit_years": form_data["audit_year"],
+        "audit_years": form_data["audit_years"],
         "auditee_state": form_data["auditee_state"],
         "end_date": form_data["end_date"],
-        "entity_type": form_data["entity_type"],
+        "entity_types": form_data["entity_types"],
         "fy_end_month": form_data["fy_end_month"],
-        "names": form_data["entity_name"],
-        "report_id": form_data["report_id"],
+        "entity_names": form_data["entity_names"],
+        "report_ids": form_data["report_ids"],
         "start_date": form_data["start_date"],
-        "uei_or_eins": form_data["uei_or_ein"],
+        "ueis_and_eins": form_data["ueis_and_eins"],
         "order_by": form_data["order_by"],
         "order_direction": form_data["order_direction"],
     }
@@ -66,14 +66,14 @@ def run_search(request, form_data):
 
     advanced_parameters = {
         "agency_name": form_data["agency_name"],
-        "alns": form_data["aln"],
+        "alns": form_data["alns"],
         "cog_or_oversight": form_data["cog_or_oversight"],
         "direct_funding": form_data["direct_funding"],
-        "federal_program_name": form_data["federal_program_name"],
-        "findings": form_data["findings"],
+        "federal_program_names": form_data["federal_program_names"],
+        "finding_types": form_data["finding_types"],
         "major_program": form_data["major_program"],
-        "passthrough_name": form_data["passthrough_name"],
-        "type_requirement": form_data["type_requirement"],
+        "passthrough_names": form_data["passthrough_names"],
+        "type_requirements": form_data["type_requirements"],
         "resubmissions": form_data["resubmissions"],
     }
     search_parameters.update(advanced_parameters)

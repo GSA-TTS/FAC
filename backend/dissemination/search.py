@@ -5,12 +5,12 @@ from .searchlib.search_constants import OrderBy, Direction, DAS_LIMIT
 from .searchlib.search_general import report_timing, search_general
 from .searchlib.search_alns import search_alns
 from .searchlib.search_cog_or_oversight import search_cog_or_oversight
-from .searchlib.search_findings import search_findings
-from .searchlib.search_federal_program_name import search_federal_program_name
+from .searchlib.search_findings import search_finding_types
+from .searchlib.search_federal_program_name import search_federal_program_names
 from .searchlib.search_direct_funding import search_direct_funding
 from .searchlib.search_major_program import search_major_program
-from .searchlib.search_passthrough_name import search_passthrough_name
-from .searchlib.search_type_requirement import search_type_requirement
+from .searchlib.search_passthrough_name import search_passthrough_names
+from .searchlib.search_type_requirement import search_type_requirements
 from .searchlib.search_resubmissions import search_resubmissions
 from dissemination.models import Unified, General
 
@@ -19,18 +19,18 @@ logger = logging.getLogger(__name__)
 
 GENERAL_PARAMS = [
     "audit_years",
-    "uei_or_eins",
-    "names",
+    "ueis_and_eins",
+    "entity_names",
     "start_date",
     "end_date",
     "auditee_state",
     "fy_end_month",
-    "report_id",
+    "report_ids",
     "page",
     "order_by",
     "order_direction",
     "advanced_search_flag",
-    "entity_type",
+    "entity_types",
     "LIMIT",
 ]
 
@@ -69,12 +69,12 @@ def search(request, params):
         results = search_general(Unified, params)
         results = search_alns(results, params)
         results = search_cog_or_oversight(results, params)
-        results = search_federal_program_name(results, params)
-        results = search_findings(results, params)
+        results = search_federal_program_names(results, params)
+        results = search_finding_types(results, params)
         results = search_direct_funding(results, params)
         results = search_major_program(results, params)
-        results = search_passthrough_name(results, params)
-        results = search_type_requirement(results, params)
+        results = search_passthrough_names(results, params)
+        results = search_type_requirements(results, params)
 
     results = search_resubmissions(request, results, params)
     results = _sort_results(results, params)

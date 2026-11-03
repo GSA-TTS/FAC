@@ -19,9 +19,8 @@ def search_general(base_model, params=None):
 
     ##############
     # Audit years
-    # query.add(_get_audit_years_match_query(audit_years), Q.AND)
-    q_audit_year = _get_audit_years_match_query(params.get("audit_years", None))
-    r_audit_year = base_model.objects.filter(q_audit_year)
+    q_audit_years = _get_audit_years_match_query(params.get("audit_years", None))
+    r_audit_years = base_model.objects.filter(q_audit_years)
 
     ##############
     # State
@@ -30,13 +29,13 @@ def search_general(base_model, params=None):
 
     ##############
     # Names
-    q_names = _get_names_match_query(params.get("names", None))
-    r_names = base_model.objects.filter(q_names)
+    q_entity_names = _get_names_match_query(params.get("entity_names", None))
+    r_entity_names = base_model.objects.filter(q_entity_names)
 
     ##############
-    # UEI/EIN
-    q_uei = _get_uei_or_eins_match_query(params.get("uei_or_eins", None))
-    r_uei = base_model.objects.filter(q_uei)
+    # UEIs/EINs
+    q_ueis_and_eins = _get_uei_or_eins_match_query(params.get("ueis_and_eins", None))
+    r_ueis_and_eins = base_model.objects.filter(q_ueis_and_eins)
 
     ##############
     # Start/end dates
@@ -59,29 +58,29 @@ def search_general(base_model, params=None):
     r_fy_end_month = base_model.objects.filter(q_fy_end_month)
 
     ##############
-    # Entity type
-    q_entity_type = _get_entity_type_match_query(params.get("entity_type", None))
-    r_entity_type = base_model.objects.filter(q_entity_type)
+    # Entity types
+    q_entity_types = _get_entity_type_match_query(params.get("entity_types", None))
+    r_entity_types = base_model.objects.filter(q_entity_types)
 
     ##############
     # Report ID
-    q_report_id = _get_report_id_match_query(params.get("report_id", None))
-    r_report_id = base_model.objects.filter(q_report_id)
+    q_report_ids = _get_report_id_match_query(params.get("report_ids", None))
+    r_report_ids = base_model.objects.filter(q_report_ids)
 
     ##############
     # Intersection
     # Intersection on result sets is an &.
     results = (
-        r_audit_year
+        r_audit_years
         & r_start_date
         & r_end_date
         & r_state
-        & r_names
-        & r_uei
+        & r_entity_names
+        & r_ueis_and_eins
         & r_base
         & r_fy_end_month
-        & r_entity_type
-        & r_report_id
+        & r_entity_types
+        & r_report_ids
     )
 
     t1 = time.time()
