@@ -118,7 +118,9 @@ class Search(View):
             logger.info(f"CACHE: pulling from cache for: {count_cache_key}")
             results_count = cache.get(count_cache_key)
             if results_count is None:
-                logger.info(f"CACHE: cache miss - adding to cache for: {count_cache_key}")
+                logger.info(
+                    f"CACHE: cache miss - adding to cache for: {count_cache_key}"
+                )
                 results_count = results.count()
                 cache.set(count_cache_key, results_count)
         except Exception as e:
@@ -139,7 +141,10 @@ class Search(View):
 
         # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
         paginator = CachedPaginator(
-            object_list=results, per_page=form_data["limit"], cache_key=page_cache_key
+            object_list=results,
+            per_page=form_data["limit"],
+            pg_cache_key=page_cache_key,
+            cnt_cache_key=count_cache_key,
         )
         paginator_results = paginator.get_page(page)
         paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
