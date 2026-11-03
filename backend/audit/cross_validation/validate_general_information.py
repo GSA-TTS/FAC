@@ -5,7 +5,10 @@ from jsonschema import FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
 from django.core.exceptions import ValidationError
 from audit.cross_validation.naming import NC
-from audit.validators import validate_general_information_schema_rules
+from audit.validators import (
+    validate_general_information_schema_rules,
+    validate_general_information_names,
+)
 from audit.utils import Util
 
 required_fields = {
@@ -77,6 +80,7 @@ def validate_general_information(sac_dict, *_args, **_kwargs):
         return errors
     try:
         validate_general_information_schema_rules(patched_general_information)
+        validate_general_information_names(patched_general_information)
         validate(patched_general_information, schema, format_checker=FormatChecker())
     except JSONSchemaValidationError as err:
         return [{"error": f"General Information: {str(err)}"}]
