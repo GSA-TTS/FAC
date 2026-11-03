@@ -292,6 +292,22 @@ if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTI
     DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
     DBBACKUP_STORAGE_OPTIONS = {"location": BASE_DIR / "backup"}
 
+    # cache server
+    CACHES = {
+        "default": {
+            "BACKEND": "django_valkey.cache.ValkeyCache",
+            "LOCATION": "valkey://valkey:6379",
+            "KEY_PREFIX": "facapp_v1",  # Prefix all keys to avoid collisions
+            "TIMEOUT": 300,  # Default timeout: 5 minutes,
+            "OPTIONS": {
+                "COMPRESSOR": "django_valkey.compressors.zstd.ZStdCompressor",
+                "CLIENT_CLASS": "django_valkey.client.DefaultClient",
+                "IGNORE_EXCEPTIONS": True,  # gracefully return None on cache failures instead of crashing
+                # hopefully this stops valkey from crashing the web worker thread!!!!
+            },
+        }
+    }
+
 else:
     # One of the Cloud.gov environments
     STORAGES = {
@@ -432,34 +448,45 @@ else:
     DISABLE_AUTH = False
 
     # cache server settings
+    for cache_svc in vcap.get("aws-elasticache-redis", []):
+        if cache_svc["instance_name"] == "fac-valkey":
+            cache_creds = cache_svc["credentials"]
 
-    # CACHE_USERNAME = get_cache_username_from_vcap_services(vcap)
-    # CACHE_PASSWORD = get_cache_password_from_vcap_services(vcap)
-    # CACHE_HOSTNAME = get_cache_hostname_from_vcap_services(vcap)
-    # CACHE_PORT     = get_cache_port_____from_vcap_services(vcap)
+            CACHE_PASSWORD = cache_creds["password"]
+            CACHE_HOSTNAME = cache_creds["hostname"]
+            CACHE_PORT = cache_creds["port"]
 
-    # if ENVIRONMENT == "PRODUCTION":
-    #     CACHE_DB = "0",
+            if ENVIRONMENT == "PRODUCTION":
+                CACHE_DB = "0"
 
-    # if ENVIRONMENT == "PREVIEW":
-    #     CACHE_DB = "2",
+            if ENVIRONMENT == "PREVIEW":
+                CACHE_DB = "2"
 
-    # if ENVIRONMENT == "STAGING":
-    #     CACHE_DB = "4",
+            if ENVIRONMENT == "STAGING":
+                CACHE_DB = "4"
 
-    # if ENVIRONMENT == "DEVELOPMENT":
-    #     CACHE_DB = "6",
+            if ENVIRONMENT == "DEVELOPMENT":
+                CACHE_DB = "6"
 
-    # CACHE_LOCATION = f"valkey://{CACHE_USERNAME}:{CACHE_PASSWORD}@{CACHE_HOSTNAME}:{CACHE_PORT}/{CACHE_DB}"
+            CACHE_LOCATION = (
+                f"rediss://:{CACHE_PASSWORD}@{CACHE_HOSTNAME}:{CACHE_PORT}/{CACHE_DB}"
+            )
 
-    # CACHES = {
-    #     "default": {
-    #         "BACKEND": "django_valkey.cache.ValkeyCache",
-    #         "LOCATION": CACHE_LOCATION,
-    #         "KEY_PREFIX": "facapp",  # Prefix all keys to avoid collisions
-    #         "TIMEOUT": 300,          # Default timeout: 5 minutes
-    #     }
-    # }
+            CACHES = {
+                "default": {
+                    "BACKEND": "django_valkey.cache.ValkeyCache",
+                    "LOCATION": CACHE_LOCATION,
+                    "KEY_PREFIX": "facapp_v1",  # Prefix all keys to avoid collisions
+                    "TIMEOUT": 300,  # Default timeout: 5 minutes,
+                    "OPTIONS": {
+                        "COMPRESSOR": "django_valkey.compressors.zstd.ZStdCompressor",
+                        "CLIENT_CLASS": "django_valkey.client.DefaultClient",
+                        "IGNORE_EXCEPTIONS": True,
+                    },
+                }
+            }
+        else:
+            print("CACHE: cache server NOT configured properly !!!!")
 
 ADMIN_URL = "admin/"
 
@@ -639,22 +666,6 @@ DOLLAR_THRESHOLDS = [
         "message": "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
     },
 ]
-
-# cache server
-CACHES = {
-    "default": {
-        "BACKEND": "django_valkey.cache.ValkeyCache",
-        "LOCATION": "valkey://valkey:6379",
-        "KEY_PREFIX": "facapp_v1",  # Prefix all keys to avoid collisions
-        "TIMEOUT": 300,  # Default timeout: 5 minutes,
-        "OPTIONS": {
-            "COMPRESSOR": "django_valkey.compressors.zstd.ZStdCompressor",
-            "CLIENT_CLASS": "django_valkey.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,  # gracefully return None on cache failures instead of crashing
-            # hopefully this stops valkey from crashing the web worker thread!!!!
-        },
-    }
-}
 
 # bcuz we've add a cache server (valkey)
 # - to be safe we explicitly set SESSION_ENGINE after all others that use sessions!
