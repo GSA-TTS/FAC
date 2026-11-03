@@ -3,7 +3,7 @@ import logging
 import math
 import time
 from django.core.cache import cache
-
+from django.core.paginator import Paginator
 from dissemination.views.CachedPaginator import CachedPaginator
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
@@ -26,6 +26,7 @@ from dissemination.searchlib.search_resub_tags import (
     add_resub_tag_data,
 )
 from dissemination.views.utils import include_private_results
+from flags.state import flag_enabled
 from support.decorators import newrelic_timing_metric
 from users.permissions import is_federal_user
 
@@ -72,6 +73,7 @@ class Search(View):
         time_starting_post = time.time()
 
         form = SearchForm(request.POST)
+        paginator = None
         paginator_results = None
         results_count = None
         page = 1
@@ -113,21 +115,25 @@ class Search(View):
         # construct cache keys
         page_cache_key, count_cache_key = create_cache_keys(form_data)
 
-        # reading results_count from cache
-        try:
-            logger.info(f"CACHE: pulling from cache for: {count_cache_key}")
-            results_count = cache.get(count_cache_key)
-            if results_count is None:
-                logger.info(f"CACHE: cache miss - adding to cache for: {count_cache_key}")
-                results_count = results.count()
-                cache.set(count_cache_key, results_count)
-        except Exception as e:
-            # fail silently
-            logger.error(
-                f"CACHE: cache connection failed for 'result_count' during read/write: {e}"
-            )
-            # we'll probably want to call 'results_count = results.count()' again!!!!
-            # so we're not bogged down by a cache server that misbehaves
+        if flag_enabled("ENABLE_CACHE"):
+            # reading results_count from cache
+            try:
+                logger.info(f"CACHE: pulling from cache for: {count_cache_key}")
+                results_count = cache.get(count_cache_key)
+                if results_count is None:
+                    logger.info(
+                        f"CACHE: cache miss - adding results.count() to cache for: {count_cache_key}"
+                    )
+                    results_count = results.count()
+                    cache.set(count_cache_key, results_count)
+            except Exception as e:
+                # fail silently
+                logger.error(
+                    f"CACHE: cache connection failed for 'result_count' during read/write: {e}"
+                )
+        else:
+            logger.info("CACHE: disabled - calling results.count()")
+            results_count = results.count()
 
         # Reset page number to one if the value already surpasses the number of feasible pages.
         page = form_data["page"]
@@ -138,9 +144,17 @@ class Search(View):
         logger.info(f"TOTAL: results_count: [{results_count}]")
 
         # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
-        paginator = CachedPaginator(
-            object_list=results, per_page=form_data["limit"], cache_key=page_cache_key
-        )
+        if flag_enabled("ENABLE_CACHE"):
+            paginator = CachedPaginator(
+                object_list=results,
+                per_page=form_data["limit"],
+                pg_cache_key=page_cache_key,
+                cnt_cache_key=count_cache_key,
+            )
+        else:
+            logger.info("CACHE: disabled - calling 'regular' paginator")
+            paginator = Paginator(object_list=results, per_page=form_data["limit"])
+
         paginator_results = paginator.get_page(page)
         paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
             page, on_each_side=1

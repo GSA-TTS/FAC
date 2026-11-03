@@ -405,6 +405,7 @@ django==5.2.17 \
     #   django-csp
     #   django-dbbackup
     #   django-filter
+    #   django-flags
     #   django-storages
     #   django-valkey
     #   django-viewflow
@@ -431,6 +432,10 @@ django-filter==24.3 \
     # via
     #   -r requirements/requirements.in
     #   django-viewflow
+django-flags==5.2.0 \
+    --hash=sha256:a3aee5e0d11e24e35f5ae4a423d52cad721f639181c1b1251e0148d8530a3f81 \
+    --hash=sha256:aa22543410f68a4082c576f3be469ea67a51c933f8a43eb8b10f6236f158e17e
+    # via -r requirements/requirements.in
 django-fsm==3.0.0 \
     --hash=sha256:0112bcac573ad14051cf8ebe73bf296b6d5409f093e5f1677eb16e2196e263b3 \
     --hash=sha256:fa28f84f47eae7ce9247585ac6c1895e4ada08efff93fb243a59e9ff77b2d4ec

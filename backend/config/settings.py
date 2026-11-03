@@ -112,6 +112,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.postgres",
     "django.contrib.staticfiles",
+    "flags",
 ]
 
 # Third-party apps
@@ -230,6 +231,9 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 STATIC_URL = "/static/"
+
+# feature flags
+FLAGS = {"ENABLE_CACHE": []}
 
 # Environment specific configurations
 DEBUG = False

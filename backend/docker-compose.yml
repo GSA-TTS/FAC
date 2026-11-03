@@ -15,9 +15,11 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
+      - ./my-postgres.conf:/var/lib/postgresql/data/postgresql.conf
       - postgres-data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
+    command: postgres -c config_file=/var/lib/postgresql/data/postgresql.conf
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
       interval: 10s
@@ -30,9 +32,11 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
+      - ./my-postgres.conf:/var/lib/postgresql/data/postgresql.conf
       - postgres-data2:/var/lib/postgresql/data/
     ports:
       - "5431:5432"
+    command: postgres -c config_file=/var/lib/postgresql/data/postgresql.conf
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
       interval: 10s

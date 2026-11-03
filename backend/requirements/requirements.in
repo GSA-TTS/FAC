@@ -6,6 +6,7 @@ django-cors-headers==4.5.0
 django-csp==3.8
 django-dbbackup==4.2.1
 django-filter==24.3
+django-flags==5.2.0
 django-fsm==3.0.0
 django-storages[boto3]==1.14.2
 django-valkey[zstd]==0.4.1
