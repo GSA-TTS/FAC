@@ -108,31 +108,16 @@ class Search(View):
 
         logger.info(f"Searching on fields: {form_data}")
 
-        # Generate results on valid user input.
-        # results as a queryset of dictionaries
+        # Generate results on valid user input as a QuerySet of dictionaries
         results = run_search(request, form_data)
 
         # construct cache keys
         page_cache_key, count_cache_key = create_cache_keys(form_data)
 
         if flag_enabled("ENABLE_CACHE"):
-            # reading results_count from cache
-            try:
-                logger.info(f"CACHE: pulling from cache for: {count_cache_key}")
-                results_count = cache.get(count_cache_key)
-                if results_count is None:
-                    logger.info(
-                        f"CACHE: cache miss - adding results.count() to cache for: {count_cache_key}"
-                    )
-                    results_count = results.count()
-                    cache.set(count_cache_key, results_count)
-            except Exception as e:
-                # fail silently
-                logger.error(
-                    f"CACHE: cache connection failed for 'result_count' during read/write: {e}"
-                )
+            results_count = self._get_cached_results_count(results, count_cache_key)
         else:
-            logger.info("CACHE: disabled - calling results.count()")
+            logger.info("CACHE: DISABLED - calling results.count()")
             results_count = results.count()
 
         # Reset page number to one if the value already surpasses the number of feasible pages.
@@ -152,7 +137,7 @@ class Search(View):
                 cnt_cache_key=count_cache_key,
             )
         else:
-            logger.info("CACHE: disabled - calling 'regular' paginator")
+            logger.info("CACHE: DISABLED - calling 'regular' paginator")
             paginator = Paginator(object_list=results, per_page=form_data["limit"])
 
         paginator_results = paginator.get_page(page)
@@ -190,3 +175,23 @@ class Search(View):
         total_time_s = total_time_ms / 1000
         logger.info(f"Total time between post and render {total_time_ms}ms")
         return render(request, "search.html", context | {"total_time_s": total_time_s})
+
+    def _get_cached_results_count(self, results, count_cache_key):
+        """Return results_count from cache."""
+        try:
+            logger.info(f"CACHE: READ from cache key: {count_cache_key}")
+
+            results_count = cache.get(count_cache_key)
+
+            if results_count is None:
+                logger.info(
+                    f"CACHE: WRITE 'results_count' to cache key: {count_cache_key}"
+                )
+
+                results_count = results.count()
+                cache.set(count_cache_key, results_count)
+        except Exception as e:
+            # fail silently
+            logger.error(f"CACHE: FAIL for 'results_count' during READ/WRITE: {e}")
+
+        return results_count
