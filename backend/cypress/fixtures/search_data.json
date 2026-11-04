@@ -42,6 +42,8 @@
     "state": "WV",
     "ueiOrein": "TM6DE2N7HYN3",
     "fiscalYearEndMonth": "6",
+    "typeRequirement": "A",
     "entityType": "local",
+    "passthroughName": "SDE",
     "reportId": "2023-06-GSAFAC-0000000001"
 }

@@ -187,7 +187,7 @@ describe('Test Advance Search Fields', () => {
   });
 });
 
-describe.only('Test search and return results', () => {
+describe('Test search and return results', () => {
   it('Fills out basic search fields and downloads summary report', () => {
 
     search.elements.yearCheckboxById(searchData.yearsToCheck[0])
