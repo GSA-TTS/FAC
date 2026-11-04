@@ -229,12 +229,9 @@ class SeparateNotesSingleFieldsFromArrayFields(SimpleTestCase):
         self.assertEqual(result, expected_output)
 
 
-
 class ProcessUnifiedResultsTests(SimpleTestCase):
     @patch("dissemination.summary_reports.Unified")
-    def test_findings_without_reference_numbers_are_excluded(
-        self, mock_unified
-    ):
+    def test_findings_without_reference_numbers_are_excluded(self, mock_unified):
         """Findings without reference numbers should not appear in reports."""
         from dissemination.summary_reports import (
             initialize_data_structure,
@@ -276,20 +273,15 @@ class ProcessUnifiedResultsTests(SimpleTestCase):
 
         self.assertEqual(len(data["finding"]["entries"]), 1)
 
-        reference_index = data["finding"]["field_names"].index(
-            "reference_number"
-        )
+        reference_index = data["finding"]["field_names"].index("reference_number")
 
         self.assertEqual(
             data["finding"]["entries"][0][reference_index],
             "2024-001",
         )
-    
-    
+
     @patch("dissemination.summary_reports.Unified")
-    def test_findings_without_award_references_are_excluded(
-        self, mock_unified
-    ):
+    def test_findings_without_award_references_are_excluded(self, mock_unified):
         """Findings without award references should be excluded."""
         from dissemination.summary_reports import (
             initialize_data_structure,
@@ -320,9 +312,7 @@ class ProcessUnifiedResultsTests(SimpleTestCase):
 
         mock_unified.objects.all.return_value.filter.return_value = rows
 
-        process_unified_results(
-            [report_id], names, data, False, []
-        )
+        process_unified_results([report_id], names, data, False, [])
 
         self.assertEqual(len(data["finding"]["entries"]), 1)
 
@@ -333,9 +323,7 @@ class ProcessUnifiedResultsTests(SimpleTestCase):
         )
 
     @patch("dissemination.summary_reports.Unified")
-    def test_duplicate_general_and_federal_award_records(
-        self, mock_unified
-    ):
+    def test_duplicate_general_and_federal_award_records(self, mock_unified):
         """General and federal award rows should not be duplicated."""
         from dissemination.summary_reports import (
             initialize_data_structure,
@@ -347,8 +335,7 @@ class ProcessUnifiedResultsTests(SimpleTestCase):
         data = initialize_data_structure(names)
 
         field_names = set(
-            data["general"]["field_names"]
-            + data["federalaward"]["field_names"]
+            data["general"]["field_names"] + data["federalaward"]["field_names"]
         )
 
         def make_row(award_reference):
@@ -369,21 +356,14 @@ class ProcessUnifiedResultsTests(SimpleTestCase):
 
         mock_unified.objects.all.return_value.filter.return_value = rows
 
-        process_unified_results(
-            [report_id], names, data, False, []
-        )
+        process_unified_results([report_id], names, data, False, [])
 
         self.assertEqual(len(data["general"]["entries"]), 1)
         self.assertEqual(len(data["federalaward"]["entries"]), 2)
 
-        award_index = data["federalaward"]["field_names"].index(
-            "award_reference"
-        )
+        award_index = data["federalaward"]["field_names"].index("award_reference")
 
-        awards = [
-            row[award_index]
-            for row in data["federalaward"]["entries"]
-        ]
+        awards = [row[award_index] for row in data["federalaward"]["entries"]]
 
         self.assertCountEqual(
             awards,
@@ -410,15 +390,12 @@ class ProcessUnifiedResultsTests(SimpleTestCase):
 
         mock_unified.objects.all.return_value.filter.return_value = []
 
-        process_unified_results(
-            [report_id], names, data, False, []
-        )
+        process_unified_results([report_id], names, data, False, [])
 
         for name in names:
             with self.subTest(model_name=name):
                 self.assertEqual(data[name]["entries"], [])
-                
-        
+
     @patch("dissemination.summary_reports.Unified")
     def test_passthrough_without_name_is_excluded(self, mock_unified):
         """Passthrough rows without names should be excluded."""
@@ -450,9 +427,7 @@ class ProcessUnifiedResultsTests(SimpleTestCase):
 
         mock_unified.objects.all.return_value.filter.return_value = rows
 
-        process_unified_results(
-            [report_id], names, data, False, []
-        )
+        process_unified_results([report_id], names, data, False, [])
 
         self.assertEqual(len(data["passthrough"]["entries"]), 1)
 
@@ -465,9 +440,7 @@ class ProcessUnifiedResultsTests(SimpleTestCase):
 
 class ProcessNonUnifiedResultsTests(SimpleTestCase):
     @patch("dissemination.summary_reports._get_model_by_name")
-    def test_excludes_private_tribal_records_without_permission(
-        self, mock_get_model
-    ):
+    def test_excludes_private_tribal_records_without_permission(self, mock_get_model):
         """Restricted tribal records should be excluded without permission."""
         from dissemination.summary_reports import (
             initialize_data_structure,
@@ -517,9 +490,7 @@ class ProcessNonUnifiedResultsTests(SimpleTestCase):
         )
 
     @patch("dissemination.summary_reports._get_model_by_name")
-    def test_includes_private_tribal_records_with_permission(
-        self, mock_get_model
-    ):
+    def test_includes_private_tribal_records_with_permission(self, mock_get_model):
         """Restricted tribal records should be included with permission."""
         from dissemination.summary_reports import (
             initialize_data_structure,
