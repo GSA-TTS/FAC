@@ -106,30 +106,13 @@ class Search(View):
 
         logger.info(f"Searching on fields: {form_data}")
 
-        # Generate results on valid user input.
-        # results as a queryset of dictionaries
+        # Generate results on valid user input as a QuerySet of dictionaries
         results = run_search(request, form_data)
 
         # construct cache keys
         page_cache_key, count_cache_key = create_cache_keys(form_data)
 
-        # reading results_count from cache
-        try:
-            logger.info(f"CACHE: pulling from cache for: {count_cache_key}")
-            results_count = cache.get(count_cache_key)
-            if results_count is None:
-                logger.info(
-                    f"CACHE: cache miss - adding to cache for: {count_cache_key}"
-                )
-                results_count = results.count()
-                cache.set(count_cache_key, results_count)
-        except Exception as e:
-            # fail silently
-            logger.error(
-                f"CACHE: cache connection failed for 'result_count' during read/write: {e}"
-            )
-            # we'll probably want to call 'results_count = results.count()' again!!!!
-            # so we're not bogged down by a cache server that misbehaves
+        results_count = self._get_cached_results_count(results, count_cache_key)
 
         # Reset page number to one if the value already surpasses the number of feasible pages.
         page = form_data["page"]
@@ -181,3 +164,23 @@ class Search(View):
         total_time_s = total_time_ms / 1000
         logger.info(f"Total time between post and render {total_time_ms}ms")
         return render(request, "search.html", context | {"total_time_s": total_time_s})
+
+    def _get_cached_results_count(self, results, count_cache_key):
+        """Return results_count from cache."""
+        try:
+            logger.info(f"CACHE: READ from cache key: {count_cache_key}")
+
+            results_count = cache.get(count_cache_key)
+
+            if results_count is None:
+                logger.info(
+                    f"CACHE: WRITE 'results_count' to cache key: {count_cache_key}"
+                )
+
+                results_count = results.count()
+                cache.set(count_cache_key, results_count)
+        except Exception as e:
+            # fail silently
+            logger.error(f"CACHE: FAIL for 'results_count' during READ/WRITE: {e}")
+
+        return results_count
