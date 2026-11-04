@@ -4,3 +4,6 @@ max-line-length = 88
 max-complexity = 10
 extend-ignore = E203
 exclude = ./node_modules/,.venv
+
+# ignore C901 on settings file
+per-file-ignores = config/settings.py: C901

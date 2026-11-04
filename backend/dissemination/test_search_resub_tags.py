@@ -1,5 +1,6 @@
 from django.test import TestCase
 from model_bakery import baker
+from django.forms.models import model_to_dict
 
 from dissemination.models import General
 from dissemination.searchlib.search_resub_tags import (
@@ -21,9 +22,10 @@ class ResubmissionTagTests(TestCase):
                 resubmission_version=0,
             )
         ]
-        add_resub_tag_data(rows)
+        row_list = [model_to_dict(obj) for obj in rows]
+        add_resub_tag_data(row_list)
 
-        self.assertEqual(rows[0].resubmission_tag, None)
+        self.assertEqual(row_list[0].get("resubmission_tag"), None)
 
     def test_v1_no_tag(self):
         """v1 most_recent audits don't get a tag"""
@@ -38,9 +40,10 @@ class ResubmissionTagTests(TestCase):
                 resubmission_version=1,
             )
         ]
-        add_resub_tag_data(rows)
+        row_list = [model_to_dict(obj) for obj in rows]
+        add_resub_tag_data(row_list)
 
-        self.assertEqual(rows[0].resubmission_tag, None)
+        self.assertEqual(row_list[0].get("resubmission_tag"), None)
 
     def test_v2_most_recent(self):
         """v2 most_recent audits do get a tag"""
@@ -55,10 +58,11 @@ class ResubmissionTagTests(TestCase):
                 resubmission_version=2,
             )
         ]
-        add_resub_tag_data(rows)
+        row_list = [model_to_dict(obj) for obj in rows]
+        add_resub_tag_data(row_list)
 
         self.assertEqual(
-            rows[0].resubmission_tag, f"V2 ({RESUBMISSION_TAGS.MOST_RECENT})"
+            row_list[0].get("resubmission_tag"), f"V2 ({RESUBMISSION_TAGS.MOST_RECENT})"
         )
 
     def test_v1_resub(self):
@@ -74,10 +78,11 @@ class ResubmissionTagTests(TestCase):
                 resubmission_version=1,
             )
         ]
-        add_resub_tag_data(rows)
+        row_list = [model_to_dict(obj) for obj in rows]
+        add_resub_tag_data(row_list)
 
         self.assertEqual(
-            rows[0].resubmission_tag, f"V1 ({RESUBMISSION_TAGS.DEPRECATED})"
+            row_list[0].get("resubmission_tag"), f"V1 ({RESUBMISSION_TAGS.DEPRECATED})"
         )
 
     def test_mixed(self):
@@ -109,12 +114,13 @@ class ResubmissionTagTests(TestCase):
                 resubmission_version=2,
             ),
         ]
-        add_resub_tag_data(rows)
+        row_list = [model_to_dict(obj) for obj in rows]
+        add_resub_tag_data(row_list)
 
-        self.assertEqual(rows[0].resubmission_tag, None)
+        self.assertEqual(row_list[0].get("resubmission_tag"), None)
         self.assertEqual(
-            rows[1].resubmission_tag, f"V1 ({RESUBMISSION_TAGS.DEPRECATED})"
+            row_list[1].get("resubmission_tag"), f"V1 ({RESUBMISSION_TAGS.DEPRECATED})"
         )
         self.assertEqual(
-            rows[2].resubmission_tag, f"V2 ({RESUBMISSION_TAGS.MOST_RECENT})"
+            row_list[2].get("resubmission_tag"), f"V2 ({RESUBMISSION_TAGS.MOST_RECENT})"
         )

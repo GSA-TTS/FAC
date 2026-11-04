@@ -5,6 +5,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from unittest.mock import patch
+from django.core.cache import cache
 
 from audit.models import (
     ExcelFile,
@@ -173,9 +174,18 @@ class SearchViewTests(TestCase):
             permission=permission,
         )
         self.perm_client.force_login(self.perm_user)
+        self._clear_cache()
 
     def _search_url(self):
         return reverse("dissemination:Search")
+
+    def _clear_cache(self):
+        # temporarily clearing cache
+        try:
+            cache.clear()
+        except Exception as e:
+            # fail silently
+            print(f"cache connection failed to clear: {e}")
 
     def test_allows_anonymous(self):
         response = self.anon_client.get(self._search_url())
@@ -1216,6 +1226,15 @@ class PageHandlingTests(TestCase):
             "order_direction": "asc",
             "page": "1",
         }
+        self._clear_cache()
+
+    def _clear_cache(self):
+        # temporarily clearing cache
+        try:
+            cache.clear()
+        except Exception as e:
+            # fail silently
+            print(f"cache connection failed to clear: {e}")
 
     @patch("dissemination.views.search.run_search")
     def test_search_post_page_too_high(self, mock_run_search):

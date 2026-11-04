@@ -292,6 +292,22 @@ if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTI
     DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
     DBBACKUP_STORAGE_OPTIONS = {"location": BASE_DIR / "backup"}
 
+    # cache server
+    CACHES = {
+        "default": {
+            "BACKEND": "django_valkey.cache.ValkeyCache",
+            "LOCATION": "valkey://valkey:6379",
+            "KEY_PREFIX": "facapp_v1",  # Prefix all keys to avoid collisions
+            "TIMEOUT": 300,  # Default timeout: 5 minutes,
+            "OPTIONS": {
+                "COMPRESSOR": "django_valkey.compressors.zstd.ZStdCompressor",
+                "CLIENT_CLASS": "django_valkey.client.DefaultClient",
+                "IGNORE_EXCEPTIONS": True,  # gracefully return None on cache failures instead of crashing
+                # hopefully this stops valkey from crashing the web worker thread!!!!
+            },
+        }
+    }
+
 else:
     # One of the Cloud.gov environments
     STORAGES = {
@@ -431,9 +447,48 @@ else:
     # Will not be enabled in cloud environments
     DISABLE_AUTH = False
 
+    # cache server settings
+    for cache_svc in vcap.get("aws-elasticache-redis", []):
+        if cache_svc["instance_name"] == "fac-valkey":
+            cache_creds = cache_svc["credentials"]
+
+            CACHE_PASSWORD = cache_creds["password"]
+            CACHE_HOSTNAME = cache_creds["hostname"]
+            CACHE_PORT = cache_creds["port"]
+
+            if ENVIRONMENT == "PRODUCTION":
+                CACHE_DB = "0"
+
+            if ENVIRONMENT == "PREVIEW":
+                CACHE_DB = "2"
+
+            if ENVIRONMENT == "STAGING":
+                CACHE_DB = "4"
+
+            if ENVIRONMENT == "DEVELOPMENT":
+                CACHE_DB = "6"
+
+            CACHE_LOCATION = (
+                f"rediss://:{CACHE_PASSWORD}@{CACHE_HOSTNAME}:{CACHE_PORT}/{CACHE_DB}"
+            )
+
+            CACHES = {
+                "default": {
+                    "BACKEND": "django_valkey.cache.ValkeyCache",
+                    "LOCATION": CACHE_LOCATION,
+                    "KEY_PREFIX": "facapp_v1",  # Prefix all keys to avoid collisions
+                    "TIMEOUT": 300,  # Default timeout: 5 minutes,
+                    "OPTIONS": {
+                        "COMPRESSOR": "django_valkey.compressors.zstd.ZStdCompressor",
+                        "CLIENT_CLASS": "django_valkey.client.DefaultClient",
+                        "IGNORE_EXCEPTIONS": True,
+                    },
+                }
+            }
+        else:
+            print("CACHE: cache server NOT configured properly !!!!")
 
 ADMIN_URL = "admin/"
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -611,3 +666,11 @@ DOLLAR_THRESHOLDS = [
         "message": "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
     },
 ]
+
+# bcuz we've add a cache server (valkey)
+# - to be safe we explicitly set SESSION_ENGINE after all others that use sessions!
+# - although its the django default
+#   - we are forcing sessions to 'save to the DB' (in django_session)
+#     - we've seen it switch to using the cache accidentally !
+#     - which breaks OIDC and login functionality !!!!
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
