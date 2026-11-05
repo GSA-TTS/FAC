@@ -1,6 +1,10 @@
 import searchPage from '../page_objects/search-page.js';
 import searchDataJson from '../fixtures/search_data.json'
 
+// This test relies on having 2023-06-GSAFAC-0000000001 disseminated
+// This can be found in the 20k dump and disseminated via:
+// docker compose run --rm web python manage.py delete_and_regenerate_dissemination_from_intake --report_id 2023-06-GSAFAC-0000000001
+
 let search;
 const searchData = searchDataJson;
 
