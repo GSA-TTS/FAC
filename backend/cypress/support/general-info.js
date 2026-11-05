@@ -25,7 +25,7 @@ export function testValidGeneralInfo(isResubmission=false) {
 		cy.get('#auditee_state').type('VA{enter}');
 		cy.get('#auditee_zip').clear();
 		cy.get('#auditee_zip').type('23219');
-		
+
 		// Auditee UEI is pre-filled and uneditable.
 		// cy.get('#auditee_uei').type('CMBSGK6P7BE1');
 		cy.get('label[for=multiple-ueis-yes]').click();
