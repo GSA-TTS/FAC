@@ -202,6 +202,10 @@ describe('Test search and return results', () => {
     search.elements.entityNameField().clear().type(searchData.name)
       .should('have.value', searchData.name);
 
+    search.elements.facAcceptDateAccordionBtn().contains('FAC acceptance date').as('accordionButton').click();
+    search.elements.startDateField().clear().type(searchData.accDate[0]);
+    search.elements.endDateField().clear().type(searchData.accDate[1]);
+
     search.elements.stateAccordionBtn().contains('State').as('accordionButton').click();
     search.elements.auditeeState().select(searchData.state).should('have.value', searchData.state);
 
@@ -210,6 +214,10 @@ describe('Test search and return results', () => {
 
     search.elements.entityTypeAccordionBtn().contains('Entity type').as('accordionButton').click();
     search.elements.entityTypeCheckboxId(searchData.entityType).check({ force: true }).should('be.checked').and('have.value', searchData.entityType);
+
+    search.elements.reportdIdAccordionBtn().as('accordionButton').click();
+    search.elements.reportIdField().clear().type(searchData.reportId)
+      .should('have.value', searchData.reportId);
 
     search.clickSearchSubmitButton();
     cy.url().should('include', '/dissemination/search/');
