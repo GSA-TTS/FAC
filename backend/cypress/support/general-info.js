@@ -18,16 +18,16 @@ export function testValidGeneralInfo(isResubmission=false) {
 		// Auditee information
 		cy.get('#auditee_name').clear();
 		cy.get('#auditee_name').clear().type('Audit McAuditee');
-		
+
 		cy.get('#ein').type('546000173');
 		cy.get('label[for=ein_not_an_ssn_attestation]').click();
 		cy.get('label[for=multiple-eins-yes]').click();
 
 		cy.get('#auditee_address_line_1').clear();
-		cy.get('#auditee_address_line_1').clear().type('1111 E Broad ST');
+		cy.get('#auditee_address_line_1').type('1111 E Broad ST');
 
 		cy.get('#auditee_city').clear();
-		cy.get('#auditee_city').clear().type('Richmond');
+		cy.get('#auditee_city').type('Richmond');
 
 		cy.get('#auditee_state').clear()
 		cy.get('#auditee_state').type('VA{enter}');
