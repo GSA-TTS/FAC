@@ -17,7 +17,7 @@ export function testValidGeneralInfo(isResubmission=false) {
 
 		// Auditee information
 		cy.get('#auditee_name').clear();
-		cy.get('#auditee_name').clear().type('Audit McAuditee');
+		cy.get('#auditee_name').type('Audit McAuditee');
 
 		cy.get('#ein').type('546000173');
 		cy.get('label[for=ein_not_an_ssn_attestation]').click();
