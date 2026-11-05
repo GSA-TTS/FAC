@@ -226,6 +226,9 @@ describe('Test search and return results', () => {
     search.elements.fiscalYearEndMonthBtn().contains('Fiscal year end month').as('accordionButton').click();
     search.elements.fyEndMonth().select(searchData.fiscalYearEndMonth).should('have.value', searchData.fiscalYearEndMonth);
 
+    search.elements.typeRequirementAccordionBtn().contains('Type of compliance requirement').as('accordionButton').click();
+    search.elements.typeRequirementField().clear().type(searchData.typeRequirement);
+
     search.elements.entityTypeAccordionBtn().contains('Entity type').as('accordionButton').click();
     search.elements.entityTypeCheckboxId(searchData.entityType).check({ force: true }).should('be.checked').and('have.value', searchData.entityType);
 
