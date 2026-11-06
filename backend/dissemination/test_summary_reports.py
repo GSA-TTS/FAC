@@ -12,7 +12,14 @@ from dissemination.summary_reports import (
     insert_dissem_coversheet,
     separate_notes_single_fields_from_array_fields,
 )
-from dissemination.models import FederalAward, General, CapText, Note, FindingText
+from dissemination.models import (
+    FederalAward,
+    General,
+    CapText,
+    Note,
+    FindingText,
+    Finding,
+)
 from dissemination.test_utils import bake_unified
 
 from model_bakery import baker
@@ -229,42 +236,69 @@ class SeparateNotesSingleFieldsFromArrayFields(SimpleTestCase):
         self.assertEqual(result, expected_output)
 
 
-class ProcessUnifiedResultsTests(SimpleTestCase):
+class ProcessUnifiedResultsTests(TestCase):
     @patch("dissemination.summary_reports.Unified")
-    def test_findings_without_reference_numbers_are_excluded(self, mock_unified):
+    def test_findings_without_reference_numbers_are_excluded(self):
         """Findings without reference numbers should not appear in reports."""
         from dissemination.summary_reports import (
             initialize_data_structure,
             process_unified_results,
         )
 
-        report_id = "2024-06-GSAFAC-0000000001"
+        general = baker.make(General)
+
+        bake_unified(
+            general,
+            [baker.make(Finding, report_id=general, reference_number="")],
+        )
+        bake_unified(
+            general,
+            [baker.make(Finding, report_id=general, reference_number="2024-001")],
+        )
+
         names = {"finding"}
         data = initialize_data_structure(names)
 
-        # Include all fields expected by the finding section.
-        field_names = data["finding"]["field_names"]
+        process_unified_results(
+            [general.report_id],
+            names,
+            data,
+            False,
+            [],
+        )
 
-        def make_finding(reference_number):
-            fields = {name: None for name in field_names}
-            fields.update(
-                report_id=report_id,
-                award_reference="AWARD-1",
-                reference_number=reference_number,
-                passthrough_name=None,
-            )
-            return SimpleNamespace(**fields)
+        self.assertEqual(len(data["finding"]["entries"]), 1)
 
-        rows = [
-            make_finding(None),
-            make_finding(""),
-            make_finding("2024-001"),
-        ]
+        reference_index = data["finding"]["field_names"].index("reference_number")
 
-        mock_unified.objects.all.return_value.filter.return_value = rows
+        self.assertEqual(
+            data["finding"]["entries"][0][reference_index],
+            "2024-001",
+        )
+
+    def test_findings_without_reference_numbers_are_excluded(self):
+        """Findings without reference numbers should not appear in reports."""
+        from dissemination.summary_reports import (
+            initialize_data_structure,
+            process_unified_results,
+        )
+
+        general = baker.make(General)
+
+        bake_unified(
+            general,
+            [baker.make(Finding, report_id=general, reference_number="")],
+        )
+        bake_unified(
+            general,
+            [baker.make(Finding, report_id=general, reference_number="2024-001")],
+        )
+
+        names = {"finding"}
+        data = initialize_data_structure(names)
 
         process_unified_results(
-            [report_id],
+            [general.report_id],
             names,
             data,
             False,
