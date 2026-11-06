@@ -14,7 +14,6 @@ source tools/api_teardown.sh
 source tools/migrate_app_tables.sh
 source tools/api_standup.sh
 source tools/run_collectstatic.sh
-source tools/materialized_views.sh
 source tools/create_staffusers.sh
 
 #####
