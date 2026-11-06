@@ -1,8 +1,4 @@
 {
-    "accDate": [
-        "05/01/2024",
-        "05/31/2024"
-    ],
     "aln": "93",
     "findings": [
         "all_findings",
@@ -43,7 +39,7 @@
     "ueiOrein": "D7A4J33FUMJ1",
     "fiscalYearEndMonth": "12",
     "typeRequirement": "A",
-    "entityType": "tribal",
+    "entityType": "state",
     "passthroughName": "SDE",
-    "reportId": "2022-12-GSAFAC-0000000001"
+    "reportId": "2023-06-GSAFAC-0000000001"
 }
