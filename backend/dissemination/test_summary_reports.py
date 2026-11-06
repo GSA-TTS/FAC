@@ -1,5 +1,7 @@
 from django.test import SimpleTestCase
 from django.test import TestCase
+from unittest.mock import patch
+from types import SimpleNamespace
 
 from dissemination.summary_reports import (
     can_read_tribal_disclaimer,
@@ -10,7 +12,14 @@ from dissemination.summary_reports import (
     insert_dissem_coversheet,
     separate_notes_single_fields_from_array_fields,
 )
-from dissemination.models import FederalAward, General, CapText, Note, FindingText
+from dissemination.models import (
+    FederalAward,
+    General,
+    CapText,
+    Note,
+    FindingText,
+    Finding,
+)
 from dissemination.test_utils import bake_unified
 
 from model_bakery import baker
@@ -225,3 +234,320 @@ class SeparateNotesSingleFieldsFromArrayFields(SimpleTestCase):
         expected_output = data  # Expect no change since there are no entries to process
         result = separate_notes_single_fields_from_array_fields(data)
         self.assertEqual(result, expected_output)
+
+
+class ProcessUnifiedResultsTests(TestCase):
+    def test_findings_without_reference_numbers_are_excluded(self):
+        """Findings without reference numbers should not appear in reports."""
+        from dissemination.summary_reports import (
+            initialize_data_structure,
+            process_unified_results,
+        )
+
+        general = baker.make(General)
+
+        bake_unified(
+            general,
+            [baker.make(Finding, report_id=general, reference_number="")],
+        )
+        bake_unified(
+            general,
+            [baker.make(Finding, report_id=general, reference_number="2024-001")],
+        )
+
+        names = {"finding"}
+        data = initialize_data_structure(names)
+
+        process_unified_results(
+            [general.report_id],
+            names,
+            data,
+            False,
+            [],
+        )
+
+        self.assertEqual(len(data["finding"]["entries"]), 1)
+
+        reference_index = data["finding"]["field_names"].index("reference_number")
+
+        self.assertEqual(
+            data["finding"]["entries"][0][reference_index],
+            "2024-001",
+        )
+
+    @patch("dissemination.summary_reports.Unified")
+    def test_findings_without_award_references_are_excluded(self, mock_unified):
+        """Findings without award references should be excluded."""
+        from dissemination.summary_reports import (
+            initialize_data_structure,
+            process_unified_results,
+        )
+
+        report_id = "2024-06-GSAFAC-0000000001"
+        names = {"finding"}
+        data = initialize_data_structure(names)
+
+        field_names = data["finding"]["field_names"]
+
+        def make_finding(award_reference):
+            fields = {name: None for name in field_names}
+            fields.update(
+                report_id=report_id,
+                award_reference=award_reference,
+                reference_number="2024-001",
+                passthrough_name=None,
+            )
+            return SimpleNamespace(**fields)
+
+        rows = [
+            make_finding(None),
+            make_finding(""),
+            make_finding("AWARD-1"),
+        ]
+
+        mock_unified.objects.all.return_value.filter.return_value = rows
+
+        process_unified_results([report_id], names, data, False, [])
+
+        self.assertEqual(len(data["finding"]["entries"]), 1)
+
+        award_index = field_names.index("award_reference")
+        self.assertEqual(
+            data["finding"]["entries"][0][award_index],
+            "AWARD-1",
+        )
+
+    @patch("dissemination.summary_reports.Unified")
+    def test_duplicate_general_and_federal_award_records(self, mock_unified):
+        """General and federal award rows should not be duplicated."""
+        from dissemination.summary_reports import (
+            initialize_data_structure,
+            process_unified_results,
+        )
+
+        report_id = "2024-06-GSAFAC-0000000001"
+        names = {"general", "federalaward"}
+        data = initialize_data_structure(names)
+
+        field_names = set(
+            data["general"]["field_names"] + data["federalaward"]["field_names"]
+        )
+
+        def make_row(award_reference):
+            fields = {name: None for name in field_names}
+            fields.update(
+                report_id=report_id,
+                award_reference=award_reference,
+                reference_number=None,
+                passthrough_name=None,
+            )
+            return SimpleNamespace(**fields)
+
+        rows = [
+            make_row("AWARD-1"),
+            make_row("AWARD-1"),
+            make_row("AWARD-2"),
+        ]
+
+        mock_unified.objects.all.return_value.filter.return_value = rows
+
+        process_unified_results([report_id], names, data, False, [])
+
+        self.assertEqual(len(data["general"]["entries"]), 1)
+        self.assertEqual(len(data["federalaward"]["entries"]), 2)
+
+        award_index = data["federalaward"]["field_names"].index("award_reference")
+
+        awards = [row[award_index] for row in data["federalaward"]["entries"]]
+
+        self.assertCountEqual(
+            awards,
+            ["AWARD-1", "AWARD-2"],
+        )
+
+    @patch("dissemination.summary_reports.Unified")
+    def test_empty_unified_results(self, mock_unified):
+        """No Unified records should produce empty entries."""
+        from dissemination.summary_reports import (
+            initialize_data_structure,
+            process_unified_results,
+        )
+
+        report_id = "2024-06-GSAFAC-0000000001"
+        names = {
+            "general",
+            "federalaward",
+            "finding",
+            "passthrough",
+        }
+
+        data = initialize_data_structure(names)
+
+        mock_unified.objects.all.return_value.filter.return_value = []
+
+        process_unified_results([report_id], names, data, False, [])
+
+        for name in names:
+            with self.subTest(model_name=name):
+                self.assertEqual(data[name]["entries"], [])
+
+    @patch("dissemination.summary_reports.Unified")
+    def test_passthrough_without_name_is_excluded(self, mock_unified):
+        """Passthrough rows without names should be excluded."""
+        from dissemination.summary_reports import (
+            initialize_data_structure,
+            process_unified_results,
+        )
+
+        report_id = "2024-06-GSAFAC-0000000001"
+        names = {"passthrough"}
+        data = initialize_data_structure(names)
+
+        field_names = data["passthrough"]["field_names"]
+
+        def make_passthrough(name):
+            fields = {field: None for field in field_names}
+            fields.update(
+                report_id=report_id,
+                award_reference="AWARD-1",
+                reference_number=None,
+                passthrough_name=name,
+            )
+            return SimpleNamespace(**fields)
+
+        rows = [
+            make_passthrough(None),
+            make_passthrough("Test Organization"),
+        ]
+
+        mock_unified.objects.all.return_value.filter.return_value = rows
+
+        process_unified_results([report_id], names, data, False, [])
+
+        self.assertEqual(len(data["passthrough"]["entries"]), 1)
+
+        name_index = field_names.index("passthrough_name")
+        self.assertEqual(
+            data["passthrough"]["entries"][0][name_index],
+            "Test Organization",
+        )
+
+
+class ProcessNonUnifiedResultsTests(SimpleTestCase):
+    @patch("dissemination.summary_reports._get_model_by_name")
+    def test_excludes_private_tribal_records_without_permission(self, mock_get_model):
+        """Restricted tribal records should be excluded without permission."""
+        from dissemination.summary_reports import (
+            initialize_data_structure,
+            process_non_unified_results,
+        )
+
+        public_id = "2024-06-GSAFAC-0000000001"
+        tribal_id = "2024-06-GSAFAC-0000000002"
+
+        names = {"findingtext"}
+        data = initialize_data_structure(names)
+        field_names = data["findingtext"]["field_names"]
+
+        def make_record(report_id):
+            fields = {name: None for name in field_names}
+            fields.update(
+                id=1,
+                report_id=report_id,
+                finding_ref_number="2024-001",
+                finding_text="Test finding",
+            )
+            return SimpleNamespace(**fields)
+
+        records = [
+            make_record(public_id),
+            make_record(tribal_id),
+        ]
+
+        mock_model = mock_get_model.return_value
+        mock_model.objects.all.return_value.filter.return_value = records
+
+        process_non_unified_results(
+            [public_id, tribal_id],
+            names,
+            data,
+            False,
+            [tribal_id],
+        )
+
+        self.assertEqual(len(data["findingtext"]["entries"]), 1)
+
+        report_id_index = field_names.index("report_id")
+
+        self.assertEqual(
+            data["findingtext"]["entries"][0][report_id_index],
+            public_id,
+        )
+
+    @patch("dissemination.summary_reports._get_model_by_name")
+    def test_includes_private_tribal_records_with_permission(self, mock_get_model):
+        """Restricted tribal records should be included with permission."""
+        from dissemination.summary_reports import (
+            initialize_data_structure,
+            process_non_unified_results,
+        )
+
+        tribal_id = "2024-06-GSAFAC-0000000002"
+
+        names = {"findingtext"}
+        data = initialize_data_structure(names)
+        field_names = data["findingtext"]["field_names"]
+
+        fields = {name: None for name in field_names}
+        fields.update(
+            id=1,
+            report_id=tribal_id,
+            finding_ref_number="2024-001",
+            finding_text="Private tribal finding",
+        )
+
+        record = SimpleNamespace(**fields)
+
+        mock_model = mock_get_model.return_value
+        mock_model.objects.all.return_value.filter.return_value = [record]
+
+        process_non_unified_results(
+            [tribal_id],
+            names,
+            data,
+            True,
+            [tribal_id],
+        )
+
+        self.assertEqual(len(data["findingtext"]["entries"]), 1)
+
+        report_id_index = field_names.index("report_id")
+
+        self.assertEqual(
+            data["findingtext"]["entries"][0][report_id_index],
+            tribal_id,
+        )
+
+    @patch("dissemination.summary_reports._get_model_by_name")
+    def test_empty_results(self, mock_get_model):
+        """No matching records should produce empty entries."""
+        from dissemination.summary_reports import (
+            initialize_data_structure,
+            process_non_unified_results,
+        )
+
+        names = {"findingtext"}
+        data = initialize_data_structure(names)
+
+        mock_model = mock_get_model.return_value
+        mock_model.objects.all.return_value.filter.return_value = []
+
+        process_non_unified_results(
+            ["2024-06-GSAFAC-0000000001"],
+            names,
+            data,
+            False,
+            [],
+        )
+
+        self.assertEqual(data["findingtext"]["entries"], [])
