@@ -12,7 +12,6 @@ services:
   - fac-key-service
   - newrelic-creds
   - https-proxy-creds
-  - smtp-proxy-creds
   - fac-logdrain
   - fac-snapshot-db
   - backups

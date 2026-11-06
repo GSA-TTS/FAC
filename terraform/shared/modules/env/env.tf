@@ -1,26 +1,16 @@
 module "database" {
-  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.3.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.5.0"
 
-  cf_space_id   = var.cf_space.id
-  name          = "fac-db"
-  tags          = ["rds"]
-  rds_plan_name = var.database_plan
-  json_params   = var.db_params
-}
-
-module "snapshot-database" {
-  source = "github.com/gsa-tts/terraform-cloudgov//database?ref=v2.3.0"
-
-  count         = var.cf_space.name == "staging" || var.cf_space.name == "production" ? 1 : 0
-  cf_space_id   = var.cf_space.id
-  name          = "fac-snapshot-db"
-  tags          = ["rds"]
-  rds_plan_name = var.snapshot_database_plan
-  json_params   = var.snapshot_db_params
+  cf_space_id     = var.cf_space.id
+  name            = "fac-db"
+  tags            = ["rds"]
+  rds_plan_name   = var.database_plan
+  json_params     = var.db_params
+  prevent_destroy = true
 }
 
 module "s3-public" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.5.0"
 
   cf_space_id  = var.cf_space.id
   name         = "fac-public-s3"
@@ -29,7 +19,7 @@ module "s3-public" {
 }
 
 module "s3-private" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.5.0"
 
   cf_space_id  = var.cf_space.id
   name         = "fac-private-s3"
