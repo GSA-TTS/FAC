@@ -237,7 +237,6 @@ class SeparateNotesSingleFieldsFromArrayFields(SimpleTestCase):
 
 
 class ProcessUnifiedResultsTests(TestCase):
-    @patch("dissemination.summary_reports.Unified")
     def test_findings_without_reference_numbers_are_excluded(self):
         """Findings without reference numbers should not appear in reports."""
         from dissemination.summary_reports import (
