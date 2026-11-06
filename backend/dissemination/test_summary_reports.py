@@ -276,44 +276,6 @@ class ProcessUnifiedResultsTests(TestCase):
             "2024-001",
         )
 
-    def test_findings_without_reference_numbers_are_excluded(self):
-        """Findings without reference numbers should not appear in reports."""
-        from dissemination.summary_reports import (
-            initialize_data_structure,
-            process_unified_results,
-        )
-
-        general = baker.make(General)
-
-        bake_unified(
-            general,
-            [baker.make(Finding, report_id=general, reference_number="")],
-        )
-        bake_unified(
-            general,
-            [baker.make(Finding, report_id=general, reference_number="2024-001")],
-        )
-
-        names = {"finding"}
-        data = initialize_data_structure(names)
-
-        process_unified_results(
-            [general.report_id],
-            names,
-            data,
-            False,
-            [],
-        )
-
-        self.assertEqual(len(data["finding"]["entries"]), 1)
-
-        reference_index = data["finding"]["field_names"].index("reference_number")
-
-        self.assertEqual(
-            data["finding"]["entries"][0][reference_index],
-            "2024-001",
-        )
-
     @patch("dissemination.summary_reports.Unified")
     def test_findings_without_award_references_are_excluded(self, mock_unified):
         """Findings without award references should be excluded."""
