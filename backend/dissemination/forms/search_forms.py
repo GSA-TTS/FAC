@@ -84,7 +84,7 @@ class SearchForm(forms.Form):
     )
 
     # Query params
-    agency_name = forms.CharField(required=False)  # does name make sense? number?
+    cog_over_number = forms.CharField(required=False)
     alns = forms.CharField(required=False)
     audit_years = forms.MultipleChoiceField(
         choices=audit_year_choices,

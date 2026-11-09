@@ -65,7 +65,7 @@ def run_search(request, form_data):
     search_parameters = basic_parameters.copy()
 
     advanced_parameters = {
-        "agency_name": form_data["agency_name"],
+        "cog_over_number": form_data["cog_over_number"],
         "alns": form_data["alns"],
         "cog_or_oversight": form_data["cog_or_oversight"],
         "direct_funding": form_data["direct_funding"],

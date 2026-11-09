@@ -570,29 +570,29 @@ class SearchFilterTests(TestCase):
         bake_unified(general_over, [fed_over])
 
         # Either cog or over with no agency should return all
-        params = {"agency_name": None, "cog_or_oversight": "either"}
+        params = {"cog_over_number": None, "cog_or_oversight": "either"}
         results = search(self.request, params)
         self.assertEqual(len(results), 2)
 
         # Unused agency should return nothing
-        params = {"agency_name": 99, "cog_or_oversight": "either"}
+        params = {"cog_over_number": 99, "cog_or_oversight": "either"}
         results = search(self.request, params)
         self.assertEqual(len(results), 0)
 
         # Either cog or over with valid agency
-        params = {"agency_name": 42, "cog_or_oversight": "either"}
+        params = {"cog_over_number": 42, "cog_or_oversight": "either"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_cog.report_id)
 
         # Cog with valid agency
-        params = {"agency_name": 42, "cog_or_oversight": "cog"}
+        params = {"cog_over_number": 42, "cog_or_oversight": "cog"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_cog.report_id)
 
         # Over with valid agency
-        params = {"agency_name": 24, "cog_or_oversight": "oversight"}
+        params = {"cog_over_number": 24, "cog_or_oversight": "oversight"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_over.report_id)
