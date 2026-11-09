@@ -130,7 +130,7 @@ describe('A11y tests on a fully submitted report', () => {
   });
 });
 
-describe.only('A11y Testing on search pages', () => {
+describe('A11y Testing on search pages', () => {
   before(() => {
     cy.visit('/dissemination/search/');
     cy.get('label').contains('All years').click();
