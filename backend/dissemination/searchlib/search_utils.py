@@ -100,7 +100,7 @@ def create_cache_keys(form_data):
     limit_number = form_data_copy.pop("limit", 30)
 
     # form_data_search represents a pure search form w/out 'limit' and 'page'
-    form_data_search = json.dumps(form_data_copy)
+    form_data_search = json.dumps(form_data_copy, default=str)
 
     hex_digest = xxhash.xxh64_hexdigest(form_data_search.encode("utf-8"))
 
