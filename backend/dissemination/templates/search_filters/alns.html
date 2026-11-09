@@ -7,7 +7,12 @@
                 aria-controls="alns">Assistance Listing Numbers (formerly CFDAs)</button>
     </label>
     <div id="alns">
-        <div class="usa-hint" id="alns-hint">Separate multiple ALNs by commas or newlines.</div>
-        <textarea class="usa-textarea" id="input_alns" name="alns">{{form_user_input.alns}}</textarea>
+        <div id="alns-hint">Separate multiple ALNs by commas or newlines.</div>
+        <textarea class="usa-textarea"
+                  id="input_alns"
+                  name="alns"
+                  aria-describedby="alns-hint">
+            {{form_user_input.alns}}
+        </textarea>
     </div>
 </div>

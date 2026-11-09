@@ -6,6 +6,12 @@
             aria-controls="type-requirements">Type of compliance requirements</button>
 </label>
 <div id="type-requirements">
-    <div class="usa-hint" id="type_requirements-hint">Separate type of compliance requirements with spaces.</div>
-    <textarea class="usa-textarea" id="type-requirements-input" name="type_requirements" placeholder="P N L I B ...">{{form_user_input.type_requirements}}</textarea>
+    <div id="type-requirements-hint">Separate type of compliance requirements with spaces.</div>
+    <textarea class="usa-textarea"
+              id="type-requirements-input"
+              name="type_requirements"
+              placeholder="P N L I B ..."
+              aria-describedby="type-requirements-hint"></textarea>
+        {{form_user_input.type_requirements}}
+    </textarea>
 </div>

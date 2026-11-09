@@ -7,7 +7,12 @@
                 aria-controls="federal-program-names">Federal Program Names</button>
     </label>
     <div id="federal-program-names">
-        <div class="usa-hint" id="federal-program-names-hint">Separate multiple names newlines.</div>
-        <textarea class="usa-textarea" id="input_federal-program-name" name="federal_program_names">{{form_user_input.federal_program_names}}</textarea>
+        <div id="federal-program-names-hint">Separate multiple names newlines.</div>
+        <textarea class="usa-textarea"
+                  id="input_federal-program-name"
+                  name="federal_program_names"
+                  aria-describedby="federal-program-names-hint">
+            {{form_user_input.federal_program_names}}
+        </textarea>
     </div>
 </div>

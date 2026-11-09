@@ -10,9 +10,11 @@
     <label class="usa-sr-only" for="input_ueis-and-eins">
         UEIs and EINs
     </label>
-    <div class="usa-hint" id="ueis-and-eins-hint">Separate multiple UEIs and EINs by commas or newlines.</div>
+    <div id="ueis-and-eins-hint">Separate multiple UEIs and EINs by commas or newlines.</div>
     <textarea class="usa-textarea"
               id="input_ueis-and-eins"
-              name="ueis_andeins"
-              aria-describedby="uei-ein-help">{{ form_user_input.ueis_and_eins }}</textarea>
+              name="ueis_and_eins"
+              aria-describedby="ueis-and-eins-hint">
+        {{ form_user_input.ueis_and_eins }}
+    </textarea>
 </div>
