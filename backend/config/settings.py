@@ -136,6 +136,17 @@ INSTALLED_APPS += [
     "curation",
 ]
 
+# bcuz we've add a cache server (valkey)
+# - valkey changes the django defaults:
+#   - from: 'django.contrib.sessions.backends.db'
+#   -   to: 'django.contrib.sessions.backends.cache'
+# - to be safe we explicitly set SESSION_ENGINE
+#   - we are forcing sessions to 'save to the DB' (in django_session)
+#     - djangooidc (which use pyoidc library [oic module])
+#       - uses whatever your session engine uses
+#     - which breaks OIDC and login functionality !!!!
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -667,10 +678,11 @@ DOLLAR_THRESHOLDS = [
     },
 ]
 
-# bcuz we've add a cache server (valkey)
-# - to be safe we explicitly set SESSION_ENGINE after all others that use sessions!
-# - although its the django default
-#   - we are forcing sessions to 'save to the DB' (in django_session)
-#     - we've seen it switch to using the cache accidentally !
-#     - which breaks OIDC and login functionality !!!!
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
+# ==============================================================================
+# ASYNC SAFETY OVERRIDE (Resolves Valkey / OIDC Threading Collision)
+# ==============================================================================
+# this tells django's thread manager to allow synchronous OIDC network calls
+# to execute safely alongside the async-native django_valkey cache layer.
+# - we're ARE NOT running Django Channels or real-time WebSockets
+# - we are are running entirely on a synchronous Gunicorn worker block.
+DJANGO_ALLOW_ASYNC_UNSAFE = True
