@@ -9,8 +9,19 @@ from dissemination.summary_reports import (
     get_tribal_report_ids,
     insert_dissem_coversheet,
     separate_notes_single_fields_from_array_fields,
+    initialize_data_structure,
+    process_unified_results,
+    process_non_unified_results,
 )
-from dissemination.models import FederalAward, General, CapText, Note, FindingText
+from dissemination.models import (
+    FederalAward,
+    General,
+    CapText,
+    Note,
+    FindingText,
+    Finding,
+    Passthrough,
+)
 from dissemination.test_utils import bake_unified
 
 from model_bakery import baker
@@ -225,3 +236,165 @@ class SeparateNotesSingleFieldsFromArrayFields(SimpleTestCase):
         expected_output = data  # Expect no change since there are no entries to process
         result = separate_notes_single_fields_from_array_fields(data)
         self.assertEqual(result, expected_output)
+
+
+class ProcessUnifiedResultsTests(TestCase):
+    def test_findings_without_reference_numbers_are_excluded(self):
+        """Findings without reference numbers should not appear in reports."""
+        general = baker.make(General)
+
+        bake_unified(
+            general,
+            [baker.make(Finding, report_id=general, reference_number="")],
+        )
+        bake_unified(
+            general,
+            [baker.make(Finding, report_id=general, reference_number="2024-001")],
+        )
+
+        names = {"finding"}
+        data = initialize_data_structure(names)
+
+        process_unified_results(
+            [general.report_id],
+            names,
+            data,
+            False,
+            [],
+        )
+
+        self.assertEqual(len(data["finding"]["entries"]), 1)
+
+        reference_index = data["finding"]["field_names"].index("reference_number")
+
+        self.assertEqual(
+            data["finding"]["entries"][0][reference_index],
+            "2024-001",
+        )
+
+    def test_findings_without_award_references_are_excluded(self):
+        """Findings without award references should be excluded."""
+        general = baker.make(General)
+        bake_unified(
+            general,
+            [
+                baker.make(
+                    Finding,
+                    report_id=general,
+                    award_reference="",
+                    reference_number="2024-001",
+                )
+            ],
+        )
+        bake_unified(
+            general,
+            [
+                baker.make(
+                    Finding,
+                    report_id=general,
+                    award_reference="AWARD-1",
+                    reference_number="2024-002",
+                )
+            ],
+        )
+        names = {"finding"}
+        data = initialize_data_structure(names)
+        process_unified_results([general.report_id], names, data, False, [])
+        self.assertEqual(len(data["finding"]["entries"]), 1)
+        award_index = data["finding"]["field_names"].index("award_reference")
+        self.assertEqual(data["finding"]["entries"][0][award_index], "AWARD-1")
+
+    def test_duplicate_general_and_federal_award_records(self):
+        """General and federal award rows should not be duplicated."""
+        general = baker.make(General)
+        award1 = baker.make(FederalAward, report_id=general, award_reference="AWARD-1")
+        award2 = baker.make(FederalAward, report_id=general, award_reference="AWARD-2")
+        bake_unified(general, [award1])
+        bake_unified(general, [award2])
+        names = {"general", "federalaward"}
+        data = initialize_data_structure(names)
+        process_unified_results([general.report_id], names, data, False, [])
+        self.assertEqual(len(data["general"]["entries"]), 1)
+        self.assertEqual(len(data["federalaward"]["entries"]), 2)
+        award_index = data["federalaward"]["field_names"].index("award_reference")
+        awards = [row[award_index] for row in data["federalaward"]["entries"]]
+        self.assertCountEqual(awards, ["AWARD-1", "AWARD-2"])
+
+    def test_empty_unified_results(self):
+        """No Unified records should produce empty entries."""
+        general = baker.make(General)
+        names = {"general", "federalaward", "finding", "passthrough"}
+        data = initialize_data_structure(names)
+        process_unified_results([general.report_id], names, data, False, [])
+        for name in names:
+            with self.subTest(model_name=name):
+                self.assertEqual(data[name]["entries"], [])
+
+    def test_passthrough_without_name_is_excluded(self):
+        """Passthrough rows without names should be excluded."""
+        general = baker.make(General)
+        passthrough = baker.make(
+            Passthrough,
+            report_id=general,
+            award_reference="AWARD-1",
+            passthrough_name="Test Organization",
+        )
+        bake_unified(general, [passthrough])
+        names = {"passthrough"}
+        data = initialize_data_structure(names)
+        process_unified_results([general.report_id], names, data, False, [])
+        self.assertEqual(len(data["passthrough"]["entries"]), 1)
+        name_index = data["passthrough"]["field_names"].index("passthrough_name")
+        self.assertEqual(
+            data["passthrough"]["entries"][0][name_index], "Test Organization"
+        )
+
+
+class ProcessNonUnifiedResultsTests(TestCase):
+    def test_excludes_private_tribal_records_without_permission(self):
+        """Restricted tribal records should be excluded without permission."""
+        public_general = baker.make(General, is_public=True)
+        tribal_general = baker.make(General, is_public=False)
+        baker.make(FindingText, report_id=public_general, finding_ref_number="2024-001")
+        baker.make(FindingText, report_id=tribal_general, finding_ref_number="2024-002")
+        names = {"findingtext"}
+        data = initialize_data_structure(names)
+        process_non_unified_results(
+            [public_general.report_id, tribal_general.report_id],
+            names,
+            data,
+            False,
+            [tribal_general.report_id],
+        )
+        self.assertEqual(len(data["findingtext"]["entries"]), 1)
+        report_id_index = data["findingtext"]["field_names"].index("report_id")
+        self.assertEqual(
+            data["findingtext"]["entries"][0][report_id_index], public_general.report_id
+        )
+
+    def test_includes_private_tribal_records_with_permission(self):
+        """Restricted tribal records should be included with permission."""
+        tribal_general = baker.make(General, is_public=False)
+        baker.make(FindingText, report_id=tribal_general, finding_ref_number="2024-001")
+        names = {"findingtext"}
+        data = initialize_data_structure(names)
+        process_non_unified_results(
+            [tribal_general.report_id],
+            names,
+            data,
+            True,
+            [tribal_general.report_id],
+        )
+        self.assertEqual(len(data["findingtext"]["entries"]), 1)
+        report_id_index = data["findingtext"]["field_names"].index("report_id")
+        self.assertEqual(
+            data["findingtext"]["entries"][0][report_id_index], tribal_general.report_id
+        )
+
+    def test_empty_results(self):
+        """No matching records should produce empty entries."""
+        general = baker.make(General)
+        names = {"findingtext"}
+        data = initialize_data_structure(names)
+        process_non_unified_results([general.report_id], names, data, False, [])
+        self.assertEqual(data["findingtext"]["entries"], [])
