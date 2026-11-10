@@ -25,6 +25,15 @@ from cfenv import AppEnv
 
 from .db_url import get_db_url_from_vcap_services
 
+# ==============================================================================
+# ASYNC SAFETY OVERRIDE (Resolves Valkey / OIDC Threading Collision)
+# ==============================================================================
+# this tells django's thread manager to allow synchronous OIDC network calls
+# to execute safely alongside the async-native django_valkey cache layer.
+# - we're ARE NOT running Django Channels or real-time WebSockets
+# - we are are running entirely on a synchronous Gunicorn worker block.
+DJANGO_ALLOW_ASYNC_UNSAFE = True
+
 newrelic.agent.initialize()
 
 env = environs.Env()
@@ -677,12 +686,3 @@ DOLLAR_THRESHOLDS = [
         "message": "$1,000,000 or more with a Fiscal Year starting ON or AFTER October 01, 2024",
     },
 ]
-
-# ==============================================================================
-# ASYNC SAFETY OVERRIDE (Resolves Valkey / OIDC Threading Collision)
-# ==============================================================================
-# this tells django's thread manager to allow synchronous OIDC network calls
-# to execute safely alongside the async-native django_valkey cache layer.
-# - we're ARE NOT running Django Channels or real-time WebSockets
-# - we are are running entirely on a synchronous Gunicorn worker block.
-DJANGO_ALLOW_ASYNC_UNSAFE = True
