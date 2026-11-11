@@ -18,6 +18,8 @@ locals {
     # Mirrors @GSA-TTS/FAC-team (developers)
     # https://github.com/orgs/GSA-TTS/teams/fac-team/members
     # TODO: Automate updates via GitHub's GraphQL API
+    var.cf_user,
+
     "candace.campbell@gsa.gov",
     "daryll.pierre@gsa.gov",
     "james.person@gsa.gov",
