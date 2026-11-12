@@ -44,7 +44,7 @@
     "autoprefixer": "10.4.20",
     "esbuild": "0.28.2",
     "esbuild-sass-plugin": "3.7.0",
-    "glob": "14.0.4",
+    "glob": "14.0.6",
     "npm-run-all2": "9.0.3",
     "plotly.js-strict-dist": "3.0.1",
     "postcss": "8.5.26",
