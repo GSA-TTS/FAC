@@ -2,11 +2,13 @@ from datetime import date
 import logging
 import math
 import time
+from urllib.parse import urlencode
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
+from django.urls import reverse
 
 from config.settings import (
     STATE_ABBREVS,
@@ -42,33 +44,33 @@ class Search(View):
     def _is_beta_search(self, request):
         return request.path == "/dissemination/search/beta/"
 
-    def get(self, request, *args, **kwargs):
-        """
-        When accessing the search page through get, return the blank search page.
-        """
-        form = SearchForm()
-
-        return render(
-            request,
-            "search.html",
-            {
-                "form": form,
-                "form_user_input": {"audit_year": default_checked_audit_years},
-                "state_abbrevs": STATE_ABBREVS,
-                "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
-                "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
-                "can_view_resubmissions": is_federal_user(request.user),
-            },
-        )
-
     @newrelic_timing_metric("search-advanced")
-    def post(self, request, *args, **kwargs):
-        """
-        When accessing the search page through post, run a search and display the results.
-        """
+    def get(self, request, *args, **kwargs):
+        # Not a search, just visiting the page
+        if not request.GET:
+            form = SearchForm()
+
+            return render(
+                request,
+                "search.html",
+                {
+                    "form": form,
+                    "form_user_input": {"audit_year": default_checked_audit_years},
+                    "state_abbrevs": STATE_ABBREVS,
+                    "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                    "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
+                    "can_view_resubmissions": is_federal_user(request.user),
+                },
+            )
+
+        # If any empty parameters were stripped, redirect to the cleaned URL to
+        # prevent clutter in the user's address bar
+        cleaned_query_string = self._clean_query_string(request)
+        if cleaned_query_string:
+            return redirect(f"{reverse("dissemination:Search")}?{cleaned_query_string}")
+
         time_starting_post = time.time()
 
-        form = SearchForm(request.POST)
         paginator_results = None
         results_count = None
         page = 1
@@ -82,6 +84,7 @@ class Search(View):
         }
 
         # Obtain cleaned form data.
+        form = SearchForm(request.GET)
         form.is_valid()  # Runs default cleaning functions AND "clean_*" functions in forms.py
         form_data = form.cleaned_data
         form_user_input = {k: v[0] if len(v) == 1 else v for k, v in form.data.lists()}
@@ -144,6 +147,7 @@ class Search(View):
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
+            "report_ids_display": "\n".join(form_data["report_id"]),
         }
         time_beginning_render = time.time()
         total_time_ms = int(
@@ -152,3 +156,22 @@ class Search(View):
         total_time_s = total_time_ms / 1000
         logger.info(f"Total time between post and render {total_time_ms}ms")
         return render(request, "search.html", context | {"total_time_s": total_time_s})
+
+    def _clean_query_string(self, request):
+        """
+        Removes empty parameters from the given request URL
+        """
+        clean_params = []
+        has_empty = False
+
+        for key, values in request.GET.lists():
+            for value in values:
+                if value.strip():
+                    clean_params.append((key, value))
+                else:
+                    has_empty = True
+
+        if has_empty:
+            return urlencode(clean_params)
+        else:
+            return None
