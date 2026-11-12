@@ -463,9 +463,22 @@ def are_two_sacs_identical(sac1, sac2):
 # Consider using deepdiff
 # https://miguendes.me/the-best-way-to-compare-two-dictionaries-in-python
 # This walks a JSON tree and finds the differences, and nicely spells them out.
-def compare_report_ids(rid_1, rid_2):
+def compare_report_ids(rid_1, rid_2, exclude_tribal):
+    """Compare two report IDs.
+
+    Args:
+        rid_1: Report id 1.
+        rid_2: Report id 2.
+        exclude_tribal (boolean): Exclude tribal data from comparison.
+
+    Returns:
+        dict: Summary of all comparison checklists.
+    """
+
     sac_r1 = report_id_to_sac(rid_1)
     sac_r2 = report_id_to_sac(rid_2)
+
+    logger.info(f"-----> remove_tribal : {exclude_tribal}")
 
     if sac_r1 is None or sac_r2 is None:
         logger.error(
@@ -506,31 +519,33 @@ def compare_report_ids(rid_1, rid_2):
 
     ###############
     # corrective_action_plan
-    res = compare_lists_of_objects(
-        sac_r1,
-        sac_r2,
-        [
-            "corrective_action_plan",
-            "CorrectiveActionPlan",
-            "corrective_action_plan_entries",
-        ],
-        lambda entry: entry["reference_number"],
-    )
-    summary["corrective_action_plan"] = res
+    if exclude_tribal is False:
+        res = compare_lists_of_objects(
+            sac_r1,
+            sac_r2,
+            [
+                "corrective_action_plan",
+                "CorrectiveActionPlan",
+                "corrective_action_plan_entries",
+            ],
+            lambda entry: entry["reference_number"],
+        )
+        summary["corrective_action_plan"] = res
 
     ###############
     # findings_text
-    res = compare_lists_of_objects(
-        sac_r1,
-        sac_r2,
-        [
-            "findings_text",
-            "FindingsText",
-            "findings_text_entries",
-        ],
-        lambda entry: entry["reference_number"],
-    )
-    summary["findings_text"] = res
+    if exclude_tribal is False:
+        res = compare_lists_of_objects(
+            sac_r1,
+            sac_r2,
+            [
+                "findings_text",
+                "FindingsText",
+                "findings_text_entries",
+            ],
+            lambda entry: entry["reference_number"],
+        )
+        summary["findings_text"] = res
 
     ###############
     # findings_uniform_guidance
@@ -592,17 +607,18 @@ def compare_report_ids(rid_1, rid_2):
 
     ###############
     # notes_to_sefa
-    res = compare_lists_of_objects(
-        sac_r1,
-        sac_r2,
-        [
-            "notes_to_sefa",
-            "NotesToSefa",
-            "notes_to_sefa_entries",
-        ],
-        lambda entry: str(entry["seq_number"]) + ": " + entry["note_title"],
-    )
-    summary["notes_to_sefa"] = res
+    if exclude_tribal is False:
+        res = compare_lists_of_objects(
+            sac_r1,
+            sac_r2,
+            [
+                "notes_to_sefa",
+                "NotesToSefa",
+                "notes_to_sefa_entries",
+            ],
+            lambda entry: str(entry["seq_number"]) + ": " + entry["note_title"],
+        )
+        summary["notes_to_sefa"] = res
 
     ###############
     # tribal_data_consent
@@ -624,7 +640,7 @@ def report_id_as_string(o):
         return o
 
 
-def compare_with_prev(rid):
+def compare_with_prev(rid, exclude_tribal):
     if isinstance(rid, str):
         sac = SingleAuditChecklist.objects.get(report_id=rid)
     elif isinstance(rid, SingleAuditChecklist):
@@ -660,7 +676,7 @@ def compare_with_prev(rid):
         return (
             report_id_as_string(prev),
             report_id_as_string(rid),
-            compare_report_ids(prev, rid),
+            compare_report_ids(prev, rid, exclude_tribal),
         )
     else:
         return (

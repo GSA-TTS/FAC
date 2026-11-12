@@ -8,10 +8,7 @@ from audit.models import (
     Access,
 )
 
-from audit.mixins import (
-    LoginRequiredMixin,
-)
-
+from audit.models.constants import STATUS
 from users.models import UserPermission
 
 
@@ -20,7 +17,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class CompareSubmissionsView(LoginRequiredMixin, generic.View):
+class CompareSubmissionsView(generic.View):
 
     def get(self, request, report_id, route):
         current_user = request.user
@@ -51,7 +48,9 @@ class CompareSubmissionsView(LoginRequiredMixin, generic.View):
         # - un/authenticated:
         #   - have no access
         #
-        # For all other users, they must be associated with the audit.
+        # in search flow:
+        # - un/authenticated:
+        #   - can see comparisons that are either resubmitted or disseminated
 
         # Get the accesses for this SAC
 
@@ -64,21 +63,36 @@ class CompareSubmissionsView(LoginRequiredMixin, generic.View):
             user_id=current_user.id
         ).exists()
 
-        if route in ("submission", "search"):
-            # If I am attached to this report, I can see the diff.
-            if is_authenticated and is_on_audit:
-                logger.debug("Authenticated as a user on the audit")
-                pass
-            # If I am a Federal user, I can see the diff
-            elif is_authenticated and is_federal_user:
-                logger.debug("Authenticated as a federal user")
+        has_access = is_authenticated and (is_on_audit or is_federal_user)
+
+        statuses = [STATUS.DISSEMINATED, STATUS.RESUBMITTED]
+        exclude_tribal = False
+
+        if route == "submission" and not has_access:
+            raise PermissionDenied(
+                "You do not have access to this submission comparison page."
+            )
+
+        if route == "search":
+            if not has_access:
+                # during search: DO NOT show tribal related info if not consented
+                if sac_1.tribal_data_consent is not None:
+                    if (
+                        sac_1.tribal_data_consent.get(
+                            "is_tribal_information_authorized_to_be_public"
+                        )
+                        is False
+                    ):
+                        exclude_tribal = True
+
+            if has_access or sac_1.submission_status in statuses:
                 pass
             else:
                 raise PermissionDenied(
-                    "You do not have access to this comparison page."
+                    "You do not have access to this search comparison page."
                 )
 
-        context = _compare_sac(sac_1)
+        context = _compare_sac(sac_1, exclude_tribal)
         context = context | {"is_authenticated": is_authenticated}
         context = context | {"is_on_audit": is_on_audit}
         context = context | {"is_federal_user": is_federal_user}
@@ -87,12 +101,12 @@ class CompareSubmissionsView(LoginRequiredMixin, generic.View):
         return render(request, "audit/compare_submissions.html", context)
 
 
-def _compare_sac(sac):
+def _compare_sac(sac, exclude_tribal):
     """Compare our sac and return context."""
     has_diffs = False
     has_error = False
 
-    report_id_1, report_id_2, compared = compare_with_prev(sac)
+    report_id_1, report_id_2, compared = compare_with_prev(sac, exclude_tribal)
     context = {"comparison": compared}
 
     nice_names = {}

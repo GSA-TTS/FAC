@@ -473,7 +473,7 @@ class CompareSubmissionTests(TestCase):
         setup_mock_db()
         # Comparing the same report should yield no change/difference.
         summary = compare_report_ids(
-            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000001"
+            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000001", False
         )
         self.assertEqual("identical", summary.get("status", "should not get default"))
 
@@ -483,7 +483,7 @@ class CompareSubmissionTests(TestCase):
         setup_mock_db()
 
         summary = compare_report_ids(
-            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000002"
+            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000002", False
         )
 
         self.assertEqual(
@@ -501,7 +501,7 @@ class CompareSubmissionTests(TestCase):
         setup_mock_db()
         # We should see a difference of one field shows up in both r1 - r2 and r2 - r1.
         summary = compare_report_ids(
-            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003"
+            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003", False
         )
 
         # There should be one key in both: ein
@@ -523,7 +523,7 @@ class CompareSubmissionTests(TestCase):
     #     # Therefore, it will show up in r1 and r2.
     #     setup_mock_db()
     #     summary = compare_report_ids(
-    #         "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003"
+    #         "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003", False
     #     )
     #     for key in ["in_r1", "in_r2"]:
     #         self.assertEqual(["AWARD-0003"], summary.get("federal_awards").get(key))
@@ -534,7 +534,7 @@ class CompareSubmissionTests(TestCase):
     #     # that is constructed from multiple parts of an object.
     #     setup_mock_db()
     #     summary = compare_report_ids(
-    #         "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003"
+    #         "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003", False
     #     )
 
     #     self.assertEqual(
