@@ -22,7 +22,7 @@ jobs:
             tag: v12.2.12
           - name: ghcr.io/gsa-tts/clamav-rest/clamav
             short-name: clamav
-            tag: latest 
+            tag: latest
           - name: metabase/metabase
             short-name: metabase
             tag: v0.64.3
@@ -65,7 +65,7 @@ jobs:
           docker tag ${{ matrix.image.name }}:${{ matrix.image.tag }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:${{ matrix.image.tag }}
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4.7.0
+        uses: docker/login-action@v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
