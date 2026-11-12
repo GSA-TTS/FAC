@@ -1,0 +1,13 @@
+{% comment %} Report IDs {% endcomment %}
+<div class="usa-accordion">
+    <label class="usa-accordion__heading" for="input_report-ids">
+        <button type="button"
+                class="usa-accordion__button"
+                aria-expanded={% if form_user_input.report_id %}"true"{% else %}"false"{% endif %}
+                aria-controls="report-ids">Report IDs</button>
+    </label>
+    <div id="report-ids">
+        <div id="report-ids-hint">Separate multiple report IDs by commas or newlines.</div>
+        <textarea class="usa-textarea" id="input_report-ids" name="report_ids">{{form_user_input.report_ids}}</textarea>
+    </div>
+</div>

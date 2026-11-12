@@ -40,13 +40,13 @@ describe('Test Basic Search Fields', () => {
 
   it('Tests UEI or EIN Field ', () => {
     const ueiOrEinValue = searchData.ueiOrein;
-    search.elements.ueiOrEinField().clear().type(ueiOrEinValue)
+    search.elements.ueiAndEinField().clear().type(ueiOrEinValue)
       .should('have.value', ueiOrEinValue);
   });
 
   it('Tests Name Field', () => {
     const nameValue = searchData.name;
-    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
+    search.elements.entityNameAccordionBtn().contains('Names (Entity, Auditee, or Auditor)').click();
     search.elements.entityNameField().clear().type(nameValue)
       .should('have.value', nameValue);
   });
@@ -101,19 +101,19 @@ describe('Test Advance Search Fields', () => {
 
   it('Tests UEI or EIN Field ', () => {
     const ueiOrEinValue = searchData.ueiOrein;
-    search.elements.ueiOrEinField().clear().type(ueiOrEinValue)
+    search.elements.ueiAndEinField().clear().type(ueiOrEinValue)
       .should('have.value', ueiOrEinValue);
   });
 
   it('Tests ALN Field ', () => {
     const alnValue = searchData.aln;
-    search.elements.alnAccordionBtn().contains('Assistance Listing Number (formerly CFDA').as('accordionButton').click();
+    search.elements.alnAccordionBtn().contains('Assistance Listing Numbers (formerly CFDAs').as('accordionButton').click();
     search.elements.alnField().clear().type(alnValue);
   });
 
   it('Tests Name Field', () => {
     const nameValue = searchData.name;
-    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
+    search.elements.entityNameAccordionBtn().contains('Names (Entity, Auditee, or Auditor)').click();
     search.elements.entityNameField().clear().type(nameValue)
       .should('have.value', nameValue);
   });
@@ -171,7 +171,7 @@ describe('Test Advance Search Fields', () => {
 
   it('Tests Type Requirement', () => {
     const typeValue = searchData.typeRequirement;
-    search.elements.typeRequirementAccordionBtn().contains('Type of compliance requirement').as('accordionButton').click();
+    search.elements.typeRequirementAccordionBtn().contains('Type of compliance requirements').as('accordionButton').click();
     search.elements.typeRequirementField().clear().type(typeValue);
   });
 
@@ -183,7 +183,7 @@ describe('Test Advance Search Fields', () => {
 
   it('Tests Passthrough Name Field', () => {
     const passthroughValue = searchData.passthroughName;
-    search.elements.passThroughNameAccordionBtn().contains('Passthrough Name').as('accordionButton').click();
+    search.elements.passThroughNameAccordionBtn().contains('Passthrough Names').as('accordionButton').click();
     search.elements.passThroughNameField().clear().type(passthroughValue);
   });
 
@@ -209,10 +209,10 @@ describe('Test search and return results', () => {
       .should('be.checked')
       .and('have.value', searchData.yearsToCheck[0]);
 
-    search.elements.ueiOrEinField().clear().type(searchData.ueiOrein)
+    search.elements.ueiAndEinField().clear().type(searchData.ueiOrein)
       .should('have.value', searchData.ueiOrein);
 
-    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
+    search.elements.entityNameAccordionBtn().contains('Names (Entity, Auditee, or Auditor)').click();
     search.elements.entityNameField().clear().type(searchData.name)
       .should('have.value', searchData.name);
 
@@ -226,7 +226,7 @@ describe('Test search and return results', () => {
     search.elements.fiscalYearEndMonthBtn().contains('Fiscal year end month').as('accordionButton').click();
     search.elements.fyEndMonth().select(searchData.fiscalYearEndMonth).should('have.value', searchData.fiscalYearEndMonth);
 
-    search.elements.typeRequirementAccordionBtn().contains('Type of compliance requirement').as('accordionButton').click();
+    search.elements.typeRequirementAccordionBtn().contains('Type of compliance requirements').as('accordionButton').click();
     search.elements.typeRequirementField().clear().type(searchData.typeRequirement);
 
     search.elements.entityTypeAccordionBtn().contains('Entity type').as('accordionButton').click();
@@ -263,10 +263,10 @@ describe('Test Reset Search Button', () => {
       .should('be.checked')
       .and('have.value', searchData.yearsToCheck[0]);
 
-    search.elements.ueiOrEinField().clear().type(searchData.ueiOrein)
+    search.elements.ueiAndEinField().clear().type(searchData.ueiOrein)
       .should('have.value', searchData.ueiOrein);
 
-    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
+    search.elements.entityNameAccordionBtn().contains('Names (Entity, Auditee, or Auditor)').click();
     search.elements.entityNameField().clear().type(searchData.name)
       .should('have.value', searchData.name);
 
@@ -290,7 +290,7 @@ describe('Test Reset Search Button', () => {
     search.clickResetButton();
 
     search.elements.yearCheckboxById(searchData.yearsToCheck[1]).should('not.be.checked');
-    search.elements.ueiOrEinField().should('have.value', '');
+    search.elements.ueiAndEinField().should('have.value', '');
     search.elements.entityNameField().should('have.value', '');
     search.elements.startDateField().should('have.value', '');
     search.elements.endDateField().should('have.value', '');

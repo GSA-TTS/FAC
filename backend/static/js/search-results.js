@@ -96,7 +96,7 @@ function resetCogOver() {
   var default_cog_over_option = document.getElementById(
     'cog_or_oversight--either'
   );
-  var cog_over_agency_number = document.getElementById('agency-name');
+  var cog_over_agency_number = document.getElementById('cog-over-number');
   if (default_cog_over_option) {
     default_cog_over_option.selected = true;
     cog_over_agency_number.value = '';
