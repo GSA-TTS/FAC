@@ -20,7 +20,6 @@ locals {
     # TODO: Automate updates via GitHub's GraphQL API
     var.cf_user,
 
-    "candace.campbell@gsa.gov",
     "daryll.pierre@gsa.gov",
     "james.person@gsa.gov",
     "philip.dominguez@gsa.gov",
@@ -37,8 +36,7 @@ locals {
     # TODO: Automate updates via GitHub's GraphQL API
     "daryll.pierre@gsa.gov",
     "james.person@gsa.gov",
-    "philip.dominguez@gsa.gov",
-    "candace.campbell@gsa.gov"
+    "philip.dominguez@gsa.gov"
   ]
 
   internal_asgs = [
