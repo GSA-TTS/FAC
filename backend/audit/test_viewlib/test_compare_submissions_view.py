@@ -5,6 +5,7 @@ from model_bakery import baker
 from audit.test_viewlib.test_compare_submissions import setup_mock_db
 from audit.models import Access, SingleAuditChecklist
 from users.models import UserPermission, Permission
+from audit.views.compare_submissions_view import remove_tribal_data_on_search
 
 User = get_user_model()
 
@@ -223,6 +224,41 @@ class CompareSubmissionsViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+
+    def test_findings_text_is_missing(self):
+        """unauthenticated user can not view tribal private data"""
+        p = setup_test()
+
+        response = p.client.get(
+            reverse(
+                self.view,
+                kwargs={"report_id": "2025-01-FAKEDB-0000000005", "route": "search"},
+            ),
+            follow=True,
+        )
+
+        content = response.content.decode("utf-8")
+        self.assertNotIn("Findings Text", content)
+
+    def test_tribal_consent(self):
+        # flag to remove tribal data on search if consent == False
+        sacs = setup_mock_db()
+        sac_r5 = sacs[4]
+
+        excluded = remove_tribal_data_on_search(
+            "search", False, sac_r5.tribal_data_consent
+        )
+        self.assertTrue(excluded)
+
+    def test_tribal_none_consent(self):
+        # data should be included on search if there is no tribal consent
+        sacs = setup_mock_db()
+        sac_r3 = sacs[2]
+
+        tribal_data_consent = getattr(sac_r3, "tribal_data_consent", None)
+
+        excluded = remove_tribal_data_on_search("search", False, tribal_data_consent)
+        self.assertFalse(excluded)
 
     def test_fail_incorrect_path(self):
         """Check that our url path must be have 'search' or 'submission' in it"""

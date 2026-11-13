@@ -66,7 +66,6 @@ class CompareSubmissionsView(generic.View):
         has_access = is_authenticated and (is_on_audit or is_federal_user)
 
         statuses = [STATUS.DISSEMINATED, STATUS.RESUBMITTED]
-        exclude_tribal = False
 
         if route == "submission" and not has_access:
             raise PermissionDenied(
@@ -74,23 +73,17 @@ class CompareSubmissionsView(generic.View):
             )
 
         if route == "search":
-            if not has_access:
-                # during search: DO NOT show tribal related info if not consented
-                if sac_1.tribal_data_consent is not None:
-                    if (
-                        sac_1.tribal_data_consent.get(
-                            "is_tribal_information_authorized_to_be_public"
-                        )
-                        is False
-                    ):
-                        exclude_tribal = True
-
             if has_access or sac_1.submission_status in statuses:
                 pass
             else:
                 raise PermissionDenied(
                     "You do not have access to this search comparison page."
                 )
+
+        # we DO NOT want to show tribal data that has not been consented!!!!
+        exclude_tribal = remove_tribal_data_on_search(
+            route, has_access, sac_1.tribal_data_consent
+        )
 
         context = _compare_sac(sac_1, exclude_tribal)
         context = context | {"is_authenticated": is_authenticated}
@@ -132,3 +125,19 @@ def _compare_sac(sac, exclude_tribal):
     context = context | {"r2": report_id_2}
 
     return context
+
+
+def remove_tribal_data_on_search(route, has_special_access, data_consent):
+    """Flag to exclude tribal data during search route."""
+    exclude_tribal = False
+
+    if route == "search":
+        if not has_special_access:
+            if data_consent is not None:
+                if (
+                    data_consent.get("is_tribal_information_authorized_to_be_public")
+                    is False
+                ):
+                    exclude_tribal = True
+
+    return exclude_tribal

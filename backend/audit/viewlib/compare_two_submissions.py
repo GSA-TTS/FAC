@@ -478,8 +478,6 @@ def compare_report_ids(rid_1, rid_2, exclude_tribal):
     sac_r1 = report_id_to_sac(rid_1)
     sac_r2 = report_id_to_sac(rid_2)
 
-    logger.info(f"-----> remove_tribal : {exclude_tribal}")
-
     if sac_r1 is None or sac_r2 is None:
         logger.error(
             f"compare_report_ids expects two report ID strings or two SAC objects, given {sac_r1} and {sac_r2}"

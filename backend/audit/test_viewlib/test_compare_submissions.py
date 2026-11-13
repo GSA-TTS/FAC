@@ -26,6 +26,8 @@ def setup_mock_db():
     sac_r1_report_id = "2025-01-FAKEDB-0000000001"
     sac_r2_report_id = "2025-01-FAKEDB-0000000002"
     sac_r3_report_id = "2025-01-FAKEDB-0000000003"
+    sac_r4_report_id = "2025-01-FAKEDB-0000000004"
+    sac_r5_report_id = "2025-01-FAKEDB-0000000005"
 
     # Make these a resubmission sequence
 
@@ -339,7 +341,78 @@ def setup_mock_db():
 
     sac_r3.save()
 
-    return [sac_r1, sac_r2, sac_r3]
+    # Make R4 the similar as R1
+
+    sac_r4_submission_status = sac_r1_submission_status
+    sac_r4_general_information = deepcopy(sac_r1_general_information)
+    sac_r4_general_information["user_provided_organization_type"] = "tribal"
+
+    sac_r4_federal_awards = deepcopy(sac_r1_federal_awards)
+    sac_r4_findings_uniform_guidance = deepcopy(sac_r1_findings_uniform_guidance)
+
+    sac_r4_tribal_data_consent = {
+        "is_tribal_information_authorized_to_be_public": False,
+        "tribal_authorization_certifying_official_name": "jane doe",
+        "tribal_authorization_certifying_official_title": "tribal authorizing official",
+    }
+
+    sac_r4_resubmission_meta = {
+        "next_report_id": sac_r5_report_id,
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
+        "version": 1,
+    }
+
+    sac_r4 = baker.make(
+        SingleAuditChecklist,
+        report_id=sac_r4_report_id,
+        submission_status=sac_r4_submission_status,
+        general_information=sac_r4_general_information,
+        federal_awards=sac_r4_federal_awards,
+        tribal_data_consent=sac_r4_tribal_data_consent,
+        resubmission_meta=sac_r4_resubmission_meta,
+    )
+
+    sac_r4.save()
+
+    sac_r5_submission_status = STATUS.DISSEMINATED
+
+    sac_r5_findings_text = {
+        "Meta": {"version": "1.1.10", "section_name": "FindingsText"},
+        "FindingsText": {
+            "auditee_uei": "MCQEFMM2LJA4",
+            "findings_text_entries": [
+                {
+                    "text_of_finding": "blueberry pie",
+                    "reference_number": "2022-001",
+                    "contains_chart_or_table": "N",
+                }
+            ],
+        },
+    }
+
+    sac_r5_resubmission_meta = {
+        "previous_report_id": sac_r4_report_id,
+        "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
+        "version": 2,
+    }
+
+    sac_r5_general_information = deepcopy(sac_r2_general_information)
+
+    sac_r5 = baker.make(
+        SingleAuditChecklist,
+        report_id=sac_r5_report_id,
+        submission_status=sac_r5_submission_status,
+        general_information=sac_r5_general_information,
+        federal_awards=sac_r4_federal_awards,
+        findings_text=sac_r5_findings_text,
+        findings_uniform_guidance=sac_r4_findings_uniform_guidance,
+        tribal_data_consent=sac_r4_tribal_data_consent,
+        resubmission_meta=sac_r5_resubmission_meta,
+    )
+
+    sac_r5.save()
+
+    return [sac_r1, sac_r2, sac_r3, sac_r4, sac_r5]
 
 
 class CompareSubmissionTests(TestCase):
@@ -517,6 +590,17 @@ class CompareSubmissionTests(TestCase):
             "123456789",
             summary.get("general_information", {}).get("in_both", None)[0].get("to"),
         )
+
+    def test_remove_tribal(self):
+        setup_mock_db()
+        # tribal data should be excluded from summary
+        summary = compare_report_ids(
+            "2025-01-FAKEDB-0000000004", "2025-01-FAKEDB-0000000005", True
+        )
+
+        self.assertEqual(None, summary.get("corrective_action_plan", None))
+        self.assertEqual(None, summary.get("findings_text", None))
+        self.assertEqual(None, summary.get("notes_to_sefa", None))
 
     # def test_federal_award_difference(self):
     #     # This should show us that an object *changed* between two reports.
