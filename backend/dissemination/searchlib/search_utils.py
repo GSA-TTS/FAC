@@ -1,3 +1,7 @@
+import json
+import xxhash
+import copy
+
 import logging
 import textwrap
 
@@ -47,7 +51,6 @@ def run_search(request, form_data):
     Given cleaned form data, run the search.
     Returns the results QuerySet.
     """
-
     basic_parameters = {
         "audit_years": form_data["audit_year"],
         "auditee_state": form_data["auditee_state"],
@@ -83,26 +86,54 @@ def run_search(request, form_data):
     return search_sac(request, search_parameters)
 
 
+def create_cache_keys(form_data):
+    """
+    create a key used to get/set our cached results by:
+    - create pure search string w/out 'limit' and 'page'
+      - we hash it to get a unique id for that search
+      - we use that hash in our cache keys
+    - prefix that hash to identify a page_key and count_key
+    """
+
+    form_data_copy = copy.deepcopy(form_data)
+    page_number = form_data_copy.pop("page", 1)
+    limit_number = form_data_copy.pop("limit", 30)
+
+    # form_data_search represents a pure search form w/out 'limit' and 'page'
+    form_data_search = json.dumps(form_data_copy, default=str)
+
+    hex_digest = xxhash.xxh64_hexdigest(form_data_search.encode("utf-8"))
+
+    search_hash = f"search:{hex_digest}"
+    count_key = f"count:{search_hash}"
+
+    page_prefix_tag = f"page:{page_number}:limit:{limit_number}"
+    page_key = f"{page_prefix_tag}:{search_hash}"
+
+    logger.info(
+        f"CACHE: cache_keys --> page_key: [{page_key}], count_key: [{count_key}]"
+    )
+    return page_key, count_key
+
+
 # TODO: Update Post SOC Launch -> This can go
 def populate_cog_over_name(results):
     agency_names = AGENCY_NAMES
     for result in results:
-        if result.oversight_agency:
-            agency_code = result.oversight_agency
-            agency_name = agency_names.get(
-                result.oversight_agency, result.oversight_agency
-            )
-            result.agency_name = "\n".join(
+        if result.get("oversight_agency"):
+            agency_code = result.get("oversight_agency")
+            agency_name = agency_names.get(agency_code, agency_code)
+            agency_info = "\n".join(
                 textwrap.wrap(agency_code + " - " + agency_name + " (OVER)", width=20)
             )
-        elif result.cognizant_agency:
-            agency_code = result.cognizant_agency
-            agency_name = agency_names.get(
-                result.cognizant_agency, result.cognizant_agency
-            )
-            result.agency_name = "\n".join(
+            result.update(agency_name=agency_info)
+        elif result.get("cognizant_agency"):
+            agency_code = result.get("cognizant_agency")
+            agency_name = agency_names.get(agency_code)
+            agency_info = "\n".join(
                 textwrap.wrap(agency_code + " - " + agency_name + " (COG)", width=20)
             )
+            result.update(agency_name=agency_info)
     return results
 
 

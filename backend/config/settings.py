@@ -25,6 +25,15 @@ from cfenv import AppEnv
 
 from .db_url import get_db_url_from_vcap_services
 
+# ==============================================================================
+# ASYNC SAFETY OVERRIDE (Resolves Valkey / OIDC Threading Collision)
+# ==============================================================================
+# this tells django's thread manager to allow synchronous OIDC network calls
+# to execute safely alongside the async-native django_valkey cache layer.
+# - we're ARE NOT running Django Channels or real-time WebSockets
+# - we are are running entirely on a synchronous Gunicorn worker block.
+DJANGO_ALLOW_ASYNC_UNSAFE = True
+
 newrelic.agent.initialize()
 
 env = environs.Env()
@@ -135,6 +144,17 @@ INSTALLED_APPS += [
     "support",
     "curation",
 ]
+
+# bcuz we've add a cache server (valkey)
+# - valkey changes the django defaults:
+#   - from: 'django.contrib.sessions.backends.db'
+#   -   to: 'django.contrib.sessions.backends.cache'
+# - to be safe we explicitly set SESSION_ENGINE
+#   - we are forcing sessions to 'save to the DB' (in django_session)
+#     - djangooidc (which use pyoidc library [oic module])
+#       - uses whatever your session engine uses
+#     - which breaks OIDC and login functionality !!!!
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -292,6 +312,22 @@ if ENVIRONMENT not in ["SANDBOX", "DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTI
     DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
     DBBACKUP_STORAGE_OPTIONS = {"location": BASE_DIR / "backup"}
 
+    # cache server
+    CACHES = {
+        "default": {
+            "BACKEND": "django_valkey.cache.ValkeyCache",
+            "LOCATION": "valkey://valkey:6379",
+            "KEY_PREFIX": "facapp_v1",  # Prefix all keys to avoid collisions
+            "TIMEOUT": 300,  # Default timeout: 5 minutes,
+            "OPTIONS": {
+                "COMPRESSOR": "django_valkey.compressors.zstd.ZStdCompressor",
+                "CLIENT_CLASS": "django_valkey.client.DefaultClient",
+                "IGNORE_EXCEPTIONS": True,  # gracefully return None on cache failures instead of crashing
+                # hopefully this stops valkey from crashing the web worker thread!!!!
+            },
+        }
+    }
+
 else:
     # One of the Cloud.gov environments
     STORAGES = {
@@ -431,9 +467,48 @@ else:
     # Will not be enabled in cloud environments
     DISABLE_AUTH = False
 
+    # cache server settings
+    for cache_svc in vcap.get("aws-elasticache-redis", []):
+        if cache_svc["instance_name"] == "fac-valkey":
+            cache_creds = cache_svc["credentials"]
+
+            CACHE_PASSWORD = cache_creds["password"]
+            CACHE_HOSTNAME = cache_creds["hostname"]
+            CACHE_PORT = cache_creds["port"]
+
+            if ENVIRONMENT == "PRODUCTION":
+                CACHE_DB = "0"
+
+            if ENVIRONMENT == "PREVIEW":
+                CACHE_DB = "2"
+
+            if ENVIRONMENT == "STAGING":
+                CACHE_DB = "4"
+
+            if ENVIRONMENT == "DEVELOPMENT":
+                CACHE_DB = "6"
+
+            CACHE_LOCATION = (
+                f"rediss://:{CACHE_PASSWORD}@{CACHE_HOSTNAME}:{CACHE_PORT}/{CACHE_DB}"
+            )
+
+            CACHES = {
+                "default": {
+                    "BACKEND": "django_valkey.cache.ValkeyCache",
+                    "LOCATION": CACHE_LOCATION,
+                    "KEY_PREFIX": "facapp_v1",  # Prefix all keys to avoid collisions
+                    "TIMEOUT": 300,  # Default timeout: 5 minutes,
+                    "OPTIONS": {
+                        "COMPRESSOR": "django_valkey.compressors.zstd.ZStdCompressor",
+                        "CLIENT_CLASS": "django_valkey.client.DefaultClient",
+                        "IGNORE_EXCEPTIONS": True,
+                    },
+                }
+            }
+        else:
+            print("CACHE: cache server NOT configured properly !!!!")
 
 ADMIN_URL = "admin/"
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

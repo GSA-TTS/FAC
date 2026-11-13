@@ -2,7 +2,9 @@ from datetime import date
 import logging
 import math
 import time
-from django.core.paginator import Paginator
+from django.core.cache import cache
+
+from dissemination.views.CachedPaginator import CachedPaginator
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -18,6 +20,7 @@ from dissemination.search import gather_errors
 from dissemination.searchlib.search_utils import (
     populate_cog_over_name,
     run_search,
+    create_cache_keys,
 )
 from dissemination.searchlib.search_resub_tags import (
     add_resub_tag_data,
@@ -103,9 +106,13 @@ class Search(View):
 
         logger.info(f"Searching on fields: {form_data}")
 
-        # Generate results on valid user input.
+        # Generate results on valid user input as a QuerySet of dictionaries
         results = run_search(request, form_data)
-        results_count = results.count()
+
+        # construct cache keys
+        page_cache_key, count_cache_key = create_cache_keys(form_data)
+
+        results_count = self._get_cached_results_count(results, count_cache_key)
 
         # Reset page number to one if the value already surpasses the number of feasible pages.
         page = form_data["page"]
@@ -116,7 +123,12 @@ class Search(View):
         logger.info(f"TOTAL: results_count: [{results_count}]")
 
         # The paginator object handles splicing the results to a one-page iterable and calculates which page numbers to show.
-        paginator = Paginator(object_list=results, per_page=form_data["limit"])
+        paginator = CachedPaginator(
+            object_list=results,
+            per_page=form_data["limit"],
+            pg_cache_key=page_cache_key,
+            cnt_cache_key=count_cache_key,
+        )
         paginator_results = paginator.get_page(page)
         paginator_results.adjusted_elided_pages = paginator.get_elided_page_range(
             page, on_each_side=1
@@ -152,3 +164,23 @@ class Search(View):
         total_time_s = total_time_ms / 1000
         logger.info(f"Total time between post and render {total_time_ms}ms")
         return render(request, "search.html", context | {"total_time_s": total_time_s})
+
+    def _get_cached_results_count(self, results, count_cache_key):
+        """Return results_count from cache."""
+        try:
+            logger.info(f"CACHE: READ from cache key: {count_cache_key}")
+
+            results_count = cache.get(count_cache_key)
+
+            if results_count is None:
+                logger.info(
+                    f"CACHE: WRITE 'results_count' to cache key: {count_cache_key}"
+                )
+
+                results_count = results.count()
+                cache.set(count_cache_key, results_count)
+        except Exception as e:
+            # fail silently
+            logger.error(f"CACHE: FAIL for 'results_count' during READ/WRITE: {e}")
+
+        return results_count
