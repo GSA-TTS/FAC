@@ -23,4 +23,4 @@ class Command(BaseCommand):
         # compares to the previous (if one exists), or if no prev
         # exists, but a *next* DOES exist, it flips the order and
         # compares next to this one.
-        pprint(compare_with_prev(rid))
+        pprint(compare_with_prev(rid, exclude_tribal=False))

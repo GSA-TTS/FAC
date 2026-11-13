@@ -11,9 +11,11 @@ from audit.viewlib.compare_two_submissions import (
     are_two_sacs_identical,
     _get_keysets,
 )
+
 from audit.models import SingleAuditChecklist
 from model_bakery import baker
 from copy import deepcopy
+from audit.models.constants import STATUS, RESUBMISSION_STATUS
 
 
 def setup_mock_db():
@@ -21,20 +23,16 @@ def setup_mock_db():
     true = True
     false = False
 
-    report_ids = [
-        "2025-01-FAKEDB-0000000001",
-        "2025-01-FAKEDB-0000000002",
-        "2025-01-FAKEDB-0000000003",
-    ]
-    rids = {}
-    for ndx, rid in enumerate(report_ids):
-        baker.make(SingleAuditChecklist, report_id=rid)
-        rids[f"rid_{ndx + 1}"] = rid
+    sac_r1_report_id = "2025-01-FAKEDB-0000000001"
+    sac_r2_report_id = "2025-01-FAKEDB-0000000002"
+    sac_r3_report_id = "2025-01-FAKEDB-0000000003"
+    sac_r4_report_id = "2025-01-FAKEDB-0000000004"
+    sac_r5_report_id = "2025-01-FAKEDB-0000000005"
 
-    sac_r1 = SingleAuditChecklist.objects.get(report_id=rids["rid_1"])
-    sac_r2 = SingleAuditChecklist.objects.get(report_id=rids["rid_2"])
+    # Make these a resubmission sequence
 
-    sac_r1.general_information = {
+    sac_r1_submission_status = STATUS.RESUBMITTED
+    sac_r1_general_information = {
         "ein": "370906335",
         "audit_type": "single-audit",
         "auditee_uei": "G9LDNMFWZHY7",
@@ -73,7 +71,7 @@ def setup_mock_db():
         "auditor_ein_not_an_ssn_attestation": True,
     }
 
-    sac_r1.federal_awards = {
+    sac_r1_federal_awards = {
         "Meta": {"section_name": "FederalAwardsExpended"},
         "FederalAwards": {
             "auditee_uei": "R5MQB3PSN2E3",
@@ -138,7 +136,7 @@ def setup_mock_db():
         },
     }
 
-    sac_r1.findings_uniform_guidance = {
+    sac_r1_findings_uniform_guidance = {
         "Meta": {"section_name": "FindingsUniformGuidance"},
         "FindingsUniformGuidance": {
             "auditee_uei": "MCQEFMM2LJA4",
@@ -183,9 +181,26 @@ def setup_mock_db():
         },
     }
 
+    sac_r1_resubmission_meta = {
+        "next_report_id": sac_r2_report_id,
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
+        "version": 1,
+    }
+
+    sac_r1 = baker.make(
+        SingleAuditChecklist,
+        report_id=sac_r1_report_id,
+        submission_status=sac_r1_submission_status,
+        general_information=sac_r1_general_information,
+        federal_awards=sac_r1_federal_awards,
+        findings_uniform_guidance=sac_r1_findings_uniform_guidance,
+        resubmission_meta=sac_r1_resubmission_meta,
+    )
+
     sac_r1.save()
 
-    sac_r2.general_information = {
+    sac_r2_submission_status = STATUS.RESUBMITTED
+    sac_r2_general_information = {
         "ein": "316000427",
         "audit_type": "single-audit",
         "auditee_uei": "RHVRCYWNTFX3",
@@ -224,7 +239,7 @@ def setup_mock_db():
         "auditor_ein_not_an_ssn_attestation": true,
     }
 
-    sac_r2.federal_awards = {
+    sac_r2_federal_awards = {
         "Meta": {"section_name": "FederalAwardsExpended"},
         "FederalAwards": {
             "auditee_uei": "JRRVW2KT4U71",
@@ -251,16 +266,33 @@ def setup_mock_db():
         },
     }
 
+    sac_r2_resubmission_meta = {
+        "previous_report_id": sac_r1_report_id,
+        "next_report_id": sac_r3_report_id,
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
+        "version": 2,
+    }
+
+    sac_r2 = baker.make(
+        SingleAuditChecklist,
+        report_id=sac_r2_report_id,
+        submission_status=sac_r2_submission_status,
+        general_information=sac_r2_general_information,
+        federal_awards=sac_r2_federal_awards,
+        resubmission_meta=sac_r2_resubmission_meta,
+    )
+
     sac_r2.save()
 
     # Make R3 the same as R1, but with one difference
-    sac_r3 = SingleAuditChecklist.objects.get(report_id=rids["rid_3"])
-    sac_r3.general_information = sac_r1.general_information | {
+
+    sac_r3_submission_status = STATUS.IN_PROGRESS
+    sac_r3_general_information = sac_r1.general_information | {
         "ein": "123456789",
     }
     # Simulate changing row 3
-    sac_r3.federal_awards = deepcopy(sac_r1.federal_awards)
-    sac_r3.federal_awards["FederalAwards"]["federal_awards"] = sac_r1.federal_awards[
+    sac_r3_federal_awards = deepcopy(sac_r1.federal_awards)
+    sac_r3_federal_awards["FederalAwards"]["federal_awards"] = sac_r1.federal_awards[
         "FederalAwards"
     ]["federal_awards"][0:-1] + [
         {
@@ -280,34 +312,107 @@ def setup_mock_db():
             "direct_or_indirect_award": {"is_direct": "Y"},
         }
     ]
-    sac_r3.federal_awards["FederalAwards"]["total_amount_expended"] = 3209366
-    sac_r3.findings_uniform_guidance = deepcopy(sac_r1.findings_uniform_guidance)
+    sac_r3_federal_awards["FederalAwards"]["total_amount_expended"] = 3209366
+    sac_r3_findings_uniform_guidance = deepcopy(sac_r1.findings_uniform_guidance)
     # Remove the last finding
-    sac_r3.findings_uniform_guidance["FindingsUniformGuidance"][
+    sac_r3_findings_uniform_guidance["FindingsUniformGuidance"][
         "findings_uniform_guidance_entries"
-    ] = sac_r3.findings_uniform_guidance["FindingsUniformGuidance"][
+    ] = sac_r3_findings_uniform_guidance["FindingsUniformGuidance"][
         "findings_uniform_guidance_entries"
     ][
         0:-1
     ]
 
-    sac_r3.save()
-
-    # Make these a resubmission sequence
-    sac_r1.resubmission_meta = {"next_report_id": sac_r2.report_id}
-
-    sac_r2.resubmission_meta = {
-        "previous_report_id": sac_r1.report_id,
-        "next_report_id": sac_r3.report_id,
+    sac_r3_resubmission_meta = {
+        "previous_report_id": sac_r2_report_id,
+        "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
+        "version": 3,
     }
 
-    sac_r3.resubmission_meta = {"previous_report_id": sac_r2.report_id}
+    sac_r3 = baker.make(
+        SingleAuditChecklist,
+        report_id=sac_r3_report_id,
+        submission_status=sac_r3_submission_status,
+        general_information=sac_r3_general_information,
+        federal_awards=sac_r3_federal_awards,
+        findings_uniform_guidance=sac_r3_findings_uniform_guidance,
+        resubmission_meta=sac_r3_resubmission_meta,
+    )
 
-    sac_r1.save()
-    sac_r2.save()
     sac_r3.save()
 
-    return [sac_r1, sac_r2, sac_r3]
+    # Make R4 the similar as R1
+
+    sac_r4_submission_status = sac_r1_submission_status
+    sac_r4_general_information = deepcopy(sac_r1_general_information)
+    sac_r4_general_information["user_provided_organization_type"] = "tribal"
+
+    sac_r4_federal_awards = deepcopy(sac_r1_federal_awards)
+    sac_r4_findings_uniform_guidance = deepcopy(sac_r1_findings_uniform_guidance)
+
+    sac_r4_tribal_data_consent = {
+        "is_tribal_information_authorized_to_be_public": False,
+        "tribal_authorization_certifying_official_name": "jane doe",
+        "tribal_authorization_certifying_official_title": "tribal authorizing official",
+    }
+
+    sac_r4_resubmission_meta = {
+        "next_report_id": sac_r5_report_id,
+        "resubmission_status": RESUBMISSION_STATUS.DEPRECATED,
+        "version": 1,
+    }
+
+    sac_r4 = baker.make(
+        SingleAuditChecklist,
+        report_id=sac_r4_report_id,
+        submission_status=sac_r4_submission_status,
+        general_information=sac_r4_general_information,
+        federal_awards=sac_r4_federal_awards,
+        tribal_data_consent=sac_r4_tribal_data_consent,
+        resubmission_meta=sac_r4_resubmission_meta,
+    )
+
+    sac_r4.save()
+
+    sac_r5_submission_status = STATUS.DISSEMINATED
+
+    sac_r5_findings_text = {
+        "Meta": {"version": "1.1.10", "section_name": "FindingsText"},
+        "FindingsText": {
+            "auditee_uei": "MCQEFMM2LJA4",
+            "findings_text_entries": [
+                {
+                    "text_of_finding": "blueberry pie",
+                    "reference_number": "2022-001",
+                    "contains_chart_or_table": "N",
+                }
+            ],
+        },
+    }
+
+    sac_r5_resubmission_meta = {
+        "previous_report_id": sac_r4_report_id,
+        "resubmission_status": RESUBMISSION_STATUS.MOST_RECENT,
+        "version": 2,
+    }
+
+    sac_r5_general_information = deepcopy(sac_r2_general_information)
+
+    sac_r5 = baker.make(
+        SingleAuditChecklist,
+        report_id=sac_r5_report_id,
+        submission_status=sac_r5_submission_status,
+        general_information=sac_r5_general_information,
+        federal_awards=sac_r4_federal_awards,
+        findings_text=sac_r5_findings_text,
+        findings_uniform_guidance=sac_r4_findings_uniform_guidance,
+        tribal_data_consent=sac_r4_tribal_data_consent,
+        resubmission_meta=sac_r5_resubmission_meta,
+    )
+
+    sac_r5.save()
+
+    return [sac_r1, sac_r2, sac_r3, sac_r4, sac_r5]
 
 
 class CompareSubmissionTests(TestCase):
@@ -441,7 +546,7 @@ class CompareSubmissionTests(TestCase):
         setup_mock_db()
         # Comparing the same report should yield no change/difference.
         summary = compare_report_ids(
-            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000001"
+            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000001", False
         )
         self.assertEqual("identical", summary.get("status", "should not get default"))
 
@@ -451,7 +556,7 @@ class CompareSubmissionTests(TestCase):
         setup_mock_db()
 
         summary = compare_report_ids(
-            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000002"
+            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000002", False
         )
 
         self.assertEqual(
@@ -469,7 +574,7 @@ class CompareSubmissionTests(TestCase):
         setup_mock_db()
         # We should see a difference of one field shows up in both r1 - r2 and r2 - r1.
         summary = compare_report_ids(
-            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003"
+            "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003", False
         )
 
         # There should be one key in both: ein
@@ -486,12 +591,23 @@ class CompareSubmissionTests(TestCase):
             summary.get("general_information", {}).get("in_both", None)[0].get("to"),
         )
 
+    def test_remove_tribal(self):
+        setup_mock_db()
+        # tribal data should be excluded from summary
+        summary = compare_report_ids(
+            "2025-01-FAKEDB-0000000004", "2025-01-FAKEDB-0000000005", True
+        )
+
+        self.assertEqual(None, summary.get("corrective_action_plan", None))
+        self.assertEqual(None, summary.get("findings_text", None))
+        self.assertEqual(None, summary.get("notes_to_sefa", None))
+
     # def test_federal_award_difference(self):
     #     # This should show us that an object *changed* between two reports.
     #     # Therefore, it will show up in r1 and r2.
     #     setup_mock_db()
     #     summary = compare_report_ids(
-    #         "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003"
+    #         "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003", False
     #     )
     #     for key in ["in_r1", "in_r2"]:
     #         self.assertEqual(["AWARD-0003"], summary.get("federal_awards").get(key))
@@ -502,7 +618,7 @@ class CompareSubmissionTests(TestCase):
     #     # that is constructed from multiple parts of an object.
     #     setup_mock_db()
     #     summary = compare_report_ids(
-    #         "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003"
+    #         "2025-01-FAKEDB-0000000001", "2025-01-FAKEDB-0000000003", False
     #     )
 
     #     self.assertEqual(

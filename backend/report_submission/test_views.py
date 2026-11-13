@@ -24,7 +24,7 @@ def omit(remove, d) -> dict:
 SAMPLE_BASE_SAC_DATA = {
     # 0. Meta data
     "submitted_by": None,
-    "date_created": "2022-08-11",
+    "date_created": "2022-08-11 00:00:00+00",
     "submission_status": "in_progress",
     "report_id": "2022ABC1000023",
     "audit_type": "single-audit",
