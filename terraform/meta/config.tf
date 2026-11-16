@@ -18,7 +18,8 @@ locals {
     # Mirrors @GSA-TTS/FAC-team (developers)
     # https://github.com/orgs/GSA-TTS/teams/fac-team/members
     # TODO: Automate updates via GitHub's GraphQL API
-    "candace.campbell@gsa.gov",
+    var.cf_user,
+
     "daryll.pierre@gsa.gov",
     "james.person@gsa.gov",
     "philip.dominguez@gsa.gov",
@@ -35,8 +36,7 @@ locals {
     # TODO: Automate updates via GitHub's GraphQL API
     "daryll.pierre@gsa.gov",
     "james.person@gsa.gov",
-    "philip.dominguez@gsa.gov",
-    "candace.campbell@gsa.gov"
+    "philip.dominguez@gsa.gov"
   ]
 
   internal_asgs = [

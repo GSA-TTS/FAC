@@ -13,6 +13,5 @@ services:
   - newrelic-creds
   - https-proxy-creds
   - fac-logdrain
-  - fac-snapshot-db
   - backups
   - autoscaler

@@ -3,30 +3,34 @@ data "cloudfoundry_org" "org" {
   name = var.org_name
 }
 
-data "cloudfoundry_asg" "asgs" {
-  provider = cloudfoundry-community
+data "cloudfoundry_security_group" "security_group" {
   for_each = toset(var.asgs)
   name     = each.key
 }
 
 # Ensure the space exists and is configured as expected
 resource "cloudfoundry_space" "space" {
-  provider                 = cloudfoundry-community
-  name                     = var.name
-  org                      = data.cloudfoundry_org.org.id
-  allow_ssh                = var.allow_ssh
-  delete_recursive_allowed = false
+  name      = var.name
+  org       = data.cloudfoundry_org.org.id
+  allow_ssh = var.allow_ssh
 }
 
-resource "cloudfoundry_space_asgs" "space_asgs" {
-  provider     = cloudfoundry-community
-  space        = cloudfoundry_space.space.id
-  running_asgs = values(data.cloudfoundry_asg.asgs)[*].id
+resource "cloudfoundry_security_group_space_bindings" "space_asgs" {
+  for_each       = data.cloudfoundry_security_group.security_group
+  security_group = each.value.id
+  running_spaces = [cloudfoundry_space.space.id]
 }
 
-resource "cloudfoundry_space_users" "space_permissions" {
-  provider   = cloudfoundry-community
-  space      = cloudfoundry_space.space.id
-  developers = var.developers
-  managers   = var.managers
+resource "cloudfoundry_space_role" "manager" {
+  for_each = toset(var.managers)
+  username = each.value
+  type     = "space_manager"
+  space    = cloudfoundry_space.space.id
+}
+
+resource "cloudfoundry_space_role" "developer" {
+  for_each = toset(var.developers)
+  username = each.value
+  type     = "space_developer"
+  space    = cloudfoundry_space.space.id
 }
