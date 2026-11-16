@@ -94,11 +94,7 @@
                         <td class="text-center">
                             <a class="usa-link display-flex flex-column flex-align-center"
                                 target="_blank"
-                                {% if resub.report_id.report_id == most_recent_resubmission.report_id.report_id and not is_sf_sac_downloadable %}
-                                    aria-disabled="true"
-                                {% else %}
-                                    href="{% url 'dissemination:SummaryReportDownload' report_id=resub.report_id.report_id %}"
-                                {% endif %}
+                                href="{% url 'dissemination:SummaryReportDownload' report_id=resub.report_id.report_id %}"
                             >
                                 <svg class="usa-icon usa-icon--size-4"
                                     aria-hidden="true"
