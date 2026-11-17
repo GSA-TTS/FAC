@@ -7,31 +7,51 @@ const previous_page_link = document.querySelectorAll(
 );
 const loader = document.getElementById(`loader`);
 const search_arrow = document.getElementById(`search_arrow`);
+let isPaginationSubmitting = false;
 
 /**
  * Attach event handlers for the pagination buttons. On click, set the appropriate form inputs and submit it for a reload.
  */
 function attachEventHandlersPagination() {
+  function submitPagination(page) {
+    if (isPaginationSubmitting) return;
+
+    isPaginationSubmitting = true;
+    FORM.elements['page'].value = page;
+
+    pagination_links.forEach((link) => {
+      link.setAttribute('aria-disabled', 'true');
+    });
+
+    next_page_link.forEach((link) => {
+      link.setAttribute('aria-disabled', 'true');
+    });
+
+    previous_page_link.forEach((link) => {
+      link.setAttribute('aria-disabled', 'true');
+    });
+
+    FORM.submit();
+  }
+
   pagination_links.forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      FORM.elements['page'].value = link.textContent;
-      FORM.submit();
+      submitPagination(link.textContent);
     });
   });
 
   if (next_page_link[0]) {
     next_page_link[0].addEventListener('click', (e) => {
       e.preventDefault();
-      FORM.elements['page'].value = parseInt(FORM.elements['page'].value) + 1;
-      FORM.submit();
+      submitPagination(parseInt(FORM.elements['page'].value, 10) + 1);
     });
   }
+
   if (previous_page_link[0]) {
     previous_page_link[0].addEventListener('click', (e) => {
       e.preventDefault();
-      FORM.elements['page'].value = parseInt(FORM.elements['page'].value) - 1;
-      FORM.submit();
+      submitPagination(parseInt(FORM.elements['page'].value, 10) - 1);
     });
   }
 }
