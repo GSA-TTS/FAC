@@ -20,12 +20,12 @@ def audit_search_federal_program_name(params):
 
 
 # TODO: Update Post SOC Launch -> Remove unused
-def search_federal_program_name(general_results, params):
+def search_federal_program_names(general_results, params):
     """
     Searches on Federal Award field 'federal_program_name'.
     """
     query = Q()
-    names = params.get("federal_program_name", [])
+    names = params.get("federal_program_names", [])
 
     if not names:
         return general_results

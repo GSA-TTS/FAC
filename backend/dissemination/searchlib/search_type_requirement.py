@@ -7,13 +7,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def search_type_requirement(general_results, params):
+def search_type_requirements(general_results, params):
     """
-    Searches on Finding field 'type_requirement'. One or several of ~550 combinations.
+    Searches on Finding field 'type_requirements'. One or several of ~550 combinations.
     """
     t0 = time.time()
     q = Q()
-    type_requirements = params.get("type_requirement", [])
+    type_requirements = params.get("type_requirements", [])
 
     for tr in type_requirements:
         q |= Q(type_requirement=tr)
