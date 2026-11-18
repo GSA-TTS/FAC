@@ -7,13 +7,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def search_findings(general_results, params):
+def search_finding_types(general_results, params):
     t0 = time.time()
     q = Q()
-    findings_fields = params.get("findings", [])
+    finding_types = params.get("finding_types", [])
 
-    for field in findings_fields:
-        match field:
+    for type in finding_types:
+        match type:
             case "all_findings":
                 q |= Q(is_modified_opinion="Y")
                 q |= Q(is_other_findings="Y")

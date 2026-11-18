@@ -19,13 +19,13 @@ def audit_search_passthrough_name(params):
 
 
 # TODO: Update Post SOC Launch -> Remove unused
-def search_passthrough_name(general_results, params):
+def search_passthrough_names(general_results, params):
     """
-    Searches on Passthrough field 'passthrough_name'.
+    Searches on Passthrough field 'passthrough_names'.
     """
     t0 = time.time()
     q = Q()
-    passthrough_names = params.get("passthrough_name", [])
+    passthrough_names = params.get("passthrough_names", [])
 
     if not passthrough_names:
         return general_results

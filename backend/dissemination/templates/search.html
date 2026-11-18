@@ -26,10 +26,10 @@
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
                         {% comment %} Advanced search contains filters the cross-reference tables (Unified table). {% endcomment %}
-                        {% include "search_filters/audit-year.html" %}
-                        {% include "search_filters/uei-ein.html" %}
-                        {% include "search_filters/aln.html" %}
-                        {% include "search_filters/name.html" %}
+                        {% include "search_filters/audit-years.html" %}
+                        {% include "search_filters/ueis-and-eins.html" %}
+                        {% include "search_filters/alns.html" %}
+                        {% include "search_filters/entity-names.html" %}
                         {% include "search_filters/acceptance-date.html" %}
                         {% include "search_filters/state.html" %}
                         {% include "search_filters/cog-over.html" %}
@@ -37,11 +37,11 @@
                         {% include "search_filters/direct_funding.html" %}
                         {% include "search_filters/major-program.html" %}
                         {% include "search_filters/fy-end-month.html" %}
-                        {% include "search_filters/type-requirement.html" %}
-                        {% include "search_filters/entity-type.html" %}
-                        {% include "search_filters/passthrough-name.html" %}
-                        {% include "search_filters/federal-program-name.html" %}
-                        {% include "search_filters/report-id.html" %}
+                        {% include "search_filters/type-requirements.html" %}
+                        {% include "search_filters/entity-types.html" %}
+                        {% include "search_filters/passthrough-names.html" %}
+                        {% include "search_filters/federal-program-names.html" %}
+                        {% include "search_filters/report-ids.html" %}
                         {% if can_view_resubmissions %}
                             {% include "search_filters/resubmissions.html" %}
                         {% endif %}

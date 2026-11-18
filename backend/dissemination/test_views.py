@@ -1013,7 +1013,7 @@ class SummaryReportDownloadViewTests(TestCase):
         bake_unified(general, [fed])
 
         response = self.anon_client.post(
-            self._summary_report_url(), {"uei_or_ein": "NotTheOther1"}
+            self._summary_report_url(), {"ueis_and_eins": "NotTheOther1"}
         )
         self.assertEqual(response.status_code, 404)
 

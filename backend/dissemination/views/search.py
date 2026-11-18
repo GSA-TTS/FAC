@@ -53,7 +53,7 @@ class Search(View):
             "search.html",
             {
                 "form": form,
-                "form_user_input": {"audit_year": default_checked_audit_years},
+                "form_user_input": {"audit_years": default_checked_audit_years},
                 "state_abbrevs": STATE_ABBREVS,
                 "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
                 "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
