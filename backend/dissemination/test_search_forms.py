@@ -29,7 +29,7 @@ class SearchFormTests(TestCase):
         )
 
     def test_clean_report_ids_z(self):
-        """Ensures that report_ids_z is parsed and replaces the value of report_id"""
+        """Ensures that report_ids_z is parsed and replaces the value of report_ids"""
         form = SearchForm(
             data={
                 "report_ids_z": "eJxVyTEOgDAMA8Cdv1iynaAmY4UED-D_f0Hdyq1nOsHA8857XiBJVbZ5mBY49qloU2sC0j7ZLo01J_ibVnnEGoO9T1Cd9QHLkxrD",
@@ -38,7 +38,7 @@ class SearchFormTests(TestCase):
 
         self.assertTrue(form.is_valid())
         self.assertEqual(
-            form.cleaned_data["report_id"],
+            form.cleaned_data["report_ids"],
             [
                 "2024-03-GSAFAC-0000184920",
                 "2021-07-GSAFAC-0000839201",
