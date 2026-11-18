@@ -65,10 +65,10 @@ class SearchForm(forms.Form):
     }
 
     # Multiple choice field Tuples. "choices" variable in field declaration.
-    AY_choices = (("all_years", "All years"),) + tuple(
+    audit_year_choices = (("all_years", "All years"),) + tuple(
         (x, str(x)) for x in reversed(range(2016, date.today().year + 1))
     )  # (("all_years", "All years"), (2016, "2016"), ..., (current_year, "current_year"))
-    findings_choices = list(zip(*findings_field_mapping.values()))
+    finding_type_choices = list(zip(*findings_field_mapping.values()))
     direct_funding_choices = (
         ("direct_funding", "Direct funding"),
         ("passthrough_funding", "Passthrough funding"),
@@ -84,30 +84,38 @@ class SearchForm(forms.Form):
     )
 
     # Query params
-    agency_name = forms.CharField(required=False)
-    aln = forms.CharField(required=False)
-    audit_year = forms.MultipleChoiceField(
-        choices=AY_choices, initial=[2023], required=False
+    cog_over_number = forms.CharField(required=False)
+    alns = forms.CharField(required=False)
+    audit_years = forms.MultipleChoiceField(
+        choices=audit_year_choices,
+        initial=[2023],
+        required=False,
     )
     auditee_state = forms.CharField(required=False)
     cog_or_oversight = forms.CharField(required=False)
     direct_funding = forms.MultipleChoiceField(
-        choices=direct_funding_choices, required=False
+        choices=direct_funding_choices,
+        required=False,
     )
     end_date = forms.DateField(required=False)
-    entity_name = forms.CharField(required=False)
-    entity_type = forms.MultipleChoiceField(choices=entity_type_choices, required=False)
-    federal_program_name = forms.CharField(required=False)
-    findings = forms.MultipleChoiceField(choices=findings_choices, required=False)
+    entity_names = forms.CharField(required=False)
+    entity_types = forms.MultipleChoiceField(
+        choices=entity_type_choices, required=False
+    )
+    federal_program_names = forms.CharField(required=False)
+    finding_types = forms.MultipleChoiceField(
+        choices=finding_type_choices, required=False
+    )
     fy_end_month = forms.CharField(required=False)
     major_program = forms.MultipleChoiceField(
-        choices=major_program_choices, required=False
+        choices=major_program_choices,
+        required=False,
     )
-    passthrough_name = forms.CharField(required=False)
-    report_id = forms.CharField(required=False)
+    passthrough_names = forms.CharField(required=False)
+    report_ids = forms.CharField(required=False)
     start_date = forms.DateField(required=False)
-    type_requirement = forms.CharField(required=False)
-    uei_or_ein = forms.CharField(required=False)
+    type_requirements = forms.CharField(required=False)
+    ueis_and_eins = forms.CharField(required=False)
     resubmissions = forms.ChoiceField(
         choices=resubmissions_choices,
         initial="include",
@@ -120,36 +128,36 @@ class SearchForm(forms.Form):
     order_by = forms.CharField(required=False)
     order_direction = forms.CharField(required=False)
 
-    def clean_aln(self):
+    def clean_alns(self):
         """
-        Clean up the ALN field. Replace common separators with a newline.
+        Clean up the ALNs field. Replace common separators with a newline.
         Split on the newlines. Strip all the resulting elements.
         """
-        text_input = self.cleaned_data["aln"]
+        text_input = self.cleaned_data["alns"]
         return clean_text_field(text_input)
 
-    def clean_entity_name(self):
+    def clean_entity_names(self):
         """
-        Clean the name field. We can't trust that separators aren't a part of a name somewhere,
+        Clean the entity names field. We can't trust that separators aren't a part of a name somewhere,
         so just split on newlines.
         """
-        text_input = self.cleaned_data["entity_name"]
+        text_input = self.cleaned_data["entity_names"]
         return text_input.splitlines()
 
-    def clean_uei_or_ein(self):
+    def clean_ueis_and_eins(self):
         """
-        Clean up the UEI/EIN field. Replace common separators with a newline.
+        Clean up the UEIs/EINs field. Replace common separators with a newline.
         Split on the newlines. Strip all the resulting elements.
         """
-        text_input = self.cleaned_data["uei_or_ein"]
+        text_input = self.cleaned_data["ueis_and_eins"]
         text_input = text_input.replace("-", "")
         return clean_text_field(text_input)
 
-    def clean_audit_year(self):
+    def clean_audit_years(self):
         """
         If "All years" is selected, don't include any years.
         """
-        audit_year = self.cleaned_data["audit_year"]
+        audit_year = self.cleaned_data["audit_years"]
         if "all_years" in audit_year:
             return []
         return audit_year
@@ -191,39 +199,39 @@ class SearchForm(forms.Form):
 
         return fy_end_month
 
-    def clean_type_requirement(self):
+    def clean_type_requirements(self):
         """
-        Clean up the type requirement field. Uppercase all input. Replace common
+        Clean up the type requirements field. Uppercase all input. Replace common
         separators with a newline. Split on the newlines.
         Strip all the resulting elements.
         """
-        text_input = self.cleaned_data["type_requirement"]
+        text_input = self.cleaned_data["type_requirements"]
         text_input = text_input.upper()
         return clean_text_field(text_input)
 
-    def clean_report_id(self):
+    def clean_report_ids(self):
         """
-        Clean up the report_id field. Uppercase all input. Replace common
+        Clean up the Report IDs field. Uppercase all input. Replace common
         separators (except '-') with a newline. Split on the newlines.
         Strip all the resulting elements.
         """
-        text_input = self.cleaned_data["report_id"]
+        text_input = self.cleaned_data["report_ids"]
         return clean_text_field(text_input, report_id_delimiters)
 
-    def clean_passthrough_name(self):
+    def clean_passthrough_names(self):
         """
-        Clean the passthrough name field. We can't trust that separators aren't a part of
+        Clean the passthrough names field. We can't trust that separators aren't a part of
         a name somewhere, so just split on newlines.
         """
-        text_input = self.cleaned_data["passthrough_name"]
+        text_input = self.cleaned_data["passthrough_names"]
         return text_input.splitlines()
 
-    def clean_federal_program_name(self):
+    def clean_federal_program_names(self):
         """
         Clean the federal program name field. We can't trust that separators aren't a part of
         a name somewhere, so just split on newlines.
         """
-        text_input = self.cleaned_data["federal_program_name"]
+        text_input = self.cleaned_data["federal_program_names"]
         return text_input.splitlines()
 
     def clean_page(self):

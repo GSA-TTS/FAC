@@ -114,52 +114,52 @@ class SearchGeneralTests(TestCase):
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
 
-    def test_uei_or_ein_matches_uei(self):
+    def test_ueis_and_eins_matches_uei(self):
         """
-        Given a uei_or_ein, search_general should return records with a matching UEI
+        Given a UEI or EIN, search_general should return records with a matching UEI
         """
         auditee_uei = "ABCDEFGHIJKL"
         baker.make(General, is_public=True, auditee_uei=auditee_uei)
 
         results = search_general(
             General,
-            {"uei_or_eins": [auditee_uei]},
+            {"ueis_and_eins": [auditee_uei]},
         )
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
 
-    def test_uei_or_ein_matches_ein(self):
+    def test_ueis_and_eins_matches_ein(self):
         """
-        Given a uei_or_ein, search_general should return records with a matching EIN
+        Given a UEI or EIN, search_general should return records with a matching EIN
         """
         auditee_ein = "ABCDEFGHIJKL"
         baker.make(General, is_public=True, auditee_ein=auditee_ein)
 
         results = search_general(
             General,
-            {"uei_or_eins": [auditee_ein]},
+            {"ueis_and_eins": [auditee_ein]},
         )
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
 
-    def test_uei_or_ein_multiple(self):
+    def test_ueis_and_eins_multiple(self):
         """
-        Given multiple uei_or_eins, search_general should return records that match either UEI or EIN
+        Given multiple UEIs and EINs, search_general should return records that match either UEI or EIN
         """
-        uei_or_eins = [
+        ueis_and_eins = [
             "ABCDEFGH0001",
             "ABCDEFGH0002",
             "ABCDEFGH0003",
         ]
 
-        baker.make(General, is_public=True, auditee_uei=uei_or_eins[0])
-        baker.make(General, is_public=True, auditee_ein=uei_or_eins[1])
+        baker.make(General, is_public=True, auditee_uei=ueis_and_eins[0])
+        baker.make(General, is_public=True, auditee_ein=ueis_and_eins[1])
         baker.make(General, is_public=True, auditee_uei="not-looking-for-this-uei")
         baker.make(General, is_public=True, auditee_ein="not-looking-for-this-ein")
 
-        results = search_general(General, {"uei_or_eins": uei_or_eins})
+        results = search_general(General, {"ueis_and_eins": ueis_and_eins})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 2)
@@ -188,7 +188,7 @@ class SearchGeneralTests(TestCase):
             additional_ein="not-looking-for-this-additional-ein",
         )
 
-        results = search_general(General, {"uei_or_eins": [ein]})
+        results = search_general(General, {"ueis_and_eins": [ein]})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 2)
@@ -217,7 +217,7 @@ class SearchGeneralTests(TestCase):
             additional_uei="not-looking-for-this-additional-uei",
         )
 
-        results = search_general(General, {"uei_or_eins": [uei]})
+        results = search_general(General, {"ueis_and_eins": [uei]})
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 2)
@@ -362,12 +362,12 @@ class SearchGeneralTests(TestCase):
             baker.make(General, is_public=True, entity_type=entity_type)
 
         # Searching for one type yields one result with the correct field
-        results = search_general(General, {"entity_type": [entity_types[0]]})
+        results = search_general(General, {"entity_types": [entity_types[0]]})
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].entity_type, entity_types[0])
 
         # Searching for several types yields the same number of results
-        results = search_general(General, {"entity_type": entity_types[2:4]})
+        results = search_general(General, {"entity_types": entity_types[2:4]})
         self.assertEqual(len(results), 2)
 
     def test_report_id(self):
@@ -385,12 +385,12 @@ class SearchGeneralTests(TestCase):
             baker.make(General, is_public=True, report_id=id)
 
         # Searching for one ID yields one result with the correct ID
-        results = search_general(General, {"report_id": [report_ids[0]]})
+        results = search_general(General, {"report_ids": [report_ids[0]]})
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, report_ids[0])
 
         # Searching for several IDs yields the same number of results
-        results = search_general(General, {"report_id": report_ids[2:4]})
+        results = search_general(General, {"report_ids": report_ids[2:4]})
         self.assertEqual(len(results), 2)
 
 
@@ -524,7 +524,7 @@ class SearchFilterTests(TestCase):
         bake_unified(general_yub_nub, [fed_yub_nub])
 
         # Search for multiple program valid names
-        params = {"federal_program_name": ["Foo", "Bar"]}
+        params = {"federal_program_names": ["Foo", "Bar"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 2)
         name_results = [result.federal_program_name for result in results]
@@ -532,18 +532,18 @@ class SearchFilterTests(TestCase):
         self.assertIn("Bar", name_results)
 
         # Search for a single valid program name
-        params = {"federal_program_name": ["Foo"]}
+        params = {"federal_program_names": ["Foo"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].federal_program_name, "Foo")
 
         # Search for an invalid program name
-        params = {"federal_program_name": ["Baz"]}
+        params = {"federal_program_names": ["Baz"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 0)
 
         # Handle delimiters, ignore case
-        params = {"federal_program_name": ["nub,yub"]}
+        params = {"federal_program_names": ["nub,yub"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].federal_program_name, "Yub Nub")
@@ -570,38 +570,38 @@ class SearchFilterTests(TestCase):
         bake_unified(general_over, [fed_over])
 
         # Either cog or over with no agency should return all
-        params = {"agency_name": None, "cog_or_oversight": "either"}
+        params = {"cog_over_number": None, "cog_or_oversight": "either"}
         results = search(self.request, params)
         self.assertEqual(len(results), 2)
 
         # Unused agency should return nothing
-        params = {"agency_name": 99, "cog_or_oversight": "either"}
+        params = {"cog_over_number": 99, "cog_or_oversight": "either"}
         results = search(self.request, params)
         self.assertEqual(len(results), 0)
 
         # Either cog or over with valid agency
-        params = {"agency_name": 42, "cog_or_oversight": "either"}
+        params = {"cog_over_number": 42, "cog_or_oversight": "either"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_cog.report_id)
 
         # Cog with valid agency
-        params = {"agency_name": 42, "cog_or_oversight": "cog"}
+        params = {"cog_over_number": 42, "cog_or_oversight": "cog"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_cog.report_id)
 
         # Over with valid agency
-        params = {"agency_name": 24, "cog_or_oversight": "oversight"}
+        params = {"cog_over_number": 24, "cog_or_oversight": "oversight"}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].report_id, general_over.report_id)
 
-    def test_search_findings(self):
+    def test_search_finding_types(self):
         """
         When making a search on a particular type of finding, search_general should only return records with a finding of that type.
         """
-        findings_fields = [
+        finding_types = [
             {"is_modified_opinion": "Y"},
             {"is_other_findings": "Y"},
             {"is_material_weakness": "Y"},
@@ -612,7 +612,7 @@ class SearchFilterTests(TestCase):
         ]
 
         # For every field, create a General object with an associated Finding with a 'Y' in that field.
-        for field in findings_fields:
+        for field in finding_types:
             general = baker.make(
                 General,
                 is_public=True,
@@ -629,13 +629,13 @@ class SearchFilterTests(TestCase):
             bake_unified(general, [award, finding])
 
         # One field returns the one appropriate general
-        params = {"findings": ["is_modified_opinion"]}
+        params = {"finding_types": ["is_modified_opinion"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
 
         # Three fields returns three appropriate generals
         params = {
-            "findings": [
+            "finding_types": [
                 "is_other_findings",
                 "is_material_weakness",
                 "is_significant_deficiency",
@@ -645,7 +645,7 @@ class SearchFilterTests(TestCase):
         self.assertEqual(len(results), 3)
 
         # Garbage fields don't apply any filters, so everything comes back
-        params = {"findings": ["a_garbage_field"]}
+        params = {"finding_types": ["a_garbage_field"]}
         results = search(self.request, params)
         self.assertEqual(len(results), 7)
 
@@ -747,13 +747,13 @@ class SearchFilterTests(TestCase):
             bake_unified(general_foreign_object, [fed, fin])
 
         params = {
-            "type_requirement": [type_requirements[0]],
+            "type_requirements": [type_requirements[0]],
         }
         results = search(self.request, params)
         self.assertEqual(len(results), 1)
 
         params = {
-            "type_requirement": type_requirements[2:4],
+            "type_requirements": type_requirements[2:4],
         }
         results = search(self.request, params)
         self.assertEqual(len(results), 2)

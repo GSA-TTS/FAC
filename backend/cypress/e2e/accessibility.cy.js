@@ -164,31 +164,31 @@ describe('A11y Testing on search pages', () => {
   it('Displays UEI/EIN guidance', () => {
     cy.visit('/dissemination/search/');
 
-    cy.get('#uei-ein-help')
+    cy.get('#ueis-and-eins-hint')
       .should('be.visible')
       .and(
         'contain.text',
-        'Separate multiple UEIs or EINs by commas or newlines.'
+        'Separate multiple UEIs and EINs by commas or newlines.'
       );
   });
 
   it('Allows dashes to remain in the UEI/EIN input before submission', () => {
     cy.visit('/dissemination/search/');
 
-    cy.get('#input_uei-or-ein').clear();
-    cy.get('#input_uei-or-ein').type('12-3456789');
-    cy.get('#input_uei-or-ein').should('have.value', '12-3456789');
+    cy.get('#input_ueis-and-eins').clear();
+    cy.get('#input_ueis-and-eins').type('12-3456789');
+    cy.get('#input_ueis-and-eins').should('have.value', '12-3456789');
   });
 
   it('Allows multiple UEIs or EINs separated by commas or newlines', () => {
     cy.visit('/dissemination/search/');
 
-    cy.get('#input_uei-or-ein').clear();
-    cy.get('#input_uei-or-ein').type(
+    cy.get('#input_ueis-and-eins').clear();
+    cy.get('#input_ueis-and-eins').type(
       '12-3456789,987654321{enter}ABCDEFG12345'
     );
 
-    cy.get('#input_uei-or-ein').should(
+    cy.get('#input_ueis-and-eins').should(
       'have.value',
       '12-3456789,987654321\nABCDEFG12345'
     );
@@ -197,12 +197,12 @@ describe('A11y Testing on search pages', () => {
   it('Associates UEI/EIN guidance with the input', () => {
     cy.visit('/dissemination/search/');
 
-    cy.get('#input_uei-or-ein')
-      .should('have.attr', 'aria-describedby', 'uei-ein-help');
+    cy.get('#input_ueis-and-eins')
+      .should('have.attr', 'aria-describedby', 'ueis-and-eins-hint');
 
-    cy.get('label[for="input_uei-or-ein"]')
+    cy.get('label[for="input_ueis-and-eins"]')
       .should('exist')
-      .and('contain.text', 'UEI or EIN');
+      .and('contain.text', 'UEIs and EINs');
   });
 
   test_check_a11y('/dissemination/search/', 'basic search');

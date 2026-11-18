@@ -1,0 +1,15 @@
+{% comment %} Type of compliance requirements {% endcomment %}
+<label for="type-requirements">
+    <button type="button"
+            class="usa-accordion__button"
+            aria-expanded={% if form_user_input.type_requirements %}"true"{% else %}"false"{% endif %}
+            aria-controls="type-requirements">Type of compliance requirements</button>
+</label>
+<div id="type-requirements">
+    <div id="type-requirements-hint">Separate type of compliance requirements with spaces.</div>
+    <textarea class="usa-textarea"
+              id="type-requirements-input"
+              name="type_requirements"
+              placeholder="P N L I B ..."
+              aria-describedby="type-requirements-hint">{{form_user_input.type_requirements}}</textarea>
+</div>
