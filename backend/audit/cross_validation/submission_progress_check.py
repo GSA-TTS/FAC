@@ -201,7 +201,9 @@ def general_information_progress_check(progress, general_info, sac):
         # Patch can be removed in few months from 04/23/2024.
         patched_general_info = Util.remove_extra_fields(deepcopy(general_info))
         is_general_info_complete = bool(
-            validate_general_information_complete_json(patched_general_info)
+            validate_general_information_complete_json(
+                patched_general_info, is_data_migration=False
+            )
         )
     except ValidationError:
         is_general_info_complete = False

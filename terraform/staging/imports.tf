@@ -1,5 +1,5 @@
 import {
-  to = module.staging.module.database.cloudfoundry_service_instance.rds
+  to = module.staging.module.database.cloudfoundry_service_instance.rds_protected[0]
   id = "ff264965-e93f-4b75-b358-49cdadaec30f"
 }
 

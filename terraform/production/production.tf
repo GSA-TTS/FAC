@@ -38,7 +38,7 @@ module "production" {
 # of Terraform. To address this, we should manage deployment of gsa-fac in
 # Terraform.
 module "domain" {
-  source = "github.com/gsa-tts/terraform-cloudgov//domain?ref=v2.3.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//domain?ref=v2.5.0"
 
   cf_org_name   = "gsa-tts-oros-fac"
   cf_space      = { id = data.cloudfoundry_space.space.id, name = "production" }
@@ -52,7 +52,7 @@ module "domain" {
 # and is managed by the cloud.gov team, as we lack sufficient IAM privileges to add it ourselves. 
 # See docs/retention.md for details on verifying or requesting changes to this policy.
 module "production-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.5.0"
 
   cf_space_id  = data.cloudfoundry_space.space.id
   name         = "backups"

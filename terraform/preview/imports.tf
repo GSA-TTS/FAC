@@ -1,5 +1,5 @@
 import {
-  to = module.preview.module.database.cloudfoundry_service_instance.rds
+  to = module.preview.module.database.cloudfoundry_service_instance.rds_protected[0]
   id = "7a2931da-7968-46b2-9b86-88dc27ecb826"
 }
 

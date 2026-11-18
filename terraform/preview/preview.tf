@@ -39,7 +39,7 @@ data "cloudfoundry_space" "space" {
 # and is managed by the cloud.gov team, as we lack sufficient IAM privileges to add it ourselves. 
 # See docs/retention.md for details on verifying or requesting changes to this policy.
 module "preview-backups-bucket" {
-  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.3.0"
+  source = "github.com/gsa-tts/terraform-cloudgov//s3?ref=v2.5.0"
 
   cf_space_id  = data.cloudfoundry_space.space.id
   name         = "backups"

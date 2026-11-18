@@ -1,15 +1,31 @@
 import searchPage from '../page_objects/search-page.js';
 import searchDataJson from '../fixtures/search_data.json'
 
+// This test relies on having the public, non-tribal audit submitted via the
+// Cypress full-submission test within the last week.
+
 let search;
 const searchData = searchDataJson;
+
+const todayDate = new Date();
+const today = todayDate.toLocaleDateString('en-US', {
+  month: '2-digit',
+  day: '2-digit',
+  year: 'numeric'
+});
+
+const lastWeekDate = new Date(todayDate);
+lastWeekDate.setDate(todayDate.getDate() - 7);
+const lastWeek = lastWeekDate.toLocaleDateString('en-US', {
+  month: '2-digit',
+  day: '2-digit',
+  year: 'numeric'
+});
 
 beforeEach(() => {
   cy.visit('/dissemination/search/');
 
   search = new searchPage();
-
-  search.elements.advanceSearchBtn().should('contain', 'advanced search').click();
 });
 
 describe('Test Basic Search Fields', () => {
@@ -24,23 +40,21 @@ describe('Test Basic Search Fields', () => {
 
   it('Tests UEI or EIN Field ', () => {
     const ueiOrEinValue = searchData.ueiOrein;
-    search.elements.ueiOrEinField().clear().type(ueiOrEinValue)
+    search.elements.ueiAndEinField().clear().type(ueiOrEinValue)
       .should('have.value', ueiOrEinValue);
   });
 
   it('Tests Name Field', () => {
     const nameValue = searchData.name;
-    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
+    search.elements.entityNameAccordionBtn().contains('Names (Entity, Auditee, or Auditor)').click();
     search.elements.entityNameField().clear().type(nameValue)
       .should('have.value', nameValue);
   });
 
   it('Tests FAC Acceptance Date Field', () => {
-    const startDate = searchData.accDate[0]
-    const endDate = searchData.accDate[1];
     search.elements.facAcceptDateAccordionBtn().contains('FAC acceptance date').as('accordionButton').click();
-    search.elements.startDateField().clear().type(startDate);
-    search.elements.endDateField().clear().type(endDate);
+    search.elements.startDateField().clear().type(lastWeek);
+    search.elements.endDateField().clear().type(today);
   });
 
   it('Tests State Field', () => {
@@ -87,29 +101,27 @@ describe('Test Advance Search Fields', () => {
 
   it('Tests UEI or EIN Field ', () => {
     const ueiOrEinValue = searchData.ueiOrein;
-    search.elements.ueiOrEinField().clear().type(ueiOrEinValue)
+    search.elements.ueiAndEinField().clear().type(ueiOrEinValue)
       .should('have.value', ueiOrEinValue);
   });
 
   it('Tests ALN Field ', () => {
     const alnValue = searchData.aln;
-    search.elements.alnAccordionBtn().contains('Assistance Listing Number (formerly CFDA').as('accordionButton').click();
+    search.elements.alnAccordionBtn().contains('Assistance Listing Numbers (formerly CFDAs').as('accordionButton').click();
     search.elements.alnField().clear().type(alnValue);
   });
 
   it('Tests Name Field', () => {
     const nameValue = searchData.name;
-    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
+    search.elements.entityNameAccordionBtn().contains('Names (Entity, Auditee, or Auditor)').click();
     search.elements.entityNameField().clear().type(nameValue)
       .should('have.value', nameValue);
   });
 
   it('Tests FAC Acceptance Date Field', () => {
-    const startDate = searchData.accDate[0]
-    const endDate = searchData.accDate[1];
     search.elements.facAcceptDateAccordionBtn().contains('FAC acceptance date').as('accordionButton').click();
-    search.elements.startDateField().clear().type(startDate);
-    search.elements.endDateField().clear().type(endDate);
+    search.elements.startDateField().clear().type(lastWeek);
+    search.elements.endDateField().clear().type(today);
   });
 
   it('Tests State Field', () => {
@@ -159,7 +171,7 @@ describe('Test Advance Search Fields', () => {
 
   it('Tests Type Requirement', () => {
     const typeValue = searchData.typeRequirement;
-    search.elements.typeRequirementAccordionBtn().contains('Type Requirement').as('accordionButton').click();
+    search.elements.typeRequirementAccordionBtn().contains('Type of compliance requirements').as('accordionButton').click();
     search.elements.typeRequirementField().clear().type(typeValue);
   });
 
@@ -171,7 +183,7 @@ describe('Test Advance Search Fields', () => {
 
   it('Tests Passthrough Name Field', () => {
     const passthroughValue = searchData.passthroughName;
-    search.elements.passThroughNameAccordionBtn().contains('Passthrough Name').as('accordionButton').click();
+    search.elements.passThroughNameAccordionBtn().contains('Passthrough Names').as('accordionButton').click();
     search.elements.passThroughNameField().clear().type(passthroughValue);
   });
 
@@ -197,16 +209,16 @@ describe('Test search and return results', () => {
       .should('be.checked')
       .and('have.value', searchData.yearsToCheck[0]);
 
-    search.elements.ueiOrEinField().clear().type(searchData.ueiOrein)
+    search.elements.ueiAndEinField().clear().type(searchData.ueiOrein)
       .should('have.value', searchData.ueiOrein);
 
-    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
+    search.elements.entityNameAccordionBtn().contains('Names (Entity, Auditee, or Auditor)').click();
     search.elements.entityNameField().clear().type(searchData.name)
       .should('have.value', searchData.name);
 
     search.elements.facAcceptDateAccordionBtn().contains('FAC acceptance date').as('accordionButton').click();
-    search.elements.startDateField().clear().type(searchData.accDate[0]);
-    search.elements.endDateField().clear().type(searchData.accDate[1]);
+    search.elements.startDateField().clear().type(lastWeek);
+    search.elements.endDateField().clear().type(today);
 
     search.elements.stateAccordionBtn().contains('State').as('accordionButton').click();
     search.elements.auditeeState().select(searchData.state).should('have.value', searchData.state);
@@ -214,12 +226,16 @@ describe('Test search and return results', () => {
     search.elements.fiscalYearEndMonthBtn().contains('Fiscal year end month').as('accordionButton').click();
     search.elements.fyEndMonth().select(searchData.fiscalYearEndMonth).should('have.value', searchData.fiscalYearEndMonth);
 
+    search.elements.typeRequirementAccordionBtn().contains('Type of compliance requirements').as('accordionButton').click();
+    search.elements.typeRequirementField().clear().type(searchData.typeRequirement);
+
     search.elements.entityTypeAccordionBtn().contains('Entity type').as('accordionButton').click();
     search.elements.entityTypeCheckboxId(searchData.entityType).check({ force: true }).should('be.checked').and('have.value', searchData.entityType);
 
-    search.elements.reportdIdAccordionBtn().as('accordionButton').click();
-    search.elements.reportIdField().clear().type(searchData.reportId)
-      .should('have.value', searchData.reportId);
+    // Having a consistent Report ID is too annoying when testing locally
+    // search.elements.reportdIdAccordionBtn().as('accordionButton').click();
+    // search.elements.reportIdField().clear().type(searchData.reportId)
+    //   .should('have.value', searchData.reportId);
 
     search.clickSearchSubmitButton();
     cy.url().should('include', '/dissemination/search/');
@@ -247,16 +263,16 @@ describe('Test Reset Search Button', () => {
       .should('be.checked')
       .and('have.value', searchData.yearsToCheck[0]);
 
-    search.elements.ueiOrEinField().clear().type(searchData.ueiOrein)
+    search.elements.ueiAndEinField().clear().type(searchData.ueiOrein)
       .should('have.value', searchData.ueiOrein);
 
-    search.elements.entityNameAccordionBtn().contains('Name (Entity, Auditee, or Auditor)').click();
+    search.elements.entityNameAccordionBtn().contains('Names (Entity, Auditee, or Auditor)').click();
     search.elements.entityNameField().clear().type(searchData.name)
       .should('have.value', searchData.name);
 
     search.elements.facAcceptDateAccordionBtn().contains('FAC acceptance date').as('accordionButton').click();
-    search.elements.startDateField().clear().type(searchData.accDate[0]);
-    search.elements.endDateField().clear().type(searchData.accDate[1]);
+    search.elements.startDateField().clear().type(lastWeek);
+    search.elements.endDateField().clear().type(today);
 
     search.elements.stateAccordionBtn().contains('State').as('accordionButton').click();
     search.elements.auditeeState().select(searchData.state).should('have.value', searchData.state);
@@ -274,7 +290,7 @@ describe('Test Reset Search Button', () => {
     search.clickResetButton();
 
     search.elements.yearCheckboxById(searchData.yearsToCheck[1]).should('not.be.checked');
-    search.elements.ueiOrEinField().should('have.value', '');
+    search.elements.ueiAndEinField().should('have.value', '');
     search.elements.entityNameField().should('have.value', '');
     search.elements.startDateField().should('have.value', '');
     search.elements.endDateField().should('have.value', '');

@@ -29,18 +29,18 @@ resource "cloudfoundry_app" "postgrest" {
     # Format: postgres://user:pass@replica.host:port,primary.host:port/dbname?options
     PGRST_DB_URI : var.cf_space.name == "production" || var.cf_space.name == "preview" ? format(
       "postgres://%s:%s@%s:%s,%s:%s/%s?%s",
-      cloudfoundry_service_key.postgrest.credentials.username,
-      cloudfoundry_service_key.postgrest.credentials.password,
-      cloudfoundry_service_key.postgrest.credentials.replica_host,
-      cloudfoundry_service_key.postgrest.credentials.port,
-      cloudfoundry_service_key.postgrest.credentials.host,
-      cloudfoundry_service_key.postgrest.credentials.port,
-      cloudfoundry_service_key.postgrest.credentials.db_name,
+      data.external.postgrest.result.username,
+      data.external.postgrest.result.password,
+      data.external.postgrest.result.replica_host,
+      data.external.postgrest.result.port,
+      data.external.postgrest.result.host,
+      data.external.postgrest.result.port,
+      data.external.postgrest.result.db_name,
       # `target_session_attrs` is for all requests except for some overrides, like LISTEN
       # Further params can be added by appending "&param=option"
       # See https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS
       "target_session_attrs=read-only"
-    ) : cloudfoundry_service_key.postgrest.credentials.uri
+    ) : data.external.postgrest.result.uri
     PGRST_DB_SCHEMAS : "api_v1_1_0,api_v1_2_0,api_v1_3_0,api_v1_3_1,admin_api_v1_1_0"
     PGRST_DB_ANON_ROLE : "anon"
     PGRST_JWT_SECRET : var.pgrst_jwt_secret
@@ -50,11 +50,11 @@ resource "cloudfoundry_app" "postgrest" {
   depends_on       = [module.cg-logshipper]
 }
 
-# The following use the community provider as these have not been moved to the official provider.
-# The community provider has upgraded to use the v3 API, however these resources should be moved to
-# the official provider once they are supported.
-resource "cloudfoundry_service_key" "postgrest" {
-  provider         = cloudfoundry-community
-  name             = "postgrest"
-  service_instance = module.database.instance_id
+data "external" "postgrest" {
+  program = ["bash", "${path.module}/postgrest-service-key.sh"]
+
+  query = {
+    org_name = var.cf_org_name
+    space    = var.cf_space.name
+  }
 }

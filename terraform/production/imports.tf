@@ -1,6 +1,6 @@
 # terraform/production/imports.tf
 import {
-  to = module.production.module.database.cloudfoundry_service_instance.rds
+  to = module.production.module.database.cloudfoundry_service_instance.rds_protected[0]
   id = "258ac781-7f34-465f-b24a-b04ec258f7db"
 }
 

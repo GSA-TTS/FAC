@@ -55,7 +55,7 @@ class Search(View):
                 "search.html",
                 {
                     "form": form,
-                    "form_user_input": {"audit_year": default_checked_audit_years},
+                    "form_user_input": {"audit_years": default_checked_audit_years},
                     "state_abbrevs": STATE_ABBREVS,
                     "summary_report_download_limit": SUMMARY_REPORT_DOWNLOAD_LIMIT,
                     "findings_report_download_limit": FINDINGS_SUMMARY_REPORT_DOWNLOAD_LIMIT,
@@ -147,7 +147,7 @@ class Search(View):
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
-            "report_ids_display": "\n".join(form_data["report_id"]),
+            "report_ids_display": "\n".join(form_data["report_ids"]),
         }
         time_beginning_render = time.time()
         total_time_ms = int(

@@ -4,35 +4,35 @@ from dissemination.forms.search_forms import SearchForm
 
 
 class SearchFormTests(TestCase):
-    def test_uei_or_ein_removes_dashes(self):
-        form = SearchForm(data={"uei_or_ein": "12-3456789"})
+    def test_ueis_and_eins_removes_dashes(self):
+        form = SearchForm(data={"ueis_and_eins": "12-3456789"})
 
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data["uei_or_ein"], ["123456789"])
+        self.assertEqual(form.cleaned_data["ueis_and_eins"], ["123456789"])
 
-    def test_uei_or_ein_separates_commas(self):
-        form = SearchForm(data={"uei_or_ein": "123456789,987654321"})
-
-        self.assertTrue(form.is_valid())
-        self.assertEqual(
-            form.cleaned_data["uei_or_ein"],
-            ["123456789", "987654321"],
-        )
-
-    def test_uei_or_ein_separates_newlines(self):
-        form = SearchForm(data={"uei_or_ein": "123456789\n987654321"})
+    def test_ueis_and_eins_separates_commas(self):
+        form = SearchForm(data={"ueis_and_eins": "123456789,987654321"})
 
         self.assertTrue(form.is_valid())
         self.assertEqual(
-            form.cleaned_data["uei_or_ein"],
+            form.cleaned_data["ueis_and_eins"],
             ["123456789", "987654321"],
         )
 
-    def test_clean_report_id_z(self):
-        """Ensures that report_id_z is parsed and replaces the value of report_id"""
+    def test_ueis_and_eins_separates_newlines(self):
+        form = SearchForm(data={"ueis_and_eins": "123456789\n987654321"})
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual(
+            form.cleaned_data["ueis_and_eins"],
+            ["123456789", "987654321"],
+        )
+
+    def test_clean_report_ids_z(self):
+        """Ensures that report_ids_z is parsed and replaces the value of report_id"""
         form = SearchForm(
             data={
-                "report_id_z": "eJxVyTEOgDAMA8Cdv1iynaAmY4UED-D_f0Hdyq1nOsHA8857XiBJVbZ5mBY49qloU2sC0j7ZLo01J_ibVnnEGoO9T1Cd9QHLkxrD",
+                "report_ids_z": "eJxVyTEOgDAMA8Cdv1iynaAmY4UED-D_f0Hdyq1nOsHA8857XiBJVbZ5mBY49qloU2sC0j7ZLo01J_ibVnnEGoO9T1Cd9QHLkxrD",
             },
         )
 

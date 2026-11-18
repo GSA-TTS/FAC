@@ -14,6 +14,7 @@ const accessFields = [
   '#auditor_contacts_re_email',
 ];
 
+
 export function addValidInfo(field) {
   const fieldType = field.split('_').pop();
   const email = field.includes('auditee')
@@ -22,8 +23,11 @@ export function addValidInfo(field) {
 
   cy.get(field).clear();
   cy.get(field).type(fieldType === 'email' ? email : 'Percy A. Person');
+
+  cy.get(field).focus();
   cy.get(field).blur();
 }
+
 
 export function testValidAccess() {
   cy.wrap(accessFields).each((field) => {

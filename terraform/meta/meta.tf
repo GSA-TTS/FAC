@@ -3,29 +3,18 @@ data "cloudfoundry_org" "organization" {
   name = local.org_name
 }
 
-data "cloudfoundry_space" "space" {
-  name = "production"
-  org  = data.cloudfoundry_org.organization.id
-}
-
 # We need to include the meta deployer user in the set of users with the
 # SpaceDeveloper role so it can manage the deployer service and binding in
 # each space. We need to add it using the user ID rather than username in order
 # to ensure it has the expected permissions. See
 # https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/436
 
-# This id is accessed with data.cloudfoundry_user.meta_deployer.users.0.id
-# https://registry.terraform.io/providers/cloudfoundry/cloudfoundry/latest/docs/data-sources/user#nested-schema-for-users
-data "cloudfoundry_user" "meta_deployer" {
-  name = var.cf_user
-}
-
 module "environments" {
   for_each   = local.spaces
   source     = "./bootstrap-env"
   name       = each.key
   org_name   = local.org_name
-  developers = concat(local.developers, [data.cloudfoundry_user.meta_deployer.users.0.id])
+  developers = concat(local.developers)
   managers   = local.managers
   allow_ssh  = lookup(each.value, "allow_ssh", true)
   # Apply egress ASGs if explicitly requested
