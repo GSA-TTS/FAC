@@ -19,16 +19,17 @@ function attachEventHandlersPagination() {
     isPaginationSubmitting = true;
     FORM.elements['page'].value = page;
 
-    pagination_links.forEach((link) => {
-      link.setAttribute('aria-disabled', 'true');
-    });
+    const allPaginationLinks = [
+      ...pagination_links,
+      ...next_page_link,
+      ...previous_page_link,
+    ];
 
-    next_page_link.forEach((link) => {
+    allPaginationLinks.forEach((link) => {
       link.setAttribute('aria-disabled', 'true');
-    });
-
-    previous_page_link.forEach((link) => {
-      link.setAttribute('aria-disabled', 'true');
+      link.style.pointerEvents = 'none';
+      link.style.opacity = '0.5';
+      link.style.cursor = 'not-allowed';
     });
 
     FORM.submit();
