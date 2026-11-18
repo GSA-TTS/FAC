@@ -595,7 +595,7 @@ class CompareSubmissionTests(TestCase):
         setup_mock_db()
         # tribal data should be excluded from summary
         summary = compare_report_ids(
-            "2025-01-FAKEDB-0000000004", "2025-01-FAKEDB-0000000005", True
+            "2025-01-FAKEDB-0000000004", "2025-01-FAKEDB-0000000005", False
         )
 
         self.assertEqual(None, summary.get("corrective_action_plan", None))

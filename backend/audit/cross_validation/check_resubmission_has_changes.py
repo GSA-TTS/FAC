@@ -24,7 +24,7 @@ def check_resubmission_has_changes(sac_dict, *_args, **_kwargs):
         return []
 
     _, _, compared = compare_two_submissions.compare_with_prev(
-        resub, exclude_tribal=False
+        resub, show_all_data=True
     )
     has_diff = False
 

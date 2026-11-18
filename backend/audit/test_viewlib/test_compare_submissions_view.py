@@ -3,9 +3,10 @@ from django.test import Client, TestCase
 from django.urls import reverse, NoReverseMatch
 from model_bakery import baker
 from audit.test_viewlib.test_compare_submissions import setup_mock_db
+
 from audit.models import Access, SingleAuditChecklist
 from users.models import UserPermission, Permission
-from audit.views.compare_submissions_view import remove_tribal_data_on_search
+from audit.views.compare_submissions_view import _has_sensitive_data
 
 User = get_user_model()
 
@@ -131,7 +132,7 @@ class CompareSubmissionsViewTests(TestCase):
             self.assertEqual(res.status_code, 403)
 
     def test_feds_have_access(self):
-        """fed user can view comparisons even if they don't have access"""
+        """removed fed user to view comparisons w/out access on submissions"""
         p = setup_test(is_federal=True)
 
         # This should delete the access objects
@@ -153,7 +154,7 @@ class CompareSubmissionsViewTests(TestCase):
                 ),
                 follow=True,
             )
-            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.status_code, 403)
 
     def test_without_login_on_search_summary(self):
         """test unauthenticated user is allowed to view comparison via search summary"""
@@ -241,24 +242,20 @@ class CompareSubmissionsViewTests(TestCase):
         self.assertNotIn("Findings Text", content)
 
     def test_tribal_consent(self):
-        # flag to remove tribal data on search if consent == False
         sacs = setup_mock_db()
         sac_r5 = sacs[4]
 
-        excluded = remove_tribal_data_on_search(
-            "search", False, sac_r5.tribal_data_consent
-        )
-        self.assertTrue(excluded)
+        has_tribal = _has_sensitive_data(sac_r5)
+
+        self.assertTrue(has_tribal)
 
     def test_tribal_none_consent(self):
-        # data should be included on search if there is no tribal consent
         sacs = setup_mock_db()
         sac_r3 = sacs[2]
 
-        tribal_data_consent = getattr(sac_r3, "tribal_data_consent", None)
+        has_tribal = _has_sensitive_data(sac_r3)
 
-        excluded = remove_tribal_data_on_search("search", False, tribal_data_consent)
-        self.assertFalse(excluded)
+        self.assertFalse(has_tribal)
 
     def test_fail_incorrect_path(self):
         """Check that our url path must be have 'search' or 'submission' in it"""

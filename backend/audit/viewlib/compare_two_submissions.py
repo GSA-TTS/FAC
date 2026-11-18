@@ -463,13 +463,13 @@ def are_two_sacs_identical(sac1, sac2):
 # Consider using deepdiff
 # https://miguendes.me/the-best-way-to-compare-two-dictionaries-in-python
 # This walks a JSON tree and finds the differences, and nicely spells them out.
-def compare_report_ids(rid_1, rid_2, exclude_tribal):
+def compare_report_ids(rid_1, rid_2, show_all_data):
     """Compare two report IDs.
 
     Args:
         rid_1: Report id 1.
         rid_2: Report id 2.
-        exclude_tribal (boolean): Exclude tribal data from comparison.
+        show_all_data (boolean): Exclude tribal data from comparison.
 
     Returns:
         dict: Summary of all comparison checklists.
@@ -517,7 +517,7 @@ def compare_report_ids(rid_1, rid_2, exclude_tribal):
 
     ###############
     # corrective_action_plan
-    if exclude_tribal is False:
+    if show_all_data:
         res = compare_lists_of_objects(
             sac_r1,
             sac_r2,
@@ -532,7 +532,7 @@ def compare_report_ids(rid_1, rid_2, exclude_tribal):
 
     ###############
     # findings_text
-    if exclude_tribal is False:
+    if show_all_data:
         res = compare_lists_of_objects(
             sac_r1,
             sac_r2,
@@ -605,7 +605,7 @@ def compare_report_ids(rid_1, rid_2, exclude_tribal):
 
     ###############
     # notes_to_sefa
-    if exclude_tribal is False:
+    if show_all_data:
         res = compare_lists_of_objects(
             sac_r1,
             sac_r2,
@@ -638,7 +638,7 @@ def report_id_as_string(o):
         return o
 
 
-def compare_with_prev(rid, exclude_tribal):
+def compare_with_prev(rid, show_all_data):
     if isinstance(rid, str):
         sac = SingleAuditChecklist.objects.get(report_id=rid)
     elif isinstance(rid, SingleAuditChecklist):
@@ -674,7 +674,7 @@ def compare_with_prev(rid, exclude_tribal):
         return (
             report_id_as_string(prev),
             report_id_as_string(rid),
-            compare_report_ids(prev, rid, exclude_tribal),
+            compare_report_ids(prev, rid, show_all_data),
         )
     else:
         return (
