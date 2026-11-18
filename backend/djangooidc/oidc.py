@@ -239,6 +239,8 @@ class Client(oic.Client):
                 },
                 authn_method=self.registration_response["token_endpoint_auth_method"],
                 skew=10,
+                # Seconds until the clientside JWT expires. In the `oic` package, this becomes the "exp" that Login requires we set equal to or less than 5min/300s.
+                lifetime=getattr(settings, "OIDC_TOKEN_REQUEST_LIFETIME", 300),
             )
         except Exception as err:
             logger.error(err)
