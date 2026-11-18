@@ -134,10 +134,10 @@ class SearchForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
-        # Replace report_id with decompressed version, when available
+        # Replace report_ids with decompressed version, when available
         report_ids_z = cleaned_data.get("report_ids_z")
         if report_ids_z:
-            cleaned_data["report_id"] = report_ids_z
+            cleaned_data["report_ids"] = report_ids_z
 
     def clean_alns(self):
         """
@@ -232,7 +232,7 @@ class SearchForm(forms.Form):
     def clean_report_ids_z(self):
         """
         Clean up the compressed report IDs field. Base64 decode, uncompress,
-        then to normal report_id cleaning.
+        then normal report_id cleaning.
         """
         compressed_val = self.cleaned_data["report_ids_z"]
 

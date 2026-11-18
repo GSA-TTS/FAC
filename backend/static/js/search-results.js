@@ -187,30 +187,30 @@ async function buildCompressedUrl() {
 
     let rawReportIds = '';
 
-    // Build standard params and find raw report_id param
+    // Build standard params and find raw report_ids param
     for (const [key, value] of formData.entries()) {
       if (!value) continue; // Skip empty fields
 
-      if (key === 'report_id') {
+      if (key === 'report_ids') {
         rawReportIds = value.trim();
       } else {
         searchParams.append(key, value);
       }
     }
 
-    // Process the report_id field
+    // Process the report_ids field
     if (rawReportIds) {
       try {
         // Only compress if the string is reasonably long, otherwise keep it readable
         if (rawReportIds.length > 125) { // > 125 chars = 5+ report_ids
           const compressed = await compressString(rawReportIds);
-          searchParams.set('report_id_z', compressed);
+          searchParams.set('report_ids_z', compressed);
         } else {
-          searchParams.set('report_id', rawReportIds);
+          searchParams.set('report_ids', rawReportIds);
         }
       } catch (err) {
         console.error('Compression failed, falling back to raw param:', err);
-        searchParams.set('report_id', rawReportIds);
+        searchParams.set('report_ids', rawReportIds);
       }
     }
 
