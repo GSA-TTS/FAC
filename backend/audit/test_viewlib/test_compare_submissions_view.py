@@ -6,7 +6,14 @@ from audit.test_viewlib.test_compare_submissions import setup_mock_db
 
 from audit.models import Access, SingleAuditChecklist
 from users.models import UserPermission, Permission
-from audit.views.compare_submissions_view import _has_sensitive_data
+from audit.views.compare_submissions_view import (
+    _has_sensitive_data,
+    _compare_sac,
+    _get_comparison_permissions,
+    _get_search_show_all_data,
+    _get_submission_show_all_data,
+    _get_related_report_id,
+)
 
 User = get_user_model()
 
@@ -256,6 +263,61 @@ class CompareSubmissionsViewTests(TestCase):
         has_tribal = _has_sensitive_data(sac_r3)
 
         self.assertFalse(has_tribal)
+
+    def test_compare_sac(self):
+        sacs = setup_mock_db()
+        sac_r5 = sacs[4]
+
+        context = _compare_sac(sac_r5, True)
+        self.assertTrue(context["has_diffs"])
+        self.assertFalse(context["has_error"])
+        self.assertEqual(context["r1"], "2025-01-FAKEDB-0000000004")
+        self.assertEqual(context["r2"], "2025-01-FAKEDB-0000000005")
+
+    def test_comparison_permissions(self):
+        p = setup_test()
+
+        sac_r4 = p.sacs[3]
+        sac_r5 = p.sacs[4]
+
+        permissions = _get_comparison_permissions(p.user, sac_r4, sac_r5)
+        self.assertTrue(permissions["is_auth_user"])
+        self.assertFalse(permissions["is_federal_user"])
+        self.assertTrue(permissions["is_on_sac1"])
+        self.assertTrue(permissions["is_on_sac2"])
+        self.assertTrue(permissions["has_tribal"])
+        self.assertTrue(permissions["is_on_audit"])
+        self.assertTrue(permissions["has_access"])
+
+    def test_get_search_show_all_data(self):
+        p = setup_test()
+
+        sac_r4 = p.sacs[3]
+        sac_r5 = p.sacs[4]
+
+        permissions = _get_comparison_permissions(p.user, sac_r4, sac_r5)
+        show_all_data = _get_search_show_all_data(sac_r5, permissions)
+
+        self.assertTrue(show_all_data)
+
+    def test_get_submission_show_all_data(self):
+        p = setup_test()
+
+        sac_r4 = p.sacs[3]
+        sac_r5 = p.sacs[4]
+
+        permissions = _get_comparison_permissions(p.user, sac_r4, sac_r5)
+        show_all_data = _get_submission_show_all_data(permissions)
+
+        self.assertTrue(show_all_data)
+
+    def test_get_related_report_id(self):
+        p = setup_test()
+
+        sac_r5 = p.sacs[4]
+
+        next_report_id = _get_related_report_id(sac_r5)
+        self.assertEqual(next_report_id, "2025-01-FAKEDB-0000000004")
 
     def test_fail_incorrect_path(self):
         """Check that our url path must be have 'search' or 'submission' in it"""

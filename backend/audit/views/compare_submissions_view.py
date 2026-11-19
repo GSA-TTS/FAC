@@ -24,32 +24,6 @@ SUBMISSION_DENIED_MESSAGE = "You do not have access to this submission compariso
 SEARCH_DENIED_MESSAGE = "You do not have access to this search comparison page."
 
 
-class CompareSubmissionsView(generic.View):
-
-    def get(self, request, report_id, route):
-        current_user = request.user
-
-        sac_1 = _get_sac(report_id)
-        sac_2 = _get_related_sac(sac_1)
-
-        # Get the accesses for this SAC
-        permissions = _get_comparison_permissions(current_user, sac_1, sac_2)
-
-        show_all_data = _get_show_all_data(
-            route=route,
-            sac_1=sac_1,
-            permissions=permissions,
-        )
-
-        context = _compare_sac(sac_1, show_all_data)
-        context = context | {"is_authenticated": permissions["is_auth_user"]}
-        context = context | {"is_on_audit": permissions["is_on_audit"]}
-        context = context | {"is_federal_user": permissions["is_federal_user"]}
-        context = context | {"route": route}
-
-        return render(request, COMPARE_TEMPLATE, context)
-
-
 def _get_sac(report_id):
     try:
         return SingleAuditChecklist.objects.get(report_id=report_id)
@@ -132,6 +106,7 @@ def _get_comparison_permissions(user, sac_1, sac_2):
 
     has_tribal = _has_sensitive_data(sac_1) or _has_sensitive_data(sac_2)
 
+    # is on BOTH audits!!
     is_on_audit = is_on_sac1 and is_on_sac2
 
     has_access = is_auth_user and (is_on_audit or is_federal_user)
@@ -169,11 +144,8 @@ def _compare_sac(sac, show_all_data):
     has_error = False
 
     report_id_1, report_id_2, compared = compare_with_prev(sac, show_all_data)
-    context = {"comparison": compared}
 
-    nice_names = {}
-    for k in compared.keys():
-        nice_names[k] = k.replace("_", " ").title()
+    nice_names = {key: key.replace("_", " ").title() for key in compared.keys()}
 
     for val in compared.values():
         if val == "error":
@@ -187,13 +159,14 @@ def _compare_sac(sac, show_all_data):
             has_diffs = True
             break
 
-    context = context | {"has_diffs": has_diffs}
-    context = context | {"has_error": has_error}
-    context = context | {"nice_names": nice_names}
-    context = context | {"r1": report_id_1}
-    context = context | {"r2": report_id_2}
-
-    return context
+    return {
+        "comparison": compared,
+        "has_diffs": has_diffs,
+        "has_error": has_error,
+        "nice_names": nice_names,
+        "r1": report_id_1,
+        "r2": report_id_2,
+    }
 
 
 def _has_sensitive_data(sac):
@@ -205,3 +178,36 @@ def _has_sensitive_data(sac):
             has_tribal = True
 
     return has_tribal
+
+
+class CompareSubmissionsView(generic.View):
+
+    def get(self, request, report_id, route):
+        """With a resubmission report_id and route this directs the
+        user to view comparisons between SACs.  Special care is taken
+        to view tribal data"""
+        current_user = request.user
+
+        sac_1 = _get_sac(report_id)
+        sac_2 = _get_related_sac(sac_1)
+
+        # Get the accesses for this SAC
+        permissions = _get_comparison_permissions(current_user, sac_1, sac_2)
+
+        show_all_data = _get_show_all_data(
+            route=route,
+            sac_1=sac_1,
+            permissions=permissions,
+        )
+
+        context = _compare_sac(sac_1, show_all_data)
+        context.update(
+            {
+                "is_authenticated": permissions["is_auth_user"],
+                "is_on_audit": permissions["is_on_audit"],
+                "is_federal_user": permissions["is_federal_user"],
+                "route": route,
+            }
+        )
+
+        return render(request, COMPARE_TEMPLATE, context)
