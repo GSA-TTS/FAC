@@ -1,9 +1,10 @@
 ---
 name: Export Audit Data to CSV Scheduler
 on:
+  workflow_dispatch:
   schedule:
-    # Staging, Prod test - All days 7 AM UTC
-    - cron: '0 7 * * 6'
+    # Daily at 7:23 AM UTC. Semi-random time to avoid any scheduling conflicts in GHA.
+    - cron: '23 7 * * *'
 
 jobs:
   scheduled-audit-data-export:
@@ -14,7 +15,7 @@ jobs:
           - name: staging
           - name: production
     name: Run bulk data export
-    uses: ./.github/workflows/weekly-export-audit-data-to-csv-scheduled.yml
+    uses: ./.github/workflows/export-audit-data-to-csv-scheduled.yml
     secrets: inherit
     with:
       environment: ${{ matrix.environment.name }}
