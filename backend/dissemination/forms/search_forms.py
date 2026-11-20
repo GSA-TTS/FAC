@@ -1,4 +1,6 @@
+import base64
 from datetime import date
+import zlib
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -113,6 +115,7 @@ class SearchForm(forms.Form):
     )
     passthrough_names = forms.CharField(required=False)
     report_ids = forms.CharField(required=False)
+    report_ids_z = forms.CharField(required=False)
     start_date = forms.DateField(required=False)
     type_requirements = forms.CharField(required=False)
     ueis_and_eins = forms.CharField(required=False)
@@ -127,6 +130,14 @@ class SearchForm(forms.Form):
     page = forms.CharField(required=False)
     order_by = forms.CharField(required=False)
     order_direction = forms.CharField(required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # Replace report_ids with decompressed version, when available
+        report_ids_z = cleaned_data.get("report_ids_z")
+        if report_ids_z:
+            cleaned_data["report_ids"] = report_ids_z
 
     def clean_alns(self):
         """
@@ -217,6 +228,24 @@ class SearchForm(forms.Form):
         """
         text_input = self.cleaned_data["report_ids"]
         return clean_text_field(text_input, report_id_delimiters)
+
+    def clean_report_ids_z(self):
+        """
+        Clean up the compressed report IDs field. Base64 decode, uncompress,
+        then normal report_id cleaning.
+        """
+        compressed_val = self.cleaned_data["report_ids_z"]
+
+        # Decode URL-safe Base64, then decompress
+        try:
+            # Restore Base64 `=` padding that was removed for URL compatibility
+            padded = compressed_val + "=" * (-len(compressed_val) % 4)
+            raw_bytes = base64.urlsafe_b64decode(padded.encode("ascii"))
+            decompressed = zlib.decompress(raw_bytes).decode("utf-8")
+            cleaned = clean_text_field(decompressed, report_id_delimiters)
+            return cleaned
+        except (zlib.error, ValueError):
+            return []
 
     def clean_passthrough_names(self):
         """
