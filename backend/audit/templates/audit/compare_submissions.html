@@ -7,7 +7,7 @@
       <div>
         <h1>Resubmission comparison</h1>
         {% if route == "submission" and is_authenticated %}
-          {% if is_on_audit or is_federal_user %}
+          {% if is_on_audit %}
         <p>To assist auditees and auditors in completing the resubmission of audits,
            the Clearinghouse provides an automated comparison between the previous submission
            (<a class="usa-link" href="{% url 'audit:SubmissionProgress' r1 %}">{{ r1 }}</a>)
@@ -35,7 +35,7 @@
     </div>
 
     {% if route == "submission" and is_authenticated %}
-      {% if is_on_audit or is_federal_user %}
+      {% if is_on_audit %}
     <a class="usa-button margin-bottom-8 margin-top-5" href="{% url 'audit:SubmissionProgress' r2 %}">Return to the submission checklist</a>
       {% endif %}
     {% endif %}

@@ -9,7 +9,6 @@ from audit.models import (
 )
 
 from audit.models.constants import STATUS
-from users.models import UserPermission
 
 import logging
 
@@ -25,117 +24,132 @@ SEARCH_DENIED_MESSAGE = "You do not have access to this search comparison page."
 
 
 def _get_sac(report_id):
+    """Get a SAC using a report ID."""
     try:
         return SingleAuditChecklist.objects.get(report_id=report_id)
     except SingleAuditChecklist.DoesNotExist as err:
         raise PermissionDenied(f"Cannot find report id {report_id}") from err
 
 
-def _get_related_sac(sac):
-    related_report_id = _get_related_report_id(sac)
+def _get_previous_sac(sac):
+    """Use a resubmission SAC, get its previous SAC."""
+    previous_report_id = _get_previous_report_id(sac)
 
-    related_sac = report_id_to_sac(related_report_id)
+    previous_sac = report_id_to_sac(previous_report_id)
 
-    if related_sac is None:
+    if previous_sac is None:
         raise PermissionDenied("The associated audit does not exist.")
 
-    return related_sac
+    return previous_sac
 
 
-def _get_related_report_id(sac):
+def _get_previous_report_id(sac):
+    """Search SAC resubmission_meta for 'previous_report_id'."""
     resubmission_meta = sac.resubmission_meta or {}
 
     if "previous_report_id" in resubmission_meta:
         return resubmission_meta["previous_report_id"]
-
-    if "next_report_id" in resubmission_meta:
-        return resubmission_meta["next_report_id"]
 
     raise PermissionDenied(
         "The audit provided does not have any associated audits to compare with."
     )
 
 
-def _get_show_all_data(*, route, sac_1, permissions):
+def _get_show_all_data(*, route, sac, permissions):
+    """
+    Assemble decision to 'show all data' for a comparison.
+
+    Returns:
+        bool: True to 'show all data';  False to 'show partial data'
+    """
     if route == "submission":
-        return _get_submission_show_all_data(permissions)
+        return _get_submissions_show_all_data(permissions)
 
     if route == "search":
-        return _get_search_show_all_data(sac_1, permissions)
+        return _get_search_show_all_data(sac, permissions)
 
     raise PermissionDenied("Invalid comparison route.")
 
 
-def _get_submission_show_all_data(permissions):
-    if not permissions["is_on_sac1"]:
+def _get_submissions_show_all_data(permissions):
+    """Determine what user can view during Submission.
+
+    Args:
+        sac: The single audit checklist
+        permissions: The user's permissions.
+
+    Returns:
+        bool: True to 'show all data';  False to 'show partial data'
+    """
+    if not permissions["is_on_audit"]:
         raise PermissionDenied(SUBMISSION_DENIED_MESSAGE)
 
-    if permissions["has_tribal"] and not permissions["has_access"]:
-        return False
+    has_private_tribal = permissions["has_private_tribal"]
+    is_on_both_audits = permissions["is_on_both_audits"]
+
+    if has_private_tribal:
+        if is_on_both_audits:
+            return True
+        else:
+            return False
     else:
         return True
 
 
-def _get_search_show_all_data(sac_1, permissions):
-    has_tribal = permissions["has_tribal"]
-    has_access = permissions["has_access"]
+def _get_search_show_all_data(sac, permissions):
+    """Determine what user can view during Search.
 
-    is_public_status = sac_1.submission_status in PUBLIC_SEARCH_STATUSES
+    Args:
+        sac: The single audit checklist
+        permissions: The user's permissions.
 
-    if not has_tribal:
-        if not is_public_status and not has_access:
-            raise PermissionDenied(SEARCH_DENIED_MESSAGE)
+    Returns:
+        bool: True to 'show all data';  False to 'show partial data'
+    """
+    has_private_tribal = permissions["has_private_tribal"]
+    is_on_both_audits = permissions["is_on_both_audits"]
+    is_on_audit = permissions["is_on_audit"]
+    is_public_status = sac.submission_status in PUBLIC_SEARCH_STATUSES
+
+    if not is_public_status and not is_on_audit:
+        raise PermissionDenied(SEARCH_DENIED_MESSAGE)
+
+    if has_private_tribal:
+        if is_on_both_audits:
+            return True
+        else:
+            return False
+    else:
         return True
 
-    if has_access:
-        return True
 
-    if is_public_status:
-        return False
-
-    raise PermissionDenied(SEARCH_DENIED_MESSAGE)
-
-
-def _get_comparison_permissions(user, sac_1, sac_2):
+def _get_comparison_permissions(user, current_sac, previous_sac):
+    """Collect permissions to determine what this user is allowed to see when comparing SACs."""
     is_auth_user = user.is_authenticated
 
-    is_federal_user = _is_federal_user(user)
+    is_on_current_sac = _user_has_access_to_sac(user, current_sac)
+    is_on_previous_sac = _user_has_access_to_sac(user, previous_sac)
 
-    is_on_sac1 = _user_has_access_to_sac(user, sac_1)
-    is_on_sac2 = _user_has_access_to_sac(user, sac_2)
+    has_private_tribal = _has_sensitive_data(current_sac) or _has_sensitive_data(previous_sac)
 
-    has_tribal = _has_sensitive_data(sac_1) or _has_sensitive_data(sac_2)
-
-    # is on BOTH audits!!
-    is_on_audit = is_on_sac1 and is_on_sac2
-
-    has_access = is_auth_user and (is_on_audit or is_federal_user)
+    is_on_both_audits = is_on_current_sac and is_on_previous_sac
 
     return {
         "is_auth_user": is_auth_user,
-        "is_federal_user": is_federal_user,
-        "is_on_sac1": is_on_sac1,
-        "is_on_sac2": is_on_sac2,
-        "has_tribal": has_tribal,
-        "is_on_audit": is_on_audit,
-        "has_access": has_access,
+        "has_private_tribal": has_private_tribal,
+        "is_on_audit": is_on_current_sac,
+        "is_on_both_audits": is_on_both_audits,
     }
 
 
 def _user_has_access_to_sac(user, sac):
+    """Determine if 'user' has access to this 'sac'."""
     if not user.is_authenticated:
         return False
 
     accesses = Access.objects.filter(sac=sac)
     user_ids_on_audit = list(map(lambda acc: acc.user_id, accesses))
     return user.id in user_ids_on_audit
-
-
-def _is_federal_user(user):
-    if not user.is_authenticated:
-        return False
-
-    return UserPermission.objects.filter(user_id=user.id).exists()
 
 
 def _compare_sac(sac, show_all_data):
@@ -170,42 +184,44 @@ def _compare_sac(sac, show_all_data):
 
 
 def _has_sensitive_data(sac):
-    has_tribal = False
+    """Determine if this SAC uses private tribal data."""
+    has_private_tribal = False
     data_consent = sac.tribal_data_consent
 
     if data_consent is not None:
         if data_consent.get("is_tribal_information_authorized_to_be_public") is False:
-            has_tribal = True
+            has_private_tribal = True
 
-    return has_tribal
+    return has_private_tribal
 
 
 class CompareSubmissionsView(generic.View):
+    """Compare Submission view used in 'submission' and 'search' flows."""
 
     def get(self, request, report_id, route):
-        """With a resubmission report_id and route this directs the
-        user to view comparisons between SACs.  Special care is taken
-        to view tribal data"""
-        current_user = request.user
+        """
+        With a resubmission report_id and route this directs the user to view comparisons between SACs.
 
-        sac_1 = _get_sac(report_id)
-        sac_2 = _get_related_sac(sac_1)
+        Special care is taken to view 'private' tribal data
+        """
+        current_user = request.user
+        current_sac = _get_sac(report_id)
+        previous_sac = _get_previous_sac(current_sac)
 
         # Get the accesses for this SAC
-        permissions = _get_comparison_permissions(current_user, sac_1, sac_2)
+        permissions = _get_comparison_permissions(current_user, current_sac, previous_sac)
 
         show_all_data = _get_show_all_data(
             route=route,
-            sac_1=sac_1,
+            sac=current_sac,
             permissions=permissions,
         )
 
-        context = _compare_sac(sac_1, show_all_data)
+        context = _compare_sac(current_sac, show_all_data)
         context.update(
             {
                 "is_authenticated": permissions["is_auth_user"],
                 "is_on_audit": permissions["is_on_audit"],
-                "is_federal_user": permissions["is_federal_user"],
                 "route": route,
             }
         )
