@@ -22,7 +22,7 @@ class Params:
     pass
 
 
-def setup_test(is_federal=False):
+def setup_test(is_federal=False):  # noqa: C901
     # Clean up the test db
     # I've found that it caches things in some contexts, so
     # this is a rude/forceful way to make sure the only objects are the ones
@@ -126,10 +126,10 @@ class CompareSubmissionsViewTests(TestCase):
 
         # two tests
         # If we look for #1, we have no prev, we drop out
-        # while the underlying code in 'compare_report_ids' defaults 
+        # while the underlying code in 'compare_report_ids' defaults
         # to using 'next' if 'previous' is missing.  In our view we don't allow this
         #
-        for pair in [[2, 1], [5,4]]:
+        for pair in [[2, 1], [5, 4]]:
             res = p.client.get(
                 reverse(
                     self.view,
@@ -143,7 +143,6 @@ class CompareSubmissionsViewTests(TestCase):
             content = res.content.decode("utf-8")
             self.assertNotIn(f"000000000{pair[0]}", content)
             self.assertNotIn(f"000000000{pair[1]}", content)
-
 
     def test_fail_without_access_to_audit(self):
         """test that any ole authenticated user cannot access comparision via the submission route"""
@@ -179,7 +178,10 @@ class CompareSubmissionsViewTests(TestCase):
         response = p.client.get(
             reverse(
                 self.view,
-                kwargs={"report_id": "2025-01-FAKEDB-0000000001", "route": "submission"},
+                kwargs={
+                    "report_id": "2025-01-FAKEDB-0000000001",
+                    "route": "submission",
+                },
             ),
             follow=True,
         )
@@ -202,7 +204,10 @@ class CompareSubmissionsViewTests(TestCase):
         response = p.client.get(
             reverse(
                 self.view,
-                kwargs={"report_id": "2025-01-FAKEDB-0000000002", "route": "submission"},
+                kwargs={
+                    "report_id": "2025-01-FAKEDB-0000000002",
+                    "route": "submission",
+                },
             ),
             follow=True,
         )

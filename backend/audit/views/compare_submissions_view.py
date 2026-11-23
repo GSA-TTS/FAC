@@ -130,7 +130,9 @@ def _get_comparison_permissions(user, current_sac, previous_sac):
     is_on_current_sac = _user_has_access_to_sac(user, current_sac)
     is_on_previous_sac = _user_has_access_to_sac(user, previous_sac)
 
-    has_private_tribal = _has_sensitive_data(current_sac) or _has_sensitive_data(previous_sac)
+    has_private_tribal = _has_sensitive_data(current_sac) or _has_sensitive_data(
+        previous_sac
+    )
 
     is_on_both_audits = is_on_current_sac and is_on_previous_sac
 
@@ -209,7 +211,9 @@ class CompareSubmissionsView(generic.View):
         previous_sac = _get_previous_sac(current_sac)
 
         # Get the accesses for this SAC
-        permissions = _get_comparison_permissions(current_user, current_sac, previous_sac)
+        permissions = _get_comparison_permissions(
+            current_user, current_sac, previous_sac
+        )
 
         show_all_data = _get_show_all_data(
             route=route,
