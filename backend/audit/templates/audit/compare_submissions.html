@@ -8,10 +8,9 @@
         <h1>Resubmission comparison</h1>
         {% if route == "submission" and is_authenticated %}
           {% if is_on_audit %}
-        <p>To assist auditees and auditors in completing the resubmission of audits,
-           the Clearinghouse provides an automated comparison between the previous submission
+        <p>This is an automated comparison between submission
            (<a class="usa-link" href="{% url 'audit:SubmissionProgress' r1 %}">{{ r1 }}</a>)
-           and current submission
+           and it's subsequent submission
            (<a class="usa-link" href="{% url 'audit:SubmissionProgress' r2 %}">{{ r2 }}</a>).
         </p>
         <p>This comparison is not comprehensive; it is a summary of changes detected between sections of the SF-SAC.</p>
