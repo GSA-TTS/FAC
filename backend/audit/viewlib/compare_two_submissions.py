@@ -206,7 +206,7 @@ def _only_in(ks1, ks2, map1, map2, extract_fun, keys):
     res: dict[str, Union[str, list]] = {"status": "changed"}
 
     for k in only_in_1:
-        in_r1.append({"from": None, "to": extract_fun(map1[k]), "key": keys[0]})
+        in_r1.append({"from": extract_fun(map1[k]), "to": None, "key": keys[0]})
     for k in only_in_2:
         in_r2.append({"from": None, "to": extract_fun(map2[k]), "key": keys[0]})
     return in_r1, in_r2, res

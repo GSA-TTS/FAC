@@ -483,7 +483,7 @@ class CompareSubmissionTests(TestCase):
             res,
             {
                 "status": "changed",
-                "in_r1": [{"from": None, "to": 2, "key": "b"}],
+                "in_r1": [{"from": 2, "to": None, "key": "b"}],
                 "in_r2": [{"from": None, "to": 3, "key": "b"}],
                 "in_both": [
                     {"from": "Related to: name, value", "to": "2 difference", "key": 2}
