@@ -310,6 +310,7 @@ class ResubmissionForm(forms.Form):
 
     audit_opinion_changes = forms.CharField(
         required=False,
+        max_length=2048,
         strip=True,
         widget=forms.Textarea(
             attrs={
