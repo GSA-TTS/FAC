@@ -84,16 +84,7 @@ def _get_submissions_show_all_data(permissions):
     if not permissions["is_on_audit"]:
         raise PermissionDenied(SUBMISSION_DENIED_MESSAGE)
 
-    has_private_tribal = permissions["has_private_tribal"]
-    is_on_both_audits = permissions["is_on_both_audits"]
-
-    if has_private_tribal:
-        if is_on_both_audits:
-            return True
-        else:
-            return False
-    else:
-        return True
+    return _can_show_all_data(permissions)
 
 
 def _get_search_show_all_data(sac, permissions):
@@ -106,13 +97,24 @@ def _get_search_show_all_data(sac, permissions):
     Returns:
         bool: True to 'show all data';  False to 'show partial data'
     """
-    has_private_tribal = permissions["has_private_tribal"]
-    is_on_both_audits = permissions["is_on_both_audits"]
     is_on_audit = permissions["is_on_audit"]
     is_public_status = sac.submission_status in PUBLIC_SEARCH_STATUSES
 
     if not is_public_status and not is_on_audit:
         raise PermissionDenied(SEARCH_DENIED_MESSAGE)
+
+    return _can_show_all_data(permissions)
+
+
+def _can_show_all_data(permissions):
+    """
+    Return True when the user can see all data.
+
+    If there is private tribal data, the user must be on both audits.
+    If there is no private tribal data, all visible data can be shown.
+    """
+    has_private_tribal = permissions["has_private_tribal"]
+    is_on_both_audits = permissions["is_on_both_audits"]
 
     if has_private_tribal:
         if is_on_both_audits:
