@@ -101,7 +101,8 @@
                         </p>
                         <div class="display-flex flex-row padding-top-2 tablet-lg:padding-top-0">
                             {% if results_count <= summary_report_download_limit %}
-                                <button class="usa-button display-flex"
+                                <button class="usa-button display-flex download-loading"
+                                        data-spinner-src="{% static 'img/loader.svg' %}"
                                         formaction="{% url 'dissemination:MultipleSummaryReportDownload' %}"
                                         form="audit-search-form">
                                     <svg class="usa-icon margin-right-1 flex-align-self-center"
@@ -296,4 +297,5 @@
        data-open-modal></a>
     <script src="{% static 'compiled/js/search-mobile-orientation.js' %}"></script>
     <script src="{% static 'compiled/js/search-results.js' %}"></script>
-{% endblock content %}
+    <script src="{% static 'compiled/js/download-loading.js' %}"></script>
+    {% endblock content %}

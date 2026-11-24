@@ -388,7 +388,9 @@ ul.usa-error-message {
 }
 
 .cross-validation-loader {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .user-management-td {
