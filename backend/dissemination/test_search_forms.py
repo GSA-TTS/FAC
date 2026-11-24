@@ -40,11 +40,11 @@ class SearchFormTests(TestCase):
         self.assertEqual(
             form.cleaned_data["report_ids"],
             [
-                "2024-03-GSAFAC-0000184920",
                 "2021-07-GSAFAC-0000839201",
+                "2022-09-GSAFAC-0000301948",
                 "2023-11-GSAFAC-0000492817",
                 "2025-01-GSAFAC-0000918273",
-                "2022-09-GSAFAC-0000301948",
+                "2024-03-GSAFAC-0000184920",
             ],
         )
 
@@ -61,9 +61,9 @@ class SearchFormTests(TestCase):
             form.cleaned_data["ueis_and_eins"],
             [
                 "D7A4J33FUMJ1",
-                "NWZLK5MN2YJ6",
-                "NEKQDYH9JHN3",
-                "ZL6YUYB5Z173",
                 "JWD1G65BD2L5",
+                "NEKQDYH9JHN3",
+                "NWZLK5MN2YJ6",
+                "ZL6YUYB5Z173",
             ],
         )

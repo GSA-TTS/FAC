@@ -167,7 +167,9 @@ class SearchForm(forms.Form):
         text_input = self.cleaned_data["ueis_and_eins"]
         text_input = text_input.replace("-", "")
         ueis_and_eins = clean_text_field(text_input)
-        return list(set(ueis_and_eins))
+        unique_ueis_and_eins = list(set(ueis_and_eins))
+        unique_ueis_and_eins.sort()
+        return unique_ueis_and_eins
 
     def clean_ueis_and_eins_z(self):
         return self._clean_compressed_field("ueis_and_eins_z")
@@ -236,7 +238,9 @@ class SearchForm(forms.Form):
         """
         text_input = self.cleaned_data["report_ids"]
         report_ids = clean_text_field(text_input, report_id_delimiters)
-        return list(set(report_ids))
+        unique_report_ids = list(set(report_ids))
+        unique_report_ids.sort()
+        return unique_report_ids
 
     def clean_report_ids_z(self):
         return self._clean_compressed_field("report_ids_z")
@@ -277,8 +281,8 @@ class SearchForm(forms.Form):
 
     def _clean_compressed_field(self, field):
         """
-        Clean up the compressed field. Base64 decode, uncompress, then normal
-        text cleaning.
+        Clean up the compressed field. Base64 decode, uncompress, normal
+        text cleaning, then sort to help with caching.
         """
         compressed_val = self.cleaned_data[field]
 
@@ -289,6 +293,8 @@ class SearchForm(forms.Form):
             raw_bytes = base64.urlsafe_b64decode(padded.encode("ascii"))
             decompressed = zlib.decompress(raw_bytes).decode("utf-8")
             values = clean_text_field(decompressed, report_id_delimiters)
-            return list(set(values))
+            unique_values = list(set(values))
+            unique_values.sort()
+            return unique_values
         except (zlib.error, ValueError):
             return []
