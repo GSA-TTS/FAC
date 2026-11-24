@@ -1,14 +1,16 @@
 var FORM = document.getElementById('audit-search-form');
 const pagination_links = document.querySelectorAll('[aria-label^="Page"]');
 const next_page_link = document.querySelectorAll('[aria-label="Next page"]');
-const search_submit_buttons = document.querySelectorAll('[type="submit"]');
+const search_submit_buttons = document.querySelectorAll(
+  '#audit-search-form input[type="submit"]'
+);
 const previous_page_link = document.querySelectorAll(
   '[aria-label="Previous page"]'
 );
 const loader = document.getElementById(`loader`);
 const search_arrow = document.getElementById(`search_arrow`);
 let isPaginationSubmitting = false;
-
+let isSearchSubmitting = false;
 /**
  * Attach event handlers for the pagination buttons. On click, set the appropriate form inputs and submit it for a reload.
  */
@@ -169,22 +171,24 @@ function attachEventHandlersSorting() {
 }
 
 /**
- * Attach event listeners for form submission.
- * On clicking "Search", disable both search buttons and show the loader instead of the arrow image, then submit.
+ * Attach event listeners to search buttons.
+ * Disable both search buttons and show the loader while searching.
  */
 function attachEventHandlersSubmission() {
   search_submit_buttons.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
 
-    // The first search button is always for searching all of fac.gov, we want to ignore that one hence skipping.
-    if (button.id  === 'fac-search') return;
-
-    button.addEventListener('click', () => {
-      // The arrow won't be there if results were previously populated
+      if (isSearchSubmitting) return;
+      isSearchSubmitting = true;
+      
       if (search_arrow) {
         search_arrow.hidden = true;
       }
 
-      loader.hidden = false;
+      if (loader) {
+        loader.hidden = false;
+      }
 
       search_submit_buttons.forEach((btn) => {
         btn.disabled = true;
