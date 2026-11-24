@@ -148,6 +148,7 @@ class Search(View):
             "results_count": results_count,
             "results": paginator_results,
             "report_ids_display": "\n".join(form_data["report_ids"]),
+            "ueis_and_eins_display": "\n".join(form_data["ueis_and_eins"]),
         }
         time_beginning_render = time.time()
         total_time_ms = int(

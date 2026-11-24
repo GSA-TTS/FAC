@@ -47,3 +47,23 @@ class SearchFormTests(TestCase):
                 "2022-09-GSAFAC-0000301948",
             ],
         )
+
+    def test_clean_ueis_and_eins_z(self):
+        """Ensures that ueis_and_eins_z is parsed and replaces the value of ueis_and_eins"""
+        form = SearchForm(
+            data={
+                "ueis_and_eins_z": "",
+            },
+        )
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual(
+            form.cleaned_data["ueis_and_eins"],
+            [
+                "D7A4J33FUMJ1",
+                "NWZLK5MN2YJ6",
+                "NEKQDYH9JHN3",
+                "ZL6YUYB5Z173",
+                "JWD1G65BD2L5",
+            ],
+        )
