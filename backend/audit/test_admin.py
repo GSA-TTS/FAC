@@ -409,7 +409,7 @@ class TestDeleteFlaggedRecordsAdminAction(TestCase):
     ):
         AUDITEE_UEI = "ABCDHJH74DW7"
         REPORT_ID = "1900-01-GSAFAC-0000000001"
-        UPDATED_AT = "2023-03-01"
+        UPDATED_AT = "2023-03-01 00:00:00+00"
 
         audit = baker.make(
             Audit,

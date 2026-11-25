@@ -206,7 +206,7 @@ def _only_in(ks1, ks2, map1, map2, extract_fun, keys):
     res: dict[str, Union[str, list]] = {"status": "changed"}
 
     for k in only_in_1:
-        in_r1.append({"from": None, "to": extract_fun(map1[k]), "key": keys[0]})
+        in_r1.append({"from": extract_fun(map1[k]), "to": None, "key": keys[0]})
     for k in only_in_2:
         in_r2.append({"from": None, "to": extract_fun(map2[k]), "key": keys[0]})
     return in_r1, in_r2, res
@@ -463,7 +463,18 @@ def are_two_sacs_identical(sac1, sac2):
 # Consider using deepdiff
 # https://miguendes.me/the-best-way-to-compare-two-dictionaries-in-python
 # This walks a JSON tree and finds the differences, and nicely spells them out.
-def compare_report_ids(rid_1, rid_2):
+def compare_report_ids(rid_1, rid_2, show_all_data):
+    """Compare two report IDs.
+
+    Args:
+        rid_1: Report id 1.
+        rid_2: Report id 2.
+        show_all_data (boolean): Exclude tribal data from comparison.
+
+    Returns:
+        dict: Summary of all comparison checklists.
+    """
+
     sac_r1 = report_id_to_sac(rid_1)
     sac_r2 = report_id_to_sac(rid_2)
 
@@ -506,31 +517,33 @@ def compare_report_ids(rid_1, rid_2):
 
     ###############
     # corrective_action_plan
-    res = compare_lists_of_objects(
-        sac_r1,
-        sac_r2,
-        [
-            "corrective_action_plan",
-            "CorrectiveActionPlan",
-            "corrective_action_plan_entries",
-        ],
-        lambda entry: entry["reference_number"],
-    )
-    summary["corrective_action_plan"] = res
+    if show_all_data:
+        res = compare_lists_of_objects(
+            sac_r1,
+            sac_r2,
+            [
+                "corrective_action_plan",
+                "CorrectiveActionPlan",
+                "corrective_action_plan_entries",
+            ],
+            lambda entry: entry["reference_number"],
+        )
+        summary["corrective_action_plan"] = res
 
     ###############
     # findings_text
-    res = compare_lists_of_objects(
-        sac_r1,
-        sac_r2,
-        [
-            "findings_text",
-            "FindingsText",
-            "findings_text_entries",
-        ],
-        lambda entry: entry["reference_number"],
-    )
-    summary["findings_text"] = res
+    if show_all_data:
+        res = compare_lists_of_objects(
+            sac_r1,
+            sac_r2,
+            [
+                "findings_text",
+                "FindingsText",
+                "findings_text_entries",
+            ],
+            lambda entry: entry["reference_number"],
+        )
+        summary["findings_text"] = res
 
     ###############
     # findings_uniform_guidance
@@ -592,17 +605,18 @@ def compare_report_ids(rid_1, rid_2):
 
     ###############
     # notes_to_sefa
-    res = compare_lists_of_objects(
-        sac_r1,
-        sac_r2,
-        [
-            "notes_to_sefa",
-            "NotesToSefa",
-            "notes_to_sefa_entries",
-        ],
-        lambda entry: str(entry["seq_number"]) + ": " + entry["note_title"],
-    )
-    summary["notes_to_sefa"] = res
+    if show_all_data:
+        res = compare_lists_of_objects(
+            sac_r1,
+            sac_r2,
+            [
+                "notes_to_sefa",
+                "NotesToSefa",
+                "notes_to_sefa_entries",
+            ],
+            lambda entry: str(entry["seq_number"]) + ": " + entry["note_title"],
+        )
+        summary["notes_to_sefa"] = res
 
     ###############
     # tribal_data_consent
@@ -624,7 +638,7 @@ def report_id_as_string(o):
         return o
 
 
-def compare_with_prev(rid):
+def compare_with_prev(rid, show_all_data):
     if isinstance(rid, str):
         sac = SingleAuditChecklist.objects.get(report_id=rid)
     elif isinstance(rid, SingleAuditChecklist):
@@ -660,7 +674,7 @@ def compare_with_prev(rid):
         return (
             report_id_as_string(prev),
             report_id_as_string(rid),
-            compare_report_ids(prev, rid),
+            compare_report_ids(prev, rid, show_all_data),
         )
     else:
         return (

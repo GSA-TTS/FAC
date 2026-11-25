@@ -23,7 +23,9 @@ def check_resubmission_has_changes(sac_dict, *_args, **_kwargs):
     except SingleAuditChecklist.DoesNotExist:
         return []
 
-    _, _, compared = compare_two_submissions.compare_with_prev(resub)
+    _, _, compared = compare_two_submissions.compare_with_prev(
+        resub, show_all_data=True
+    )
     has_diff = False
 
     for val in compared.values():
