@@ -6,11 +6,11 @@
     <div class="grid-col grid-gap">
       <div>
         <h1>Resubmission comparison</h1>
-        {% if route == "submission" and is_authenticated %}
-          {% if is_on_audit %}
-        <p>This is an automated comparison between submission
+        {% if route == "submission" and is_on_audit %}
+        <p>To assist auditees and auditors in completing the resubmission of audits,
+           the Clearinghouse provides an automated comparison between the previous submission
            (<a class="usa-link" href="{% url 'audit:SubmissionProgress' r1 %}">{{ r1 }}</a>)
-           and it's subsequent submission
+           and current submission
            (<a class="usa-link" href="{% url 'audit:SubmissionProgress' r2 %}">{{ r2 }}</a>).
         </p>
         <p>This comparison is not comprehensive; it is a summary of changes detected between sections of the SF-SAC.</p>
@@ -22,7 +22,10 @@
             <p class="usa-alert__text">This comparison tool does not absolve submitters from their responsibility to independently validate and assert the correctness of their submission to the FAC.</p>
           </div>
         </section>
-          {% endif %}
+        {% endif %}
+        {% if route == "search" %}
+        <p>This is an automated comparison between submission {{ r1 }} and it's subsequent submission {{ r2 }}.</p>
+        <p>This comparison is not comprehensive; it is a summary of changes detected between sections of the SF-SAC.</p>
         {% endif %}
       </div>
     </div>
@@ -33,10 +36,8 @@
       </div>
     </div>
 
-    {% if route == "submission" and is_authenticated %}
-      {% if is_on_audit %}
+    {% if route == "submission" and is_on_audit %}
     <a class="usa-button margin-bottom-8 margin-top-5" href="{% url 'audit:SubmissionProgress' r2 %}">Return to the submission checklist</a>
-      {% endif %}
     {% endif %}
 </div>
 {% endblock content %}

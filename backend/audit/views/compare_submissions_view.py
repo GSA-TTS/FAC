@@ -127,8 +127,6 @@ def _can_show_all_data(permissions):
 
 def _get_comparison_permissions(user, current_sac, previous_sac):
     """Collect permissions to determine what this user is allowed to see when comparing SACs."""
-    is_auth_user = user.is_authenticated
-
     is_on_current_sac = _user_has_access_to_sac(user, current_sac)
     is_on_previous_sac = _user_has_access_to_sac(user, previous_sac)
 
@@ -139,7 +137,6 @@ def _get_comparison_permissions(user, current_sac, previous_sac):
     is_on_both_audits = is_on_current_sac and is_on_previous_sac
 
     return {
-        "is_auth_user": is_auth_user,
         "has_private_tribal": has_private_tribal,
         "is_on_audit": is_on_current_sac,
         "is_on_both_audits": is_on_both_audits,
@@ -226,7 +223,6 @@ class CompareSubmissionsView(generic.View):
         context = _compare_sac(current_sac, show_all_data)
         context.update(
             {
-                "is_authenticated": permissions["is_auth_user"],
                 "is_on_audit": permissions["is_on_audit"],
                 "route": route,
             }

@@ -354,7 +354,6 @@ class CompareSubmissionsViewTests(TestCase):
         sac_r5 = p.sacs[4]
 
         permissions = _get_comparison_permissions(p.user, sac_r4, sac_r5)
-        self.assertTrue(permissions["is_auth_user"])
         self.assertTrue(permissions["has_private_tribal"])
         self.assertTrue(permissions["is_on_audit"])
 
