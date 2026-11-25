@@ -19,8 +19,13 @@ def clean_text_field(text_input, delimiters=text_input_delimiters):
     """
     for delimiter in delimiters:
         text_input = text_input.replace(delimiter, "\n")
-    text_input = [x.strip() for x in text_input.splitlines()]
-    return text_input
+
+    result = []
+    for x in text_input.splitlines():
+        if x:
+            result.append(x.strip())
+
+    return result
 
 
 class SearchForm(forms.Form):

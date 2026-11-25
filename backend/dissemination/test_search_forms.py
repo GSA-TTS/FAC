@@ -75,3 +75,13 @@ class SearchFormTests(TestCase):
                 "ZL6YUYB5Z173",
             ],
         )
+
+    def test_consecutive_delimiters(self):
+        """Consecutive delimiters should not yield empty string values"""
+        form = SearchForm(data={"ueis_and_eins": "123456789,,987654321"})
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual(
+            form.cleaned_data["ueis_and_eins"],
+            ["123456789", "987654321"],
+        )
