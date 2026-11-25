@@ -147,6 +147,7 @@ class Search(View):
             "page": page,
             "results_count": results_count,
             "results": paginator_results,
+            "alns_display": "\n".join(form_data["alns"]),
             "report_ids_display": "\n".join(form_data["report_ids"]),
             "ueis_and_eins_display": "\n".join(form_data["ueis_and_eins"]),
         }

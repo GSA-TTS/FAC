@@ -28,6 +28,26 @@ class SearchFormTests(TestCase):
             ["123456789", "987654321"],
         )
 
+    def test_clean_alns_z(self):
+        """Ensures that alns_z is parsed and replaces the value of alns"""
+        form = SearchForm(
+            data={
+                "alns_z": "",
+            },
+        )
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual(
+            form.cleaned_data["alns"],
+            [
+                "00.000",
+                "00.006",
+                "00.027",
+                "00.044",
+                "00.045",
+            ],
+        )
+
     def test_clean_report_ids_z(self):
         """Ensures that report_ids_z is parsed and replaces the value of report_ids"""
         form = SearchForm(

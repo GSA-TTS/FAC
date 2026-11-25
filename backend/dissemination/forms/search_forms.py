@@ -93,6 +93,7 @@ class SearchForm(forms.Form):
     # Query params
     cog_over_number = forms.CharField(required=False)
     alns = forms.CharField(required=False)
+    alns_z = forms.CharField(required=False)
     audit_years = forms.MultipleChoiceField(
         choices=audit_year_choices,
         initial=[2023],
@@ -137,7 +138,7 @@ class SearchForm(forms.Form):
     order_by = forms.CharField(required=False)
     order_direction = forms.CharField(required=False)
 
-    COMPRESSED_FIELDS = ["report_ids", "ueis_and_eins"]
+    COMPRESSED_FIELDS = ["alns", "report_ids", "ueis_and_eins"]
 
     def clean(self):
         cleaned_data = super().clean()
@@ -154,7 +155,13 @@ class SearchForm(forms.Form):
         Split on the newlines. Strip all the resulting elements.
         """
         text_input = self.cleaned_data["alns"]
-        return clean_text_field(text_input)
+        alns = clean_text_field(text_input)
+        unique_alns = list(set(alns))
+        unique_alns.sort()
+        return unique_alns
+
+    def clean_alns_z(self):
+        return self._clean_compressed_field("alns_z")
 
     def clean_entity_names(self):
         """

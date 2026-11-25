@@ -222,7 +222,7 @@ async function buildCompressedUrl() {
     for (const [key, value] of formData.entries()) {
       if (!value) continue; // Skip empty fields
 
-      if (["report_ids", "ueis_and_eins"].includes(key)) {
+      if (["alns", "report_ids", "ueis_and_eins"].includes(key)) {
         rawZParams[key] = value.trim();
       } else {
         searchParams.append(key, value);
@@ -233,7 +233,7 @@ async function buildCompressedUrl() {
     for (const [key, rawValue] of Object.entries(rawZParams)) {
       try {
         // Only compress if the string is reasonably long, otherwise keep it readable
-        if (rawValue.length > 125) { // > 125 chars = 5+ report IDs, 13+ EINs, or 10+ UEIs
+        if (rawValue.length > 125) { // > 125 chars = 21+ ALNs, 5+ report IDs, 13+ EINs, or 10+ UEIs
           const zValue = await compressString(rawValue);
           searchParams.set(`${key}_z`, zValue);
         } else {
