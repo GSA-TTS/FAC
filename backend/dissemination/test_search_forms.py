@@ -32,7 +32,7 @@ class SearchFormTests(TestCase):
         """Ensures that alns_z is parsed and replaces the value of alns"""
         form = SearchForm(
             data={
-                "alns_z": "",
+                "alns_z": "eJwzMNAzMDDgUkADBiBhM6zCRuZYhU1MsAubAgCqFg3f",
             },
         )
 
