@@ -1,4 +1,6 @@
+import base64
 from datetime import date
+import zlib
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -17,8 +19,13 @@ def clean_text_field(text_input, delimiters=text_input_delimiters):
     """
     for delimiter in delimiters:
         text_input = text_input.replace(delimiter, "\n")
-    text_input = [x.strip() for x in text_input.splitlines()]
-    return text_input
+
+    result = []
+    for x in text_input.splitlines():
+        if x:
+            result.append(x.strip())
+
+    return result
 
 
 class SearchForm(forms.Form):
@@ -86,6 +93,7 @@ class SearchForm(forms.Form):
     # Query params
     cog_over_number = forms.CharField(required=False)
     alns = forms.CharField(required=False)
+    alns_z = forms.CharField(required=False)
     audit_years = forms.MultipleChoiceField(
         choices=audit_year_choices,
         initial=[2023],
@@ -113,9 +121,11 @@ class SearchForm(forms.Form):
     )
     passthrough_names = forms.CharField(required=False)
     report_ids = forms.CharField(required=False)
+    report_ids_z = forms.CharField(required=False)
     start_date = forms.DateField(required=False)
     type_requirements = forms.CharField(required=False)
     ueis_and_eins = forms.CharField(required=False)
+    ueis_and_eins_z = forms.CharField(required=False)
     resubmissions = forms.ChoiceField(
         choices=resubmissions_choices,
         initial="include",
@@ -128,13 +138,30 @@ class SearchForm(forms.Form):
     order_by = forms.CharField(required=False)
     order_direction = forms.CharField(required=False)
 
+    COMPRESSED_FIELDS = ["alns", "report_ids", "ueis_and_eins"]
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # Replace fields with decompressed versions, when available
+        for field in self.COMPRESSED_FIELDS:
+            z_value = cleaned_data.get(f"{field}_z")
+            if z_value:
+                cleaned_data[field] = z_value
+
     def clean_alns(self):
         """
         Clean up the ALNs field. Replace common separators with a newline.
         Split on the newlines. Strip all the resulting elements.
         """
         text_input = self.cleaned_data["alns"]
-        return clean_text_field(text_input)
+        alns = clean_text_field(text_input)
+        unique_alns = list(set(alns))
+        unique_alns.sort()
+        return unique_alns
+
+    def clean_alns_z(self):
+        return self._clean_compressed_field("alns_z")
 
     def clean_entity_names(self):
         """
@@ -151,7 +178,13 @@ class SearchForm(forms.Form):
         """
         text_input = self.cleaned_data["ueis_and_eins"]
         text_input = text_input.replace("-", "")
-        return clean_text_field(text_input)
+        ueis_and_eins = clean_text_field(text_input)
+        unique_ueis_and_eins = list(set(ueis_and_eins))
+        unique_ueis_and_eins.sort()
+        return unique_ueis_and_eins
+
+    def clean_ueis_and_eins_z(self):
+        return self._clean_compressed_field("ueis_and_eins_z")
 
     def clean_audit_years(self):
         """
@@ -216,7 +249,13 @@ class SearchForm(forms.Form):
         Strip all the resulting elements.
         """
         text_input = self.cleaned_data["report_ids"]
-        return clean_text_field(text_input, report_id_delimiters)
+        report_ids = clean_text_field(text_input, report_id_delimiters)
+        unique_report_ids = list(set(report_ids))
+        unique_report_ids.sort()
+        return unique_report_ids
+
+    def clean_report_ids_z(self):
+        return self._clean_compressed_field("report_ids_z")
 
     def clean_passthrough_names(self):
         """
@@ -251,3 +290,23 @@ class SearchForm(forms.Form):
             return int(self.cleaned_data["limit"] or 30)
         except ValueError:
             raise ValidationError("Limit value is not an integer.")
+
+    def _clean_compressed_field(self, field):
+        """
+        Clean up the compressed field. Base64 decode, uncompress, normal
+        text cleaning, then sort to help with caching.
+        """
+        compressed_val = self.cleaned_data[field]
+
+        # Decode URL-safe Base64, then decompress
+        try:
+            # Restore Base64 `=` padding that was removed for URL compatibility
+            padded = compressed_val + "=" * (-len(compressed_val) % 4)
+            raw_bytes = base64.urlsafe_b64decode(padded.encode("ascii"))
+            decompressed = zlib.decompress(raw_bytes).decode("utf-8")
+            values = clean_text_field(decompressed, report_id_delimiters)
+            unique_values = list(set(values))
+            unique_values.sort()
+            return unique_values
+        except (zlib.error, ValueError):
+            return []

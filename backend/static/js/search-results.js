@@ -173,15 +173,16 @@ function attachEventHandlersSorting() {
 /**
  * Attach event listeners to search buttons.
  * Disable both search buttons and show the loader while searching.
+ * Compress the URL when needed.
  */
 function attachEventHandlersSubmission() {
   search_submit_buttons.forEach((button) => {
-    button.addEventListener('click', (event) => {
+    button.addEventListener('click', async (event) => {
       event.preventDefault();
 
       if (isSearchSubmitting) return;
       isSearchSubmitting = true;
-      
+
       if (search_arrow) {
         search_arrow.hidden = true;
       }
@@ -190,13 +191,101 @@ function attachEventHandlersSubmission() {
         loader.hidden = false;
       }
 
-      search_submit_buttons.forEach((btn) => {
-        btn.disabled = true;
-        btn.value = 'Searching...';
+      // Disable search buttons
+      search_submit_buttons.forEach((button) => {
+        if (button.id === 'fac-search') return;
+        button.disabled = true;
+        button.value = 'Searching...';
       });
 
       FORM.submit();
+
+      await buildCompressedUrl();
     });
+  });
+}
+
+/**
+ * Compresses the URL when many report IDs or UEI/EINs are provided.
+ */
+async function buildCompressedUrl() {
+    const searchForm = document.querySelector('#audit-search-form');
+    if (!searchForm) return;
+
+    // Collect all fields currently in the form
+    const formData = new FormData(searchForm);
+    const searchParams = new URLSearchParams();
+
+    const rawZParams = {};
+
+    // Build standard params and find raw compressible params
+    for (const [key, value] of formData.entries()) {
+      if (!value) continue; // Skip empty fields
+
+      if (["alns", "report_ids", "ueis_and_eins"].includes(key)) {
+        rawZParams[key] = value.trim();
+      } else {
+        searchParams.append(key, value);
+      }
+    }
+
+    // Process the compressible fields
+    for (const [key, rawValue] of Object.entries(rawZParams)) {
+      try {
+        // Only compress if the string is reasonably long, otherwise keep it readable
+        if (rawValue.length > 125) { // > 125 chars = 21+ ALNs, 5+ report IDs, 13+ EINs, or 10+ UEIs
+          const zValue = await compressString(rawValue);
+          searchParams.set(`${key}_z`, zValue);
+        } else {
+          searchParams.set(key, rawValue);
+        }
+      } catch (err) {
+        console.error('Compression failed, falling back to raw param:', err);
+        searchParams.set(key, rawValue);
+      }
+    }
+
+    // Build the final URL and navigate
+    const actionUrl = searchForm.getAttribute('action') || window.location.pathname;
+    const finalUrl = `${actionUrl}?${searchParams.toString()}`;
+
+    window.location.href = finalUrl;
+}
+
+/**
+ * Returns a compressed and URL-safe Base64 version of the given string.
+ */
+async function compressString(str) {
+  const stream = new Blob([str])
+    .stream()
+    .pipeThrough(new CompressionStream('deflate'));
+
+  const buffer = await new Response(stream).arrayBuffer();
+  const binary = String.fromCharCode(...new Uint8Array(buffer));
+
+  // URL-safe Base64 conversion
+  return btoa(binary)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
+/**
+ * Restores the submission UI when the back button is used.
+ */
+function resetSubmissionState() {
+  if (loader) {
+    loader.hidden = true;
+  }
+
+  if (search_arrow) {
+    search_arrow.hidden = false;
+  }
+
+  search_submit_buttons.forEach((button) => {
+    if (button.id === 'fac-search') return;
+    button.disabled = false;
+    button.value = 'Search';
   });
 }
 
@@ -208,3 +297,4 @@ function init() {
 }
 
 window.onload = init;
+window.addEventListener('pageshow', resetSubmissionState);
