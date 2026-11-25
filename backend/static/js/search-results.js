@@ -1,14 +1,16 @@
 var FORM = document.getElementById('audit-search-form');
 const pagination_links = document.querySelectorAll('[aria-label^="Page"]');
 const next_page_link = document.querySelectorAll('[aria-label="Next page"]');
-const search_submit_buttons = document.querySelectorAll('[type="submit"]');
+const search_submit_buttons = document.querySelectorAll(
+  '#audit-search-form input[type="submit"]'
+);
 const previous_page_link = document.querySelectorAll(
   '[aria-label="Previous page"]'
 );
 const loader = document.getElementById(`loader`);
 const search_arrow = document.getElementById(`search_arrow`);
 let isPaginationSubmitting = false;
-
+let isSearchSubmitting = false;
 /**
  * Attach event handlers for the pagination buttons. On click, set the appropriate form inputs and submit it for a reload.
  */
@@ -169,34 +171,42 @@ function attachEventHandlersSorting() {
 }
 
 /**
- * Attach event listeners for form submission.
+ * Attach event listeners to search buttons.
+ * Disable both search buttons and show the loader while searching.
+ * Compress the URL when needed.
  */
 function attachEventHandlersSubmission() {
-  FORM.addEventListener('submit', async () => {
-    // Hide arrow graphic
-    if (search_arrow) {
-      search_arrow.hidden = true;
-    }
+  search_submit_buttons.forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      event.preventDefault();
 
-    // Show loader graphic
-    if (loader) {
-      loader.hidden = false;
-    }
+      if (isSearchSubmitting) return;
+      isSearchSubmitting = true;
 
-    // Disable search buttons
-    search_submit_buttons.forEach((button) => {
-      if (button.id === 'fac-search') return;
-      button.disabled = true;
-      button.value = 'Searching...';
+      if (search_arrow) {
+        search_arrow.hidden = true;
+      }
+
+      if (loader) {
+        loader.hidden = false;
+      }
+
+      // Disable search buttons
+      search_submit_buttons.forEach((button) => {
+        if (button.id === 'fac-search') return;
+        button.disabled = true;
+        button.value = 'Searching...';
+      });
+
+      FORM.submit();
+
+      await buildCompressedUrl();
     });
-
-    // Compress URL
-    await buildCompressedUrl();
   });
 }
 
 /**
- * Compresses the URL when many report_ids are provided.
+ * Compresses the URL when many report IDs or UEI/EINs are provided.
  */
 async function buildCompressedUrl() {
     const searchForm = document.querySelector('#audit-search-form');

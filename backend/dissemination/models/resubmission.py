@@ -72,6 +72,7 @@ class Resubmission(models.Model):
     # Open textfield description of changes to the audit opinion
     audit_opinion_changes = models.TextField(
         "Audit Opinion Changes",
+        max_length=2048,
         null=True,
         blank=True,
     )
